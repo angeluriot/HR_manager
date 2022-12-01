@@ -1,7 +1,7 @@
 {
-	"name": "hr-project-server",
+	"name": "hr-manager-server",
 	"version": "1.0.0",
-	"description": "The back-end part of HR project.",
+	"description": "The back-end part of HR manager.",
 	"type": "module",
 	"scripts": {
 		"start": "ts-node-esm sources/app.ts",
@@ -9,7 +9,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/angeluriot/HR_project.git"
+		"url": "git+https://github.com/angeluriot/HR_manager.git"
 	},
 	"keywords": [
 		"human-resources",
@@ -18,9 +18,9 @@
 	"author": "Angel Uriot",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/angeluriot/HR_project/issues"
+		"url": "https://github.com/angeluriot/HR_manager/issues"
 	},
-	"homepage": "https://github.com/angeluriot/HR_project#readme",
+	"homepage": "https://github.com/angeluriot/HR_manager#readme",
 	"devDependencies": {
 		"nodemon": "^2.0.20"
 	},
