@@ -1,7 +1,19 @@
 import Home from "./lib/views/Home.svelte";
-import Example from "./lib/views/Example.svelte";
+import Statistics from "./lib/views/Statistics.svelte";
+import Requests from "./lib/views/Requests.svelte";
+import NewRequest from "./lib/views/NewRequest.svelte";
+import Notifications from "./lib/views/Notifications.svelte";
+import Account from "./lib/views/Account.svelte";
+import Settings from "./lib/views/Settings.svelte";
+import Login from "./lib/views/Login.svelte";
 
 export const routes = {
 	"/": Home,
-	"/example": Example
+	"/statistics": Statistics,
+	"/requests": Requests,
+	"/requests/new": NewRequest,
+	"/notifications": Notifications,
+	"/account": Account,
+	"/settings": Settings,
+	"/login": Login,
 };

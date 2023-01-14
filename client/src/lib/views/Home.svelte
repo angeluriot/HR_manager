@@ -1,9 +1,10 @@
 <script lang="ts">
+	import Calendar from "../components/Calendar.svelte";
 </script>
 
 <div class="main gap-10">
-	<h1>Home</h1>
-	<a href="/#/example/">example page</a>
+	<h1>Accueil</h1>
+	<Calendar/>
 </div>
 
 <style>

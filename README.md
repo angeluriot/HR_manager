@@ -1,13 +1,15 @@
 # HR Project
 
-## Client :
+## Server :
 ```shell
+$ cd server
 $ npm install
 $ npm run dev
 ```
 
-## Server :
+## Client :
 ```shell
+$ cd client
 $ npm install
 $ npm run dev
 ```
