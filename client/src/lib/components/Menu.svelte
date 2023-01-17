@@ -13,30 +13,37 @@
 
 	const navChange = (item:string) => {
 		activeItem = item;
-		console.log(activeItem);
 	}
 </script>
 
-<nav class="fixed flex flex-col left-0 top-0 justify-start items-start">
-	<span class="text-2xl">PoPS2223</span>
+<nav class="fixed flex flex-col left-0 top-0 justify-start items-start #f1f1f1">
+	<span class="text-2xl">
+    <img src="/img/Logo_Reseau_Polytech.svg" alt="Logo Polytech" style="margin:auto;">
+    <p style="color:#007AFF; font-family:'Times New Roman', Times, serif; font-style: oblique;" >PoPS2223</p>
+  </span>
 	{#each routes as route}
             <a href={route.link} on:click={() => navChange(route.item)} class:active={route.item===activeItem}>
 				{route.item}
 			</a>
-    {/each}
+  {/each}
+  <span style="font-family:'Times New Roman', Times, serif;">Nom Prénom</span>
 </nav>
 
 <style>
 
+span {
+  position: relative;
+  margin: auto;
+}
+
+img {
+  max-width: 50px;
+}
+
 nav {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 200px;
   background-color: #f1f1f1;
   height: 100%; /* Full height */
-  position: fixed; /* Make it stick, even on scroll */
-  overflow: auto; /* Enable scrolling if the sidenav has too much content */
+  gap: 8px;
 }
 
 a {
@@ -44,8 +51,10 @@ a {
   width: 200px;
   color: #000;
   padding: 8px 16px;
+  border-radius: 8px;
   text-align: center;
-  text-decoration: none;
+  text-decoration:none;
+  font-family:'Times New Roman', Times, serif;
 }
 
 /* Change the link color on hover */
@@ -58,4 +67,5 @@ a:hover {
   background-color: #007AFF;
   color: white;
 }
+
 </style>
