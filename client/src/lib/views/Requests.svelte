@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Request from "../components/Request.svelte";
+	import Request from "../components/RequestSansSolde.svelte";
 </script>
 
 <div class="main gap-10">
