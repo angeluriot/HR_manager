@@ -24,28 +24,17 @@
 				{route.item}
 			</a>
     {/each}
-	<!-- <a href="/#/">Accueil</a>
-	<a href="/#/statistics">Statistiques</a>
-	<a href="/#/requests">Demandes</a>
-	<a href="/#/notifications">Notifications</a>
-	<a href="/#/account">Compte</a>
-	<a href="/#/settings">Paramètres</a>
-	<span>Prénom Nom</span> -->
-
-	<!-- {#each items as item}
-            <li on:click={() => dispatch('tabChange',item)}>
-                <div class:active={item===activeItem}>{item}</div>
-            </li>
-    {/each} -->
 </nav>
 
 <style>
+
 nav {
   list-style-type: none;
   margin: 0;
   padding: 0;
   width: 200px;
-  background-color: #f1f1f1;height: 100%; /* Full height */
+  background-color: #f1f1f1;
+  height: 100%; /* Full height */
   position: fixed; /* Make it stick, even on scroll */
   overflow: auto; /* Enable scrolling if the sidenav has too much content */
 }
