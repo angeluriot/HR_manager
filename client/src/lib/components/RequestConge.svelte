@@ -2,31 +2,28 @@
 </script>
 
 
-<form>
-	<div class="form-field">
+<div class = "flex flex-row gap-20">
+	<div>
 		<label for="start">Début</label>
 		<input type="date" id="start">
+		<label for="truc">truc (optionnel)</label>
+		<input type="text" id="truc">
 	</div>
-	<div class="form-field">
+	<div>
 		<label for="end">Fin</label>
 		<input type="date" id="end">
+		<label for="comment">Commentaire (optionnel)</label>
+		<input type="text" id="comment" style="height:100px;">
 	</div>
-	<div class="form-field">
+	<!-- <div class="form-field">
 		<label for="comment">Commentaire (optionnel)</label>
 		<input type="text" id="answer-b">
-	</div>
-</form>
+	</div> -->
+</div>
 
 
 <style>
-form{
-	widows: 400px;
-	margin: 0 auto;
-	text-align: center;
-}
-.form-field{
-	margin: 18px auto;
-}
+
 input{
 	width: 200px;
 	border-radius: 6px;

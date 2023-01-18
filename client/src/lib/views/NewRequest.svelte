@@ -42,7 +42,6 @@
 
 <style>
 
-
 select {
   width: 300px;
   padding: 12px 20px;
