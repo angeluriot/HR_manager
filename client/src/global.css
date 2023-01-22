@@ -10,7 +10,7 @@
 
 html, body, main
 {
-	@apply m-0 p-0 flex flex-col justify-center items-center;
+	@apply m-0 p-0 flex flex-col justify-center;
 	width: 100%;
 	height: 100%;
 }
@@ -22,7 +22,7 @@ body
 
 div
 {
-	@apply flex flex-col justify-center items-center;
+	@apply w-full flex flex-col justify-center items-center;
 }
 
 a

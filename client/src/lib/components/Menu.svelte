@@ -16,7 +16,7 @@
 	}
 </script>
 
-<nav class="fixed flex flex-col left-0 top-0 justify-start items-start #f1f1f1">
+<nav class="relative flex flex-col left-0 top-0 justify-start items-start #f1f1f1">
 	<span class="text-2xl">
     <img src="/img/Logo_Reseau_Polytech.svg" alt="Logo Polytech" style="margin:auto;">
     <p style="color:#007AFF; font-family:'Times New Roman', Times, serif; font-style: oblique;" >PoPS2223</p>

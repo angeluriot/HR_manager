@@ -1,9 +1,9 @@
 <script lang="ts">
-	import RequestMaladie from "../components/RequestMaladie.svelte";
-	import RequestSansSolde from "../components/RequestSansSolde.svelte";
-	import RequestRTT from "../components/RequestRTT.svelte";
-	import RequestTeletravail from "../components/RequestTeletravail.svelte";
-	import RequestConge from "../components/RequestConge.svelte";
+	import DemandeMaladie from "../components/DemandeMaladie.svelte";
+	import DemandeSansSolde from "../components/DemandeSansSolde.svelte";
+	import DemandeRTT from "../components/DemandeRTT.svelte";
+	import DemandeTeletravail from "../components/DemandeTeletravail.svelte";
+	import DemandeConge from "../components/DemandeConge.svelte";
 
 	let requestTypes = ["Congés","Arrêt maladie","RTT","Congés sans solde","Télétravail"];
 	let activeType = " ";
@@ -15,7 +15,7 @@
 	
 </script>
 
-<div class="main gap-10" >
+<div class="w-full gap-10" >
 	<h1>Créer une demande : {activeType}</h1>
 
 	<select>
@@ -26,18 +26,18 @@
 	</select>
 
 	{#if activeType === "Congés"}
-		<RequestConge />
+		<DemandeConge />
 	{:else if activeType === "Arrêt maladie"}
-		<RequestMaladie/>
+		<DemandeMaladie />
 	{:else if activeType === "RTT"}
-		<RequestRTT/>
+		<DemandeRTT />
 	{:else if activeType === "Congés sans solde"}
-		<RequestSansSolde/>
+		<DemandeSansSolde />
 	{:else if activeType === "Télétravail"}
-		<RequestTeletravail/>
+		<DemandeTeletravail />
+	{:else}
+		<a href="/#/requests">Retour</a>
 	{/if}
-
-	<a href="/#/requests">Retour</a>
 </div>
 
 <style>
