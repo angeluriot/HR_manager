@@ -1,5 +1,8 @@
 <script>
+    export let id;
     export let type;
+    export let first_name;
+    export let last_name;
     export let state;
     export let days;
     export let start;
@@ -17,18 +20,23 @@
         <div id="state" style="--color : {colors[2]}">{state}</div>
     </div>
     <div id="body">
-    {#if type == "Télétravail"}
-    <nobr><b>Jours :</b> {#each days as _day}{_day}{/each}</nobr>
-    {/if}
-    <nobr><b>Début :</b> {start} &nbsp; <b>Fin :</b> {end}</nobr>
-    <nobr><b>Commentaires :</b> {comments}</nobr>
+        {#if first_name != ""}
+            <nobr><b>Nom :</b> {last_name} &nbsp; <b>Prénom :</b> {first_name}</nobr>
+        {/if}
+        {#if type == "Télétravail"}
+            <nobr><b>Jours :</b> {#each days as _day}{_day}{/each}</nobr>
+        {/if}
+        <nobr><b>Début :</b> {start} &nbsp; <b>Fin :</b> {end}</nobr>
     </div>
-    <a href="/#/account">
-    <div id="btn-consulting">
-        <PencilSquare />
-        &nbsp; Consulter
+    <div id="footer">
+        <nobr><b>Commentaires :</b> {comments}</nobr>
+        <a href="/#/account">
+        <div id="btn-consulting">
+            <PencilSquare />
+            &nbsp; Consulter
+        </div>
+        </a>
     </div>
-    </a>
 </div>
 
 <style>
@@ -38,7 +46,7 @@
         border-radius: 10px;
         margin: 10px 10px 10px 10px;
         padding: 5px 5px 5px 5px;
-        width: 20vw;
+        width: 30vw;
         text-align: left;
     }
     #header{
@@ -75,5 +83,14 @@
     }
     a{
         text-decoration: none;
+    }
+    #footer{
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding-left: 2em;
+        padding-right: 2em;
+        margin-bottom: 1em;
     }
 </style>
