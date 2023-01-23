@@ -3,7 +3,7 @@
 
 
 <div class = "flex flex-row">
-	<div class = "h-full justify-start">
+	<div class = "h-full w-full justify-start">
 		<label for="début">Début</label>
 		<input type="date" id="début" class = "w-52">
 		<div class = "flex flex-row gap-10 my-2">
@@ -32,7 +32,7 @@
 		</div>
 	</div>
 	<div class = "h-full">
-		<div class = "card h-full w-3/5">
+		<div class = "card h-full !w-3/5">
 			<ul class = "italic font-light">
 			<li>jours acquis : <strong class = "text-[#007AFF]">11</strong></li>
 			<li>jours consommés : <strong class = "text-[#007AFF]">5</strong></li>
@@ -54,32 +54,21 @@
 
 
 <style>
-
-input{
-	border-radius: 6px;
-	background-color: #dcdada79;
+div{
+	@apply w-full;
 }
+input{
+	@apply rounded-md bg-[#dcdada79];
+}
+
 label{
-	margin: 10px auto;
-	text-align: left;
+	@apply my-[10px] text-left;
+}
+
+button{
+	@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
 }
 .card{
-        background: #dcdada79;
-        padding: 3px;
-        border-radius: 6px;
-        box-shadow: 0px 2px 4px rgba(6, 88, 239, 0.42);
+	@apply p-1 bg-[#dcdada79] rounded-md shadow-[0px_2px_4px_rgba(6,88,239,0.42)];
 }
-button{
-        border: 0;
-		width: 200px;
-		height: 40px;
-        cursor: pointer;
-        border-radius: 6px;
-        padding: 8px 12px;
-        font-weight: bold;
-		color: white;
-        box-shadow: 1px 2px 3px rgba(0,0,0,0.2);
-}
-
-
 </style>

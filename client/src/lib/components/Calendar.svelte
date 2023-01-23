@@ -1,7 +1,7 @@
 <script lang="ts">
 </script>
 
-<div>
+<div class = "w-full">
 	<span>Calendrier</span>
 </div>
 

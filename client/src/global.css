@@ -22,7 +22,7 @@ body
 
 div
 {
-	@apply w-full flex flex-col justify-center items-center;
+	@apply flex flex-col justify-center items-center;
 }
 
 a

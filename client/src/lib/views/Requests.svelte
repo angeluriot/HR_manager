@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Request from "../components/DemandeSansSolde.svelte";
+	import Request from "../components/Request.svelte";
 </script>
 
-<div class="main gap-10">
+<div class="main gap-10 w-full">
 	<h1>Demandes</h1>
 	<div class="flex flex-row gap-6">
 		<div class="flex flex-col gap-6">

@@ -16,7 +16,7 @@
 </script>
 
 <div class="w-full gap-10" >
-	<h1>Créer une demande : {activeType}</h1>
+	<h1 class = "text-xl">Créer une demande : {activeType}</h1>
 
 	<select>
 		<option value="">-- Choisir un motif d'absence --</option>
@@ -44,8 +44,8 @@
 
 select {
   width: 300px;
-  padding: 12px 20px;
-  margin: 8px 0;
+  height: 30px;
+  padding: 2px 8px;
   display: inline-block;
   border: 2px solid #007AFF;
   border-radius: 4px;
