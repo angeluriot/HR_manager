@@ -7,9 +7,9 @@
 	import Menu from './lib/components/Menu.svelte';
 </script>
 
-<main>
-	<Router routes={routes}/>
+<main class="absolute flex-row">
 	<Menu/>
+	<Router routes={routes}/>
 </main>
 
 <style>

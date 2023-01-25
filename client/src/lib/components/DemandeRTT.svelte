@@ -2,7 +2,7 @@
 </script>
 
 <div>
-	<span>Demande</span>
+	<span>Demande RTT</span>
 </div>
 
 <style>

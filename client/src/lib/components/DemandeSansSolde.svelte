@@ -1,8 +1,8 @@
 <script lang="ts">
 </script>
 
-<div class="main gap-10 w-full">
-	<h1>Compte</h1>
+<div>
+	<span>Demande sansSolde</span>
 </div>
 
 <style>

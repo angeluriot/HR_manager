@@ -1,7 +1,7 @@
 <script lang="ts">
 </script>
 
-<div class="main gap-10">
+<div class="main gap-10 w-full">
 	<h1>Paramètres</h1>
 </div>
 
