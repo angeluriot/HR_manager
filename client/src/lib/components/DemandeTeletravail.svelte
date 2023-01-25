@@ -76,4 +76,5 @@ label{
 button{
 	@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
 }
+
 </style>

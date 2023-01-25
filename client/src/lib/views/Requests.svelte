@@ -1,28 +1,12 @@
 <script lang="ts">
 	import RequestCard from "../components/RequestCard.svelte";
+	import { Plus } from "svelte-bootstrap-icons";
+    import NewRequest from "./NewRequest.svelte";
 
 	let nb_personal_requests = 7; // From db
 	let nb_incoming_requests = 2; // From db
 
 </script>
-
-<!--
-<div class="main gap-10 w-full">
-	<h1>Demandes</h1>
-	<div class="flex flex-row gap-6">
-		<div class="flex flex-col gap-6">
-			{#each Array(3) as _}
-				<Request/>
-			{/each}
-		</div>
-		<div class="flex flex-col gap-6">
-			{#each Array(3) as _}
-				<Request/>
-			{/each}
-		</div>
-	</div>
-	<a href="/#/requests/new">Nouvelle demande</a>
-</div> -->
 
 <div class="main flex flex-col w-full gap-12">
 	<div class="main flex flex-row gap-12">
@@ -43,12 +27,22 @@
 			</div>
 		</div>
 	</div>
-	<a href="/#/requests/new">Nouvelle demande</a>
+	<button class="bg-[#007AFF]">
+		<!-- <a href="/#/requests/new">Nouvelle demande</a> -->
+		Nouvelle demande
+	</button>
 </div>
 
 <style>
 .list
 {
 	height: 60vh;
+}
+button{
+	@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
+}
+
+button:hover{
+	@apply bg-[#005CC0];
 }
 </style>
