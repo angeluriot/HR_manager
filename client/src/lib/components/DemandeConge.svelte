@@ -52,7 +52,6 @@
 	<button class = "bg-[#007AFF]">SOUMETTRE</button>
 </div>
 
-
 <style>
 div{
 	@apply w-full;

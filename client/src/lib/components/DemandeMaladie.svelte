@@ -1,10 +1,9 @@
 <script lang="ts">
-    function showname () {
-      var name = <HTMLInputElement>document.getElementById('fileInput'); 
-      alert('Selected file: ' + name.files.item(0).name);
-      alert('Selected file: ' + name.files.item(0).size);
-      alert('Selected file: ' + name.files.item(0).type);
-    };
+	let myFile = "";
+    const showname = () => {
+		var input = <HTMLInputElement>document.getElementById("fileID");
+		myFile = input.files[0].name;
+	}
 </script>
 
 
@@ -42,13 +41,14 @@
 			<header>
 				<h4>Importer un justificatif</h4>
 			</header>
-			<p class = "text-[#a3a3a3] text-[12px]">Fichiers acceptés: PDF, TEXT, DOC , DOCX</p>
-			<input type="file" class = "hidden" accept=".doc,.docx,.pdf" id="fileID" name="filename" on:change={ () => showname }>
+			<p class = "text-[#a3a3a3] text-[10px]">Fichiers acceptés: PDF, TEXT, DOC , DOCX</p>
+			<input type="file" class = "hidden" accept=".doc,.docx,.pdf" id="fileID" name="filename" on:change={ () => showname() }>
 			<button class="!w-[100px] !h-[30px] bg-[#007AFF] py-0 text-[10px]" on:click={ () => document.getElementById("fileID").click() }>Parcourir...</button>
+			<p class = "text-[#a3a3a3] text-[10px]">{myFile}</p>
 		</div>	
 	</div>
 </div>
-<div class = "gap-10">
+<div>
 	<label for="commentaire">Commentaire (optionnel)</label>
 	<input type="text" id="commentaire" class = "w-80 h-12">
 </div>
