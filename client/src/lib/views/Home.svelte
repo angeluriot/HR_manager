@@ -9,27 +9,83 @@
 
 	let month_names = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
 
-	var all_absences = [
-		{title: "A. Didot (RTT)", date: new Date(2023, 0, 2), section_date: new Date(2023, 0, 2), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "conge"},
-		{title: "C. Moray (AM)", date: new Date(2023, 0, 2), section_date: new Date(2023, 0, 2), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie"},
-		{title: "T. Truc (AM)", date: new Date(2023, 0, 4), section_date: new Date(2023, 0, 4), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie"},
-		{title: "T. Truc2 (T)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique"},
-		{title: "T. Truc4 (T)", date: new Date(2023, 1, 7), section_date: new Date(2023, 1, 7), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique"},
-		{title: "T. Truc3 (T)", date: new Date(2023, 0, 10), section_date: new Date(2023, 0, 10), duration: 7, section_duration: 7, start_row: 0, start_col: 0, position: -1, type: "physique"}
-	];
-
-	var all_absences_per_week = [];
-
-	var absences = [];
-
 	var is_month_mode = true;
 
 	$:month, year, update_calendar();
 
+	var raw_absences = [
+		{title: "A. Didot (RTT)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "conge"},
+		{title: "C. Moray (AM)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie"},
+		{title: "T. Truc (AM)", date: new Date(2023, 0, 5), section_date: new Date(2023, 0, 5), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie"},
+		{title: "T. Truc2 (T)", date: new Date(2023, 0, 4), section_date: new Date(2023, 0, 4), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique"},
+		{title: "T. Truc4 (T)", date: new Date(2023, 1, 1), section_date: new Date(2023, 1, 1), duration: 30, section_duration: 30, start_row: 0, start_col: 0, position: -1, type: "physique"},
+		{title: "T. Truc3 (T)", date: new Date(2023, 0, 11), section_date: new Date(2023, 0, 11), duration: 7, section_duration: 7, start_row: 0, start_col: 0, position: -1, type: "physique"}
+	];
+
+	var absences_week = [];
+	var absences_week_month = [];
+	var absences = [];
+
+	init_calendar();
+
+	// Initialize all the calendar sections
+	function init_calendar()
+	{
+		// Split all absences into sub-absences to display the sections correctly
+		for (let absence of raw_absences)
+		{
+			let current_duration = absence.duration;
+			let this_section_duration;
+
+			if (absence.section_date.getDay() == 0)
+				absence.section_date = new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + 1);
+
+			else if (absence.section_date.getDay() == 6)
+				absence.section_date = new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + 2);
+
+			let this_section_date = absence.section_date;
+
+			// Split into sub-absences if the sub-absence is longer than a week
+			if (current_duration > 6 - this_section_date.getDay())
+			{
+				while (current_duration > 6 - this_section_date.getDay())
+				{
+					this_section_duration = 6 - this_section_date.getDay();
+					current_duration -= this_section_duration;
+
+					absences_week.push({title: absence.title, date: absence.date, section_date: this_section_date, duration: absence.duration, section_duration: this_section_duration, start_row: 0, start_col: 0, position: -1, type: absence.type});
+					this_section_date = new Date(this_section_date.getFullYear(), this_section_date.getMonth(), this_section_date.getDate() + 8 - this_section_date.getDay());
+				}
+
+				absences_week.push({title: absence.title, date: absence.date, section_date: this_section_date, duration: absence.duration, section_duration: current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type});
+			}
+
+			else
+				absences_week.push(absence);
+		}
+
+		// Split into sub-absences if the sub-absence is longer than a month
+		for (let absence of absences_week)
+		{
+			if (absence.section_duration + absence.section_date.getDate() > new Date(absence.section_date.getFullYear(), absence.section_date.getMonth() + 1, 0).getDate() + 1)
+			{
+				let current_duration = new Date(absence.section_date.getFullYear(), absence.section_date.getMonth() + 1, 0).getDate() - absence.section_date.getDate() + 1;
+				absences_week_month.push({title: absence.title, date: absence.date, section_date: absence.section_date, duration: absence.duration, section_duration: current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type});
+				absences_week_month.push({title: absence.title, date: absence.date, section_date: new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + current_duration), duration: absence.duration, section_duration: absence.section_duration - current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type});
+			}
+
+			else
+				absences_week_month.push(absence);
+		}
+
+		//for (let absence of absences_week_month)
+			//console.log(absence.title + " " + absence.section_duration + " " + absence.section_date);
+	}
+
+	// Update calendar when month is changed
 	function update_calendar()
 	{
 		days = [];
-		all_absences_per_week = [];
 		absences = [];
 
 		var first_day = new Date(year, month, 0).getDay();
@@ -37,58 +93,40 @@
 		var days_in_last_month = new Date(year, month, 0).getDate();
 		var prev_month = month == 0 ? 11 : month - 1;
 
+		// Days from previous month (same week as the first)
 		for (let i = days_in_last_month - first_day; i < days_in_last_month; i++)
 		{
 			let d = new Date(prev_month == 11 ? year - 1 : year, prev_month, i + 1);
 			days.push({name: '' + (i + 1), this_month: false, date: d});
 		}
 
+		// Days from this month
 		for (let i = 0; i < days_in_this_month; i++)
 		{
 			let d = new Date(year, month, i + 1);
 			days.push({name: '' + (i + 1), this_month: true, date: d});
 		}
 
+		// Days from last month (same week as the last)
 		for (let i = 0; days.length % 7; i++)
 		{
 			let d = new Date((month == 11 ? year + 1 : year), (month + 1) % 12, i + 1);
 			days.push({name: ' ' + (i + 1), this_month: false, date: d});
 		}
 
-		for (let absence of all_absences)
-		{
-			let current_duration = absence.duration;
-			let this_section_duration = absence.section_duration;
-			let this_section_date = absence.section_date;
-
-			if (current_duration > 5 - this_section_date.getDay())
-			{
-				while (current_duration > 5 - this_section_date.getDay())
-				{
-					this_section_duration = 5 - this_section_date.getDay();
-					current_duration -= this_section_duration;
-					all_absences_per_week.push({title: absence.title, date: absence.date, section_date: this_section_date, duration: absence.duration, section_duration: this_section_duration, start_row: 0, start_col: 0, position: -1, type: absence.type});
-					this_section_date = new Date(this_section_date.getFullYear(), this_section_date.getMonth(), this_section_date.getDate() + 7 - this_section_date.getDay());
-				}
-
-				all_absences_per_week.push({title: absence.title, date: absence.date, section_date: this_section_date, duration: absence.duration, section_duration: current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type});
-			}
-
-			else
-				all_absences_per_week.push(absence);
-		}
-
-		for (let absence of all_absences_per_week)
+		// Compute the correct rows and columns of the calendar to display each section
+		for (let absence of absences_week_month)
 		{
 			if (absence.section_date.getFullYear() == year && absence.section_date.getMonth() == month)
 			{
-				absence.start_row = Math.floor((absence.section_date.getDate() + first_day) / 7) + 2
-				absence.start_col = (absence.section_date.getDate() + first_day) % 7 + 1;
+				absence.start_row = Math.floor((absence.section_date.getDate() + first_day - 1) / 7) + 2;
+				absence.start_col = (absence.section_date.getDate() + first_day - 1) % 7 + 1;
 
 				absences.push(absence);
 			}
 		}
 
+		// Get a position for each section to avoid overlay
 		for (let a of absences)
 		{
 			let i = 0;
@@ -99,7 +137,7 @@
 				let position_ok = true;
 				for (let b of absences)
 				{
-					if (a.title != b.title && b.position == i && are_overlayed(a.date.getDate(), a.duration, b.date.getDate(), b.duration))
+					if (a.title != b.title && b.position == i && are_overlayed(a.section_date.getDate(), a.duration, b.section_date.getDate(), b.duration))
 					{
 						position_ok = false;
 						break;

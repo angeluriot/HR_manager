@@ -109,6 +109,9 @@
 	.day:nth-of-type(n + 36):nth-of-type(-n + 42) {
 		grid-row: 6;
 	}
+	.day:nth-of-type(n + 43):nth-of-type(-n + 59) {
+		grid-row: 7;
+	}
 	.day:nth-of-type(7n + 1) {
 		grid-column: 1/1;
 		border-right: 0;
