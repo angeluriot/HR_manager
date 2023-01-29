@@ -58,7 +58,7 @@ div{
 	@apply w-full;
 }
 input{
-	@apply rounded-md bg-[#dcdada79];
+	@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
 }
 
 label{

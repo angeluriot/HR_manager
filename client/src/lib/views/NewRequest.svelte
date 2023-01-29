@@ -59,11 +59,9 @@
 
 select {
   width: 300px;
-  height: 30px;
+  height: 35px;
   padding: 2px 8px;
-  display: inline-block;
   border: 2px solid #007AFF;
   border-radius: 4px;
-  box-sizing: border-box;
 }
 </style>
