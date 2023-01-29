@@ -16,7 +16,7 @@
 	}
 
 	const changeDoc = (doc:string) => {
-		activeDoc = doc;
+		activeDoc = "/img/" + doc;
 		console.log(doc);
 		console.log(activeDoc);
 		console.log(document.getElementById("docDisplay").hidden);
