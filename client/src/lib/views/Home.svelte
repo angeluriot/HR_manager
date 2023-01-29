@@ -6,19 +6,27 @@
 	let now = new Date();
 	let year = now.getFullYear();
 	let month = now.getMonth();
+	let day = now.getDate();
+	let day_of_the_week = now.getDay();
+	let this_monday;
+
+	if (day - day_of_the_week > 0)
+		this_monday = day - day_of_the_week;
+	else
+		this_monday = day - day_of_the_week + new Date(year, month, 0).getDate();
 
 	let month_names = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
 
-	var is_month_mode = true;
+	let is_month_mode = true;
 
-	$:month, year, update_calendar();
+	$:is_month_mode, this_monday, month, year, update_calendar();
 
 	var raw_absences = [
 		{title: "A. Didot (RTT)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "conge"},
 		{title: "C. Moray (AM)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie"},
 		{title: "T. Truc (AM)", date: new Date(2023, 0, 5), section_date: new Date(2023, 0, 5), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie"},
 		{title: "T. Truc2 (T)", date: new Date(2023, 0, 4), section_date: new Date(2023, 0, 4), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique"},
-		{title: "T. Truc4 (T)", date: new Date(2023, 1, 1), section_date: new Date(2023, 1, 1), duration: 30, section_duration: 30, start_row: 0, start_col: 0, position: -1, type: "physique"},
+		{title: "T. Truc4 (T)", date: new Date(2023, 0, 30), section_date: new Date(2023, 0, 30), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique"},
 		{title: "T. Truc3 (T)", date: new Date(2023, 0, 11), section_date: new Date(2023, 0, 11), duration: 7, section_duration: 7, start_row: 0, start_col: 0, position: -1, type: "physique"}
 	];
 
@@ -77,9 +85,6 @@
 			else
 				absences_week_month.push(absence);
 		}
-
-		//for (let absence of absences_week_month)
-			//console.log(absence.title + " " + absence.section_duration + " " + absence.section_date);
 	}
 
 	// Update calendar when month is changed
@@ -93,34 +98,49 @@
 		var days_in_last_month = new Date(year, month, 0).getDate();
 		var prev_month = month == 0 ? 11 : month - 1;
 
-		// Days from previous month (same week as the first)
-		for (let i = days_in_last_month - first_day; i < days_in_last_month; i++)
+		if (is_month_mode)
 		{
-			let d = new Date(prev_month == 11 ? year - 1 : year, prev_month, i + 1);
-			days.push({name: '' + (i + 1), this_month: false, date: d});
+			// Days from previous month (same week as the first)
+			for (let i = days_in_last_month - first_day; i < days_in_last_month; i++)
+				days.push({name: '' + (i + 1), this_month: false, date: new Date(prev_month == 11 ? year - 1 : year, prev_month, i + 1)});
+
+			// Days from this month
+			for (let i = 0; i < days_in_this_month; i++)
+				days.push({name: '' + (i + 1), this_month: true, date: new Date(year, month, i + 1)});
+
+			// Days from last month (same week as the last)
+			for (let i = 0; days.length % 7; i++)
+				days.push({name: ' ' + (i + 1), this_month: false, date: new Date((month == 11 ? year + 1 : year), (month + 1) % 12, i + 1)});
 		}
 
-		// Days from this month
-		for (let i = 0; i < days_in_this_month; i++)
+		else
 		{
-			let d = new Date(year, month, i + 1);
-			days.push({name: '' + (i + 1), this_month: true, date: d});
-		}
+			for (let i = 1; i < 8; i++)
+			{
+				if (this_monday + i <= days_in_this_month)
+					days.push({name: ' ' + (this_monday + i), this_month: true, date: new Date(year, month, this_monday + i)});
 
-		// Days from last month (same week as the last)
-		for (let i = 0; days.length % 7; i++)
-		{
-			let d = new Date((month == 11 ? year + 1 : year), (month + 1) % 12, i + 1);
-			days.push({name: ' ' + (i + 1), this_month: false, date: d});
+				else
+					days.push({name: ' ' + (this_monday + i - days_in_this_month), this_month: true, date: new Date(year, month, this_monday + i - days_in_this_month)});
+			}
 		}
 
 		// Compute the correct rows and columns of the calendar to display each section
 		for (let absence of absences_week_month)
 		{
-			if (absence.section_date.getFullYear() == year && absence.section_date.getMonth() == month)
+			if (is_month_mode && absence.section_date.getFullYear() == year && absence.section_date.getMonth() == month)
 			{
 				absence.start_row = Math.floor((absence.section_date.getDate() + first_day - 1) / 7) + 2;
 				absence.start_col = (absence.section_date.getDate() + first_day - 1) % 7 + 1;
+
+				absences.push(absence);
+			}
+
+			else if (!is_month_mode && absence.section_date.getFullYear() == year && absence.section_date.getMonth() == month
+						&& absence.section_date.getDate() > this_monday && absence.section_date.getDate() < this_monday + 5)
+			{
+				absence.start_row = 2;
+				absence.start_col = (absence.section_date.getDate() - this_monday - 1) % 7 + 1;
 
 				absences.push(absence);
 			}
@@ -165,24 +185,66 @@
 
 	function left()
 	{
-		if (month==0)
+		if (is_month_mode)
 		{
-			month=11;
-			year--;
+			if (month == 0)
+			{
+				month = 11;
+				year--;
+			}
+			else
+				month--;
 		}
 		else
-			month--;
+		{
+			let days_in_last_month = new Date(year, month, 0).getDate();
+			this_monday -= 7;
+
+			if (this_monday < 0)
+			{
+				if (month == 0)
+				{
+					month = 11;
+					year--;
+				}
+				else
+					month--;
+
+				this_monday += days_in_last_month;
+			}
+		}
 	}
 
 	function right()
 	{
-		if (month == 11)
+		if (is_month_mode)
 		{
-			month = 0;
-			year++;
+			if (month == 11)
+			{
+				month = 0;
+				year++;
+			}
+			else
+				month++;
 		}
 		else
-			month++;
+		{
+			let days_in_this_month = new Date(year, month + 1, 0).getDate();
+			this_monday += 7;
+
+			if (this_monday > days_in_this_month)
+			{
+				if (month == 11)
+				{
+					month = 0;
+					year++;
+				}
+				else
+					month++;
+
+				this_monday -= days_in_this_month;
+			}
+		}
 	}
 
 	function week_mode()
@@ -235,7 +297,7 @@
 			<button class="months_button" on:click={() => right()}>&gt;</button>
 			<span id="days_info">Nombre de jours de congé : 0 </span>
 		</div>
-		<Calendar day_names = {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]} {days} {absences}/>
+		<Calendar day_names = {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]} {days} {absences} {is_month_mode}/>
 	</div>
 </div>
 
@@ -297,7 +359,7 @@
 	}
 
 	#month_mode_button {
-		left: 125px;
+		left: 115px;
 	}
 
 	#week_mode_button {

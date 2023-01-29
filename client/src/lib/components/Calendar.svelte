@@ -3,6 +3,7 @@
 	export let day_names;
 	export let days;
 	export let absences;
+	export let is_month_mode;
 
 </script>
 
