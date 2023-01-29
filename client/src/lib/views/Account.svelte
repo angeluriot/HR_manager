@@ -17,12 +17,8 @@
 
 	const changeDoc = (doc:string) => {
 		activeDoc = "/img/" + doc;
-		console.log(doc);
-		console.log(activeDoc);
-		console.log(document.getElementById("docDisplay").hidden);
 		if(activeDoc !=""){
-			document.getElementById("docDisplay").hidden = false;
-			console.log(document.getElementById("docDisplay").hidden);
+			document.getElementById("docDisplay").style.display = "block";
 		}
 	}
 
@@ -60,9 +56,6 @@
 	<div class = "card !w-[600px] h-[90%] hidden" id="docDisplay">
 		<embed src={activeDoc} class = "w-full h-full" />
 	</div>
-	
-	<!-- <embed src="img/test.pdf" width="800px" height="2100px" /> -->
-	<!-- <iframe src="img/test.pdf" style="width: 100%;height: 100%;border: none;"></iframe> -->
 </div>
 
 <style>
