@@ -1,4 +1,9 @@
 <script lang="ts">
+	let myFile = "";
+    const showname = () => {
+		var input = <HTMLInputElement>document.getElementById("fileID");
+		myFile = input.files[0].name;
+	}
 </script>
 
 
@@ -32,14 +37,15 @@
 		</div>
 	</div>
 	<div class = "h-full">
-		<div class = "card h-full !w-3/5">
-			<ul class = "italic font-light">
-			<li>jours acquis : <strong class = "text-[#007AFF]">11</strong></li>
-			<li>jours consommés : <strong class = "text-[#007AFF]">5</strong></li>
-			<li>jours restants : <strong class = "text-[#007AFF]">6</strong></li>
-			<li>jours demandés : <strong class = "text-[#007AFF]">3</strong></li>
-			</ul>
-		</div>
+		<div class = "h-full !w-[70%] gap-2 border-dotted border-[#a3a3a3] border-[2px]">
+			<header>
+				<h4>Importer un justificatif</h4>
+			</header>
+			<p class = "text-[#a3a3a3] text-[10px]">Fichiers acceptés: PDF, TEXT, DOC , DOCX</p>
+			<input type="file" class = "hidden" accept=".doc,.docx,.pdf" id="fileID" name="filename" on:change={ () => showname() }>
+			<button class="!w-[100px] !h-[30px] bg-[#007AFF] py-0 text-[10px]" on:click={ () => document.getElementById("fileID").click() }>Parcourir...</button>
+			<p class = "text-[#a3a3a3] text-[10px]">{myFile}</p>
+		</div>	
 	</div>
 </div>
 <div>
@@ -58,7 +64,7 @@ div{
 	@apply w-full;
 }
 input{
-	@apply rounded-md bg-[#dcdada79];
+	@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
 }
 
 label{
