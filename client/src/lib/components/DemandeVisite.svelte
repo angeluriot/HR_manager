@@ -1,31 +1,19 @@
 <script lang="ts">
-
-	let color1 = "#007AFF";
-	let color2 = "#555";
-
-	const flipColor = () => {
-		let tmp = color1;
-		color1 = color2;
-		color2 = tmp;
-	}
-
 </script>
 
-<div class = "gap-8">
-	<div class = "flex flex-row gap-32">
-		<div class = "!w-[30%]">
-			<button id = "ponctuel" 
-				class = "!h-[30px] w-[150] !rounded-[25px] !py-0 bg-[{color1}]" 
-				on:click={() => flipColor()}>ponctuel</button>
+<div class = "gap-6">
+	<div class = "flex flex-row">
+		<div class = "w-full">
+			<label for="commentaire">Motif de la viste</label>
+			<input type="text" id="motif" class = "w-80">
 		</div>
-		<div class = "!w-[30%]">
-			<button id = "répétition" 
-				class = "!h-[30px] w-[150] !rounded-[25px] !py-0 bg-[{color2}]"
-				on:click={() => flipColor()}>répétition</button>
-		</div>
+		<div class = "w-full">
+			<label for="commentaire">Lieu de la visite</label>
+			<input type="text" id="lieu" class = "w-80">
+		</div>	
 	</div>
-	<div class = "flex flex-row gap-32">
-		<div class = "h-full !w-[30%] justify-start">
+	<div class = "flex flex-row">
+		<div class = "h-full w-full justify-start">
 			<label for="début">Début</label>
 			<input type="date" id="début" class = "w-52">
 			<div class = "flex flex-row gap-10 my-2">
@@ -39,7 +27,7 @@
 				</span>
 			</div>
 		</div>
-		<div class = "h-full !w-[30%] justify-start">
+		<div class = "h-full justify-start">
 			<label for="fin">Fin</label>
 			<input type="date" id="fin" class = "w-52">
 			<div class = "flex flex-row gap-10 my-2">
@@ -69,7 +57,6 @@
 div{
 	@apply w-full;
 }
-
 input{
 	@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
 }
@@ -80,5 +67,8 @@ label{
 
 button{
 	@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
+}
+.card{
+	@apply p-1 bg-[#dcdada79] rounded-md shadow-[0px_2px_4px_rgba(6,88,239,0.42)];
 }
 </style>
