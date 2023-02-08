@@ -22,12 +22,13 @@
 	$:is_month_mode, this_monday, month, year, update_calendar();
 
 	var raw_absences = [
-		{title: "A. Didot (RTT)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "conge"},
-		{title: "C. Moray (AM)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie"},
-		{title: "T. Truc (AM)", date: new Date(2023, 0, 5), section_date: new Date(2023, 0, 5), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie"},
-		{title: "T. Truc2 (T)", date: new Date(2023, 0, 4), section_date: new Date(2023, 0, 4), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique"},
-		{title: "T. Truc4 (T)", date: new Date(2023, 0, 30), section_date: new Date(2023, 0, 30), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique"},
-		{title: "T. Truc3 (T)", date: new Date(2023, 0, 11), section_date: new Date(2023, 0, 11), duration: 7, section_duration: 7, start_row: 0, start_col: 0, position: -1, type: "physique"}
+		{title: "A. Didot (RTT)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "conge", shown: true},
+		{title: "C. Moray (AM)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie", shown: true},
+		{title: "T. Truc (AM)", date: new Date(2023, 0, 5), section_date: new Date(2023, 0, 5), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie", shown: true},
+		{title: "T. Truc2 (T)", date: new Date(2023, 0, 4), section_date: new Date(2023, 0, 4), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true},
+		{title: "T. Truc4 (T)", date: new Date(2023, 0, 30), section_date: new Date(2023, 0, 30), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true},
+		{title: "T. Truc3 (T)", date: new Date(2023, 0, 11), section_date: new Date(2023, 0, 11), duration: 7, section_duration: 7, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true},
+		{title: "T. Truc5 (T)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true}
 	];
 
 	var absences_week = [];
@@ -61,11 +62,11 @@
 					this_section_duration = 6 - this_section_date.getDay();
 					current_duration -= this_section_duration;
 
-					absences_week.push({title: absence.title, date: absence.date, section_date: this_section_date, duration: absence.duration, section_duration: this_section_duration, start_row: 0, start_col: 0, position: -1, type: absence.type});
+					absences_week.push({title: absence.title, date: absence.date, section_date: this_section_date, duration: absence.duration, section_duration: this_section_duration, start_row: 0, start_col: 0, position: -1, type: absence.type, shown: true});
 					this_section_date = new Date(this_section_date.getFullYear(), this_section_date.getMonth(), this_section_date.getDate() + 8 - this_section_date.getDay());
 				}
 
-				absences_week.push({title: absence.title, date: absence.date, section_date: this_section_date, duration: absence.duration, section_duration: current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type});
+				absences_week.push({title: absence.title, date: absence.date, section_date: this_section_date, duration: absence.duration, section_duration: current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type, shown: true});
 			}
 
 			else
@@ -78,8 +79,8 @@
 			if (absence.section_duration + absence.section_date.getDate() > new Date(absence.section_date.getFullYear(), absence.section_date.getMonth() + 1, 0).getDate() + 1)
 			{
 				let current_duration = new Date(absence.section_date.getFullYear(), absence.section_date.getMonth() + 1, 0).getDate() - absence.section_date.getDate() + 1;
-				absences_week_month.push({title: absence.title, date: absence.date, section_date: absence.section_date, duration: absence.duration, section_duration: current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type});
-				absences_week_month.push({title: absence.title, date: absence.date, section_date: new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + current_duration), duration: absence.duration, section_duration: absence.section_duration - current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type});
+				absences_week_month.push({title: absence.title, date: absence.date, section_date: absence.section_date, duration: absence.duration, section_duration: current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type, shown: true});
+				absences_week_month.push({title: absence.title, date: absence.date, section_date: new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + current_duration), duration: absence.duration, section_duration: absence.section_duration - current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type, shown: true});
 			}
 
 			else
@@ -151,26 +152,37 @@
 		{
 			let i = 0;
 			let position_found = false;
+			a.shown = true;
 
-			while (!(position_found) && i < 3)
+			while (!(position_found))
 			{
-				let position_ok = true;
-				for (let b of absences)
+				if (i > 2 && is_month_mode)
 				{
-					if (a.title != b.title && b.position == i && are_overlayed(a.section_date.getDate(), a.duration, b.section_date.getDate(), b.duration))
-					{
-						position_ok = false;
-						break;
-					}
-				}
-
-				if (position_ok)
-				{
+					a.shown = false;
 					position_found = true;
-					a.position = i;
+					break;
 				}
 
-				i++;
+				else
+				{
+					let position_ok = true;
+					for (let b of absences)
+					{
+						if (a.title != b.title && b.position == i && are_overlayed(a.section_date.getDate(), a.duration, b.section_date.getDate(), b.duration))
+						{
+							position_ok = false;
+							break;
+						}
+					}
+
+					if (position_ok)
+					{
+						position_found = true;
+						a.position = i;
+					}
+
+					i++;
+				}
 			}
 		}
 	}
@@ -185,6 +197,8 @@
 
 	function left()
 	{
+		let days_in_last_month = new Date(year, month, 0).getDate();
+
 		if (is_month_mode)
 		{
 			if (month == 0)
@@ -194,10 +208,13 @@
 			}
 			else
 				month--;
+
+			this_monday += days_in_last_month;
+			while (this_monday > 6)
+				this_monday -= 7;
 		}
 		else
 		{
-			let days_in_last_month = new Date(year, month, 0).getDate();
 			this_monday -= 7;
 
 			if (this_monday < 0)
@@ -217,6 +234,8 @@
 
 	function right()
 	{
+		let days_in_this_month = new Date(year, month + 1, 0).getDate();
+
 		if (is_month_mode)
 		{
 			if (month == 11)
@@ -226,10 +245,13 @@
 			}
 			else
 				month++;
+
+			this_monday -= days_in_this_month;
+			while (this_monday < 0)
+				this_monday += 7;
 		}
 		else
 		{
-			let days_in_this_month = new Date(year, month + 1, 0).getDate();
 			this_monday += 7;
 
 			if (this_monday > days_in_this_month)
@@ -287,19 +309,37 @@
 </script>
 
 <div id="container" class="main gap-10">
-	<div class="calendar">
-		<div class="calendar_header">
-			<input type="button" on:click={() => week_mode()} class="mode_button" id="week_mode_button" value="Semaines">
-			<input type="button" on:click={() => month_mode()} class="mode_button_checked" id="month_mode_button" value="Mois">
+	<div id="calendar_container" class="main gap-10">
+		<div class="calendar">
+			<div class="calendar_header">
+				<input type="button" on:click={() => week_mode()} class="mode_button" id="week_mode_button" value="Semaines">
+				<input type="button" on:click={() => month_mode()} class="mode_button_checked" id="month_mode_button" value="Mois">
 
-			<button class="months_button" on:click={() => left()}>&lt;</button>
-			<h1 id="titre">{month_names[month] + ' ' + year}</h1>
-			<button class="months_button" on:click={() => right()}>&gt;</button>
-			<span id="days_info">Nombre de jours de congé : 0 </span>
+				<button class="months_button" on:click={() => left()}>&lt;</button>
+				<h1 id="titre">{month_names[month] + ' ' + year}</h1>
+				<button class="months_button" on:click={() => right()}>&gt;</button>
+				<span id="days_info">Nombre de jours de congé : 0 </span>
+			</div>
+			<Calendar day_names = {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]} {days} {absences} {is_month_mode}/>
 		</div>
-		<Calendar day_names = {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]} {days} {absences} {is_month_mode}/>
+	</div>
+	<div class="side_menu">
+		<button class="request_button" on:click={() => window.location.href="/#/requests"}>Nouvelle demande</button>
+		<div class="legend">
+			<div class="dots_column">
+				<span id="green_dot" class="dot"></span>
+				<span id="red_dot" class="dot"></span>
+				<span id="blue_dot" class="dot"></span>
+				<span id="gray_dot" class="dot"></span>
+			</div>
+			<span class="legend_text">Congé (congé payé, RTT...)<br>
+			Maladie (accident, arrêt maladie...)<br>
+			Absence physique (télétravail, formation...)<br>
+			Demande en cours</span>
+		</div>
 	</div>
 </div>
+
 
 <style>
 	.calendar {
@@ -350,12 +390,73 @@
 		font-size: 25px;
 	}
 
+	.request_button {
+		position: relative;
+		flex-direction: row;
+		display: flex;
+
+		right: 20%;
+		font-size: 20px;
+		color: white;
+		background: #007AFF;
+		border-radius: 14px;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+
+	.side_menu {
+		position: relative;
+		flex-direction: column;
+		display: flex;
+		align-content: left;
+		bottom: 26%;
+	}
+
+	.legend {
+		position: relative;
+		flex-direction: row;
+		display: flex;
+	}
+
+	.dots_column {
+		position: relative;
+		flex-direction: column;
+		display: flex;
+		top: 4px;
+	}
+
+	.dot {
+		position: relative;
+		height: 25px;
+		width: 25px;
+		border-radius: 50%;
+		display: inline-block;
+		margin-top: 7px;
+	}
+
+	.legend_text {
+		position: relative;
+		padding-top: 15px;
+		text-align: left;
+		line-height: 200%;
+		left: 5%;
+	}
+
 	#container {
+		position: relative;
+		flex-direction: row;
+		display: flex;
+	}
+
+	#calendar_container {
 		position: relative;
 		flex-direction: column;
 		display: flex;
 		height: 100vh;
 		margin-left: 300px;
+		right: 0%;
 	}
 
 	#month_mode_button {
@@ -374,5 +475,21 @@
 
 	#titre {
 		color: #09244B;
+	}
+
+	#green_dot {
+		background-color: #0AD442;
+	}
+
+	#red_dot {
+		background-color: #F62942;
+	}
+
+	#blue_dot {
+		background-color: #1640D4;
+	}
+
+	#gray_dot {
+		background-color: #AEB4C3;
 	}
 </style>

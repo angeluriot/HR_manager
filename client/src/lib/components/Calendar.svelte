@@ -5,6 +5,11 @@
 	export let absences;
 	export let is_month_mode;
 
+	function show_popup_info(absence)
+	{
+
+	}
+
 </script>
 
 <div class="calendar_content">
@@ -21,9 +26,11 @@
 	{/each}
 
 	{#each absences as absence}
-		<section class="absence_section {absence.type}" style="grid-row: {absence.start_row}; grid-column: {absence.start_col} / span {absence.section_duration}; top: {absence.position * 25 - 5}px">
-			<span class="absence_title">{absence.title}</span>
-		</section>
+		{#if absence.shown}
+			<section class="absence_section {absence.type}" on:keydown={() => show_popup_info(absence)} style="grid-row: {absence.start_row}; grid-column: {absence.start_col} / span {absence.section_duration}; top: {absence.position * 25 - 5}px">
+				<span class="absence_title">{absence.title}</span>
+			</section>
+		{/if}
 	{/each}
 </div>
 
