@@ -7,7 +7,16 @@
 
 	function show_popup_info(absence)
 	{
+		var popup = document.getElementById("info_popup");
+		document.getElementById("info_popup_close").style.visibility = "visible";
+  		popup.style.visibility = "visible";
+		popup.textContent = "test";
+	}
 
+	function hide_popup_info()
+	{
+		document.getElementById("info_popup").style.visibility = "hidden";
+		document.getElementById("info_popup_close").style.visibility = "hidden";
 	}
 
 </script>
@@ -27,11 +36,16 @@
 
 	{#each absences as absence}
 		{#if absence.shown}
-			<section class="absence_section {absence.type}" on:keydown={() => show_popup_info(absence)} style="grid-row: {absence.start_row}; grid-column: {absence.start_col} / span {absence.section_duration}; top: {absence.position * 25 - 5}px">
+			<section class="absence_section {absence.type}" on:click={() => show_popup_info(absence)} style="grid-row: {absence.start_row}; grid-column: {absence.start_col} / span {absence.section_duration}; top: {absence.position * 25 - 5}px">
 				<span class="absence_title">{absence.title}</span>
 			</section>
 		{/if}
 	{/each}
+
+	<div class="popup_box">
+		<span class="popup" id="info_popup">test</span>
+		<button class="btn_close_popup" id="info_popup_close" on:click={() => hide_popup_info()}>X</button>
+	</div>
 </div>
 
 <style>
@@ -92,6 +106,32 @@
 
 	.not_this_month {
 		color: #D3DDE7;
+	}
+
+	.popup_box {
+		position: absolute;
+		z-index: 2;
+		padding: 8px 0;
+		left: 80%;
+	}
+
+	.popup {
+		position: relative;
+		visibility: hidden;
+		width: 240px;
+		height: 240px;
+		border: 1px solid black;
+		color: black;
+		background-color: white;
+		text-align: center;
+		border-radius: 6px;
+	}
+
+	.btn_close_popup {
+		visibility: hidden;
+		position: absolute;
+		padding-left: 210px;
+		padding-bottom: 210px;
 	}
 
 	.day:nth-of-type(n + 1):nth-of-type(-n + 7) {

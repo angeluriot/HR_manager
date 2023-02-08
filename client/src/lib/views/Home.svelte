@@ -24,11 +24,11 @@
 	var raw_absences = [
 		{title: "A. Didot (RTT)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "conge", shown: true},
 		{title: "C. Moray (AM)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie", shown: true},
-		{title: "T. Truc (AM)", date: new Date(2023, 0, 5), section_date: new Date(2023, 0, 5), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie", shown: true},
-		{title: "T. Truc2 (T)", date: new Date(2023, 0, 4), section_date: new Date(2023, 0, 4), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true},
-		{title: "T. Truc4 (T)", date: new Date(2023, 0, 30), section_date: new Date(2023, 0, 30), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true},
-		{title: "T. Truc3 (T)", date: new Date(2023, 0, 11), section_date: new Date(2023, 0, 11), duration: 7, section_duration: 7, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true},
-		{title: "T. Truc5 (T)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true}
+		{title: "D. Hopol (AM)", date: new Date(2023, 0, 5), section_date: new Date(2023, 0, 5), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie", shown: true},
+		{title: "A. Bertrand (T)", date: new Date(2023, 0, 4), section_date: new Date(2023, 0, 4), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true},
+		{title: "E. Tessier (T)", date: new Date(2023, 0, 30), section_date: new Date(2023, 0, 30), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true},
+		{title: "F. Guilbault (T)", date: new Date(2023, 0, 11), section_date: new Date(2023, 0, 11), duration: 7, section_duration: 7, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true},
+		{title: "G. Evian (T)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true}
 	];
 
 	var absences_week = [];
@@ -320,10 +320,10 @@
 				<button class="months_button" on:click={() => right()}>&gt;</button>
 				<span id="days_info">Nombre de jours de congé : 0 </span>
 			</div>
-			<Calendar day_names = {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]} {days} {absences} {is_month_mode}/>
+			<Calendar day_names={["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]} {days} {absences} {is_month_mode}/>
 		</div>
 	</div>
-	<div class="side_menu">
+	<div id="side_menu">
 		<button class="request_button" on:click={() => window.location.href="/#/requests"}>Nouvelle demande</button>
 		<div class="legend">
 			<div class="dots_column">
@@ -395,7 +395,7 @@
 		flex-direction: row;
 		display: flex;
 
-		right: 20%;
+		right: 65px;
 		font-size: 20px;
 		color: white;
 		background: #007AFF;
@@ -404,14 +404,6 @@
 		padding-bottom: 10px;
 		padding-left: 15px;
 		padding-right: 15px;
-	}
-
-	.side_menu {
-		position: relative;
-		flex-direction: column;
-		display: flex;
-		align-content: left;
-		bottom: 26%;
 	}
 
 	.legend {
@@ -440,8 +432,8 @@
 		position: relative;
 		padding-top: 15px;
 		text-align: left;
-		line-height: 200%;
-		left: 5%;
+		line-height: 32px;
+		left: 15px;
 	}
 
 	#container {
@@ -456,7 +448,15 @@
 		display: flex;
 		height: 100vh;
 		margin-left: 300px;
-		right: 0%;
+	}
+
+	#side_menu {
+		position: relative;
+		flex-direction: column;
+		display: flex;
+		align-content: left;
+		bottom: 240px;
+		margin: auto;
 	}
 
 	#month_mode_button {
