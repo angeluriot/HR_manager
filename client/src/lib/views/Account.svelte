@@ -16,10 +16,13 @@
 	}
 
 	const changeDoc = (doc:string) => {
-		activeDoc = "/img/" + doc;
-		if(activeDoc !=""){
+		if (doc !=""){
+			activeDoc = "/img/" + doc;
 			document.getElementById("docDisplay").style.display = "block";
 		}
+		else{
+			document.getElementById("docDisplay").style.display = "none";
+		}		
 	}
 
 </script>
@@ -46,7 +49,7 @@
 		</div>
 
 		<select class = "w-[300px] h-[35px] py-[2px] px-2 border-[2px] border-[#007AFF] rounded-[4px]">
-			<option value="">-- mes documents --</option>
+			<option value="" on:click={() => changeDoc("")}>-- mes documents --</option>
 			{#each docs as doc}
 				<option value={doc} on:click={() => changeDoc(doc)}>{doc}</option>
 			{/each}
