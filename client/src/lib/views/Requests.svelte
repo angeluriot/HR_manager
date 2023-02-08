@@ -27,10 +27,11 @@
 			</div>
 		</div>
 	</div>
+	<a href="/#/requests/new">
 	<button class="bg-[#007AFF]">
-		<!-- <a href="/#/requests/new">Nouvelle demande</a> -->
 		Nouvelle demande
 	</button>
+	</a>
 </div>
 
 <style>
