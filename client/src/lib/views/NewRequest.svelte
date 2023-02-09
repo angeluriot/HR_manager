@@ -10,7 +10,7 @@
 	import DemandeVisite from "../components/DemandeVisite.svelte";
 	import { onMount } from "svelte";
 	import Global from "../shared/Global.js";
-	import Menu from '../components/Menu.svelte';
+	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
 
 	let unique = {};

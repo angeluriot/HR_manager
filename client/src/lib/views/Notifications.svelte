@@ -2,7 +2,7 @@
 	import Notification from "../components/Notification.svelte";
 	import { onMount } from "svelte";
 	import Global from "../shared/Global.js";
-	import Menu from '../components/Menu.svelte';
+	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
 
 	let unique = {};

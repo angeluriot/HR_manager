@@ -1,5 +1,4 @@
-/.vscode/*
-/!.vscode/extensions.json
+/.vscode
 /perso
 
 /client/logs
@@ -25,3 +24,5 @@
 /server/node_modules
 /server/package-lock.json
 /server/.env
+/server/resources/photos/*
+!/server/resources/photos/default.jpg
