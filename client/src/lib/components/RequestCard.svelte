@@ -29,7 +29,7 @@
 	</div>
 	<div id="footer">
 		<nobr><b>Commentaires :</b> {comments}</nobr>
-		<a href="/#/account">
+		<a href="#/account">
 		<div id="btn-consulting">
 			<PencilSquare />
 			&nbsp; Consulter

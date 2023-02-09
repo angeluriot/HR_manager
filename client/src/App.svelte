@@ -4,11 +4,9 @@
 	import './global.css';
 	import Router from 'svelte-spa-router';
 	import { routes } from './routes.js';
-	import Menu from './lib/components/Menu.svelte';
 </script>
 
-<main class="absolute flex-row">
-	<Menu/>
+<main>
 	<Router routes={routes}/>
 </main>
 

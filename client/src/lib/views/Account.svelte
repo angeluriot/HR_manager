@@ -1,4 +1,25 @@
 <script lang="ts">
+	import { onMount } from "svelte";
+	import Global from "../shared/Global.js";
+	import Menu from '../components/Menu.svelte';
+	import * as Server from "../shared/server.js";
+
+	let unique = {};
+
+	function restart()
+	{
+		unique = {}
+	}
+
+	onMount(async () =>
+	{
+		if (!Global.user)
+		{
+			await Server.auto_login();
+			restart();
+		}
+	});
+
 	// A remplacer par le contenu de la BDD
 	let name = "Nom";
 	let firstname = "Prénom";
@@ -26,39 +47,42 @@
 	}
 </script>
 
-<div class="flex flex-row gap-6 w-full">
-	<div class = "card gap-4 !w-2/5 h-[90%]">
-		<img src={profilePic} alt="Avatar" class = "rounded-xl w-32 h-32">
-		<div>
-			<h1> {name} {firstname}</h1>
-			<p> Date de naissance : {birthDate}</p>
-		</div>
-		<div>
-			<h2 class = "text-lg font-semibold">Service : {department}</h2>
-			<p> Poste : {position}</p>
-			<p> mail : <a href={mail}>{mail}</a> </p>
+{#key unique}
+	<Menu active="Compte"/>
+	<div class="flex flex-row gap-6 w-full">
+		<div class = "card gap-4 !w-2/5 h-[90%]">
+			<img src={profilePic} alt="Avatar" class = "rounded-xl w-32 h-32">
+			<div>
+				<h1> {name} {firstname}</h1>
+				<p> Date de naissance : {birthDate}</p>
+			</div>
+			<div>
+				<h2 class = "text-lg font-semibold">Service : {department}</h2>
+				<p> Poste : {position}</p>
+				<p> mail : <a href={mail}>{mail}</a> </p>
+			</div>
+
+			<div>
+				<label for="pass">Mot de passe</label>
+				<input type="password" name="password" id="pass" minlength="8" required value = {password}>
+				<button class = "!h-[30px] w-[100] my-3 !rounded-[25px] !py-0 bg-[#007AFF]"
+						on:click={() => changePassword()} >modifier
+				</button>
+			</div>
+
+			<select class = "w-[300px] h-[35px] py-[2px] px-2 border-[2px] border-[#007AFF] rounded-[4px]">
+				<option value="" on:click={() => changeDoc("")}>-- mes documents --</option>
+				{#each docs as doc}
+					<option value={doc} on:click={() => changeDoc(doc)}>{doc}</option>
+				{/each}
+			</select>
 		</div>
 
-		<div>
-			<label for="pass">Mot de passe</label>
-			<input type="password" name="password" id="pass" minlength="8" required value = {password}>
-			<button class = "!h-[30px] w-[100] my-3 !rounded-[25px] !py-0 bg-[#007AFF]"
-					on:click={() => changePassword()} >modifier
-			</button>
+		<div class = "card !w-[600px] h-[90%] hidden" id="docDisplay">
+			<embed src={activeDoc} class = "w-full h-full" />
 		</div>
-
-		<select class = "w-[300px] h-[35px] py-[2px] px-2 border-[2px] border-[#007AFF] rounded-[4px]">
-			<option value="" on:click={() => changeDoc("")}>-- mes documents --</option>
-			{#each docs as doc}
-				<option value={doc} on:click={() => changeDoc(doc)}>{doc}</option>
-			{/each}
-		</select>
 	</div>
-
-	<div class = "card !w-[600px] h-[90%] hidden" id="docDisplay">
-		<embed src={activeDoc} class = "w-full h-full" />
-	</div>
-</div>
+{/key}
 
 <style>
 	input{

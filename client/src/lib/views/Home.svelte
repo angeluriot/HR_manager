@@ -1,5 +1,25 @@
 <script lang="ts">
 	import Calendar from "../components/Calendar.svelte";
+	import { onMount } from "svelte";
+	import Global from "../shared/Global.js";
+	import Menu from '../components/Menu.svelte';
+	import * as Server from "../shared/server.js";
+
+	let unique = {};
+
+	function restart()
+	{
+		unique = {}
+	}
+
+	onMount(async () =>
+	{
+		if (!Global.user)
+		{
+			await Server.auto_login();
+			restart();
+		}
+	});
 
 	let days = [];
 	let now = new Date();
@@ -304,40 +324,42 @@
 		week_mode_button.style.left = "20px";
 		month_mode_button.style.left = "115px";
 	}
-
 </script>
 
-<div id="container" class="main gap-10">
-	<div id="calendar_container" class="main gap-10">
-		<div class="calendar">
-			<div class="calendar_header">
-				<input type="button" on:click={() => week_mode()} class="mode_button" id="week_mode_button" value="Semaines">
-				<input type="button" on:click={() => month_mode()} class="mode_button_checked" id="month_mode_button" value="Mois">
+{#key unique}
+	<Menu active="Accueil"/>
+	<div id="container" class="main gap-10">
+		<div id="calendar_container" class="main gap-10">
+			<div class="calendar">
+				<div class="calendar_header">
+					<input type="button" on:click={() => week_mode()} class="mode_button" id="week_mode_button" value="Semaines">
+					<input type="button" on:click={() => month_mode()} class="mode_button_checked" id="month_mode_button" value="Mois">
 
-				<button class="months_button" on:click={() => left()}>&lt;</button>
-				<h1 id="titre">{month_names[month] + ' ' + year}</h1>
-				<button class="months_button" on:click={() => right()}>&gt;</button>
-				<span id="days_info">Nombre de jours de congé : 0 </span>
+					<button class="months_button" on:click={() => left()}>&lt;</button>
+					<h1 id="titre">{month_names[month] + ' ' + year}</h1>
+					<button class="months_button" on:click={() => right()}>&gt;</button>
+					<span id="days_info">Nombre de jours de congé : 0 </span>
+				</div>
+				<Calendar {days} {absences} {is_month_mode}/>
 			</div>
-			<Calendar {days} {absences} {is_month_mode}/>
+		</div>
+		<div id="side_menu">
+			<button class="request_button" on:click={() => window.location.href="#/requests"}>Nouvelle demande</button>
+			<div class="legend">
+				<div class="dots_column">
+					<span id="green_dot" class="dot"></span>
+					<span id="red_dot" class="dot"></span>
+					<span id="blue_dot" class="dot"></span>
+					<span id="gray_dot" class="dot"></span>
+				</div>
+				<span class="legend_text">Congé (congé payé, RTT...)<br>
+				Maladie (accident, arrêt maladie...)<br>
+				Absence physique (télétravail, formation...)<br>
+				Demande en cours</span>
+			</div>
 		</div>
 	</div>
-	<div id="side_menu">
-		<button class="request_button" on:click={() => window.location.href="/#/requests"}>Nouvelle demande</button>
-		<div class="legend">
-			<div class="dots_column">
-				<span id="green_dot" class="dot"></span>
-				<span id="red_dot" class="dot"></span>
-				<span id="blue_dot" class="dot"></span>
-				<span id="gray_dot" class="dot"></span>
-			</div>
-			<span class="legend_text">Congé (congé payé, RTT...)<br>
-			Maladie (accident, arrêt maladie...)<br>
-			Absence physique (télétravail, formation...)<br>
-			Demande en cours</span>
-		</div>
-	</div>
-</div>
+{/key}
 
 <style>
 	.calendar {

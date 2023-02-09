@@ -1,31 +1,31 @@
 <script lang="ts">
-	import { link } from "svelte-spa-router";
+	import Global from '../shared/Global.js';
 
-	let routes = [{link:"/#/", item:"Accueil"},
-				{link:"/#/statistics", item:"Statistiques"},
-				{link:"/#/requests", item:"Demandes"},
-				{link:"#/notifications", item:"Notifications"},
-				{link:"/#/account", item:"Compte"},
-				{link:"/#/settings", item:"Paramètres"}];
+	export let active;
 
-	let activeItem = "Accueil";
-
-	const navChange = (item:string) => {
-		activeItem = item;
-	}
+	const routes = [
+		{ text: "Accueil",			link: "#/" },
+		{ text: "Statistiques",		link: "#/statistics" },
+		{ text: "Demandes",			link: "#/requests" },
+		{ text: "Notifications",	link: "#/notifications" },
+		{ text: "Compte",			link: "#/account" },
+		{ text: "Paramètres",		link: "#/settings" }
+	];
 </script>
 
 <nav class="relative flex flex-col left-0 top-0 justify-start items-start #f1f1f1">
 	<span class="text-2xl">
 		<img src="/img/Logo_Reseau_Polytech.svg" alt="Logo Polytech" style="margin:auto;">
-		<p style="color:#007AFF; font-family:'Times New Roman', Times, serif; font-style: oblique;" >PoPS2223</p>
+		<p style="color:#007AFF; font-family:'Times New Roman', Times, serif; font-style: oblique;">PoPS2223</p>
 	</span>
 	{#each routes as route}
-				<a href={route.link} on:click={() => navChange(route.item)} class:active={route.item===activeItem}>
-				{route.item}
-			</a>
+		<a href={route.link} class:active={route.text === active}>
+			{route.text}
+		</a>
 	{/each}
-	<span style="font-family:'Times New Roman', Times, serif;">Nom Prénom</span>
+	{#if Global.user}
+		<span style="font-family:'Times New Roman', Times, serif;">{Global.user.first_name} {Global.user.last_name}</span>
+	{/if}
 </nav>
 
 <style>

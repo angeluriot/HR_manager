@@ -1,5 +1,25 @@
 <script lang="ts">
 	import { scaleLinear } from 'd3-scale';
+	import { onMount } from "svelte";
+	import Global from "../shared/Global.js";
+	import Menu from '../components/Menu.svelte';
+	import * as Server from "../shared/server.js";
+
+	let unique = {};
+
+	function restart()
+	{
+		unique = {}
+	}
+
+	onMount(async () =>
+	{
+		if (!Global.user)
+		{
+			await Server.auto_login();
+			restart();
+		}
+	});
 
 	let points: any = [
 		{ year: 1990, birthrate: 16.7 },
@@ -90,65 +110,68 @@
 	}
 </script>
 
-<div class="main gap-10 w-full">
-	<h1>Statistiques</h1>
-	<div class="flex flex-row gap-6">
-		<select bind:value={activeStat}>
-			<option value="" disabled selected>-- Type de Statistiques --</option>
-			{#each selectStatisticType as type}
-				<option value={type}>{type}</option>
-			{/each}
-		</select>
-		<select bind:value={activePeriod} on:change={changeTimePeriod}>
-			<option value="" disabled selected>-- Période --</option>
-			{#each selectTimePeriod as type}
-				<option value={type}>{type}</option>
-			{/each}
-		</select>
-		<select bind:value={activeCollab}>
-			<option value="" disabled selected>-- Services et Collaborateurs --</option>
-			{#each selectCollaborators as type}
-				<option value={type}>{type}</option>
-			{/each}
-		</select>
+{#key unique}
+	<Menu active="Statistiques"/>
+	<div class="main gap-10 w-full">
+		<h1>Statistiques</h1>
+		<div class="flex flex-row gap-6">
+			<select bind:value={activeStat}>
+				<option value="" disabled selected>-- Type de Statistiques --</option>
+				{#each selectStatisticType as type}
+					<option value={type}>{type}</option>
+				{/each}
+			</select>
+			<select bind:value={activePeriod} on:change={changeTimePeriod}>
+				<option value="" disabled selected>-- Période --</option>
+				{#each selectTimePeriod as type}
+					<option value={type}>{type}</option>
+				{/each}
+			</select>
+			<select bind:value={activeCollab}>
+				<option value="" disabled selected>-- Services et Collaborateurs --</option>
+				{#each selectCollaborators as type}
+					<option value={type}>{type}</option>
+				{/each}
+			</select>
+		</div>
+
+		<h2>{(activeStat === "" ? "-- Sélectionnez une statistique --" : activeStat + " " + activePeriod)}</h2>
+
+		<div class="chart" bind:clientWidth={width} bind:clientHeight={height}>
+			<svg>
+				<!-- y axis -->
+				<g class="axis y-axis">
+					{#each yTicks as tick}
+						<g class="tick tick-{tick}" transform="translate(0, {yScale(tick)})">
+							<line x2="100%"></line>
+							<text y="-4">{tick} %</text>
+						</g>
+					{/each}
+				</g>
+
+				<!-- x axis -->
+				<g class="axis x-axis">
+					{#each points as point, i}
+						<g class="tick" transform="translate({xScale(i)},{height})">
+							<text x="{barWidth/2}" y="-4">{width > 380 ? point.x : formatMobile(point.x)}</text>
+						</g>
+					{/each}
+				</g>
+
+				<g class='bars'>
+					{#each points as point, i}
+						<rect
+							x="{xScale(i) + 2}"
+							y="{yScale(point.y)}"
+							width="{barWidth - 4}"
+							height="{yScale(0) - yScale(point.y)}"
+						></rect>
+					{/each}
+				</g>
+			</svg>
+		</div>
 	</div>
-
-	<h2>{(activeStat === "" ? "-- Sélectionnez une statistique --" : activeStat + " " + activePeriod)}</h2>
-
-	<div class="chart" bind:clientWidth={width} bind:clientHeight={height}>
-		<svg>
-			<!-- y axis -->
-			<g class="axis y-axis">
-				{#each yTicks as tick}
-					<g class="tick tick-{tick}" transform="translate(0, {yScale(tick)})">
-						<line x2="100%"></line>
-						<text y="-4">{tick} %</text>
-					</g>
-				{/each}
-			</g>
-
-			<!-- x axis -->
-			<g class="axis x-axis">
-				{#each points as point, i}
-					<g class="tick" transform="translate({xScale(i)},{height})">
-						<text x="{barWidth/2}" y="-4">{width > 380 ? point.x : formatMobile(point.x)}</text>
-					</g>
-				{/each}
-			</g>
-
-			<g class='bars'>
-				{#each points as point, i}
-					<rect
-						x="{xScale(i) + 2}"
-						y="{yScale(point.y)}"
-						width="{barWidth - 4}"
-						height="{yScale(0) - yScale(point.y)}"
-					></rect>
-				{/each}
-			</g>
-		</svg>
-	</div>
-</div>
+{/key}
 
 <style>
 	select {

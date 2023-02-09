@@ -6,6 +6,7 @@ import Notifications from "./lib/views/Notifications.svelte";
 import Account from "./lib/views/Account.svelte";
 import Settings from "./lib/views/Settings.svelte";
 import Login from "./lib/views/Login.svelte";
+import Error from "./lib/views/Error.svelte";
 
 export const routes = {
 	"/": Home,
@@ -16,4 +17,5 @@ export const routes = {
 	"/account": Account,
 	"/settings": Settings,
 	"/login": Login,
+	"*": Error
 };

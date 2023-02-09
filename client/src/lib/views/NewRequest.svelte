@@ -8,8 +8,28 @@
 	import DemandeAccident from "../components/DemandeAccident.svelte";
 	import DemandeFormation from "../components/DemandeFormation.svelte";
 	import DemandeVisite from "../components/DemandeVisite.svelte";
+	import { onMount } from "svelte";
+	import Global from "../shared/Global.js";
+	import Menu from '../components/Menu.svelte';
+	import * as Server from "../shared/server.js";
 
-	let requestTypes = ["Congés","Arrêt maladie","RTT","Congés sans solde","Télétravail","Exceptionnel","Accident","Formation","Visite"];
+	let unique = {};
+
+	function restart()
+	{
+		unique = {}
+	}
+
+	onMount(async () =>
+	{
+		if (!Global.user)
+		{
+			await Server.auto_login();
+			restart();
+		}
+	});
+
+	let requestTypes = ["Congés", "Arrêt maladie", "RTT", "Congés sans solde", "Télétravail", "Exceptionnel", "Accident", "Formation", "Visite"];
 	let activeType = " ";
 
 	const changeRequestType = (type:string) => {
@@ -18,41 +38,43 @@
 	}
 </script>
 
-<div class=" h-full w-full gap-16" >
-	<div class = "flex flex-row">
-		<h1 class = "text-xl mr-5">Créer une demande : </h1>
+{#key unique}
+	<Menu active="Demandes"/>
+	<div class=" h-full w-full gap-16" >
+		<div class = "flex flex-row">
+			<h1 class = "text-xl mr-5">Créer une demande : </h1>
 
-		<select>
-			<option value="">-- Choisir un motif d'absence --</option>
-			{#each requestTypes as type}
-				<option value={type} on:click={() => changeRequestType(type)}>{type}</option>
-			{/each}
-		</select>
+			<select>
+				<option value="">-- Choisir un motif d'absence --</option>
+				{#each requestTypes as type}
+					<option value={type} on:click={() => changeRequestType(type)}>{type}</option>
+				{/each}
+			</select>
+		</div>
+
+		{#if activeType === "Congés"}
+			<DemandeConge />
+		{:else if activeType === "Arrêt maladie"}
+			<DemandeMaladie />
+		{:else if activeType === "RTT"}
+			<DemandeRTT />
+		{:else if activeType === "Congés sans solde"}
+			<DemandeSansSolde />
+		{:else if activeType === "Télétravail"}
+			<DemandeTeletravail />
+		{:else if activeType === "Exceptionnel"}
+			<DemandeExceptionel />
+		{:else if activeType === "Accident"}
+			<DemandeAccident />
+		{:else if activeType === "Formation"}
+			<DemandeFormation />
+		{:else if activeType === "Visite"}
+			<DemandeVisite />
+		{:else}
+			<a href="#/requests">Retour</a>
+		{/if}
 	</div>
-
-
-	{#if activeType === "Congés"}
-		<DemandeConge />
-	{:else if activeType === "Arrêt maladie"}
-		<DemandeMaladie />
-	{:else if activeType === "RTT"}
-		<DemandeRTT />
-	{:else if activeType === "Congés sans solde"}
-		<DemandeSansSolde />
-	{:else if activeType === "Télétravail"}
-		<DemandeTeletravail />
-	{:else if activeType === "Exceptionnel"}
-		<DemandeExceptionel />
-	{:else if activeType === "Accident"}
-		<DemandeAccident />
-	{:else if activeType === "Formation"}
-		<DemandeFormation />
-	{:else if activeType === "Visite"}
-		<DemandeVisite />
-	{:else}
-		<a href="/#/requests">Retour</a>
-	{/if}
-</div>
+{/key}
 
 <style>
 	select {
