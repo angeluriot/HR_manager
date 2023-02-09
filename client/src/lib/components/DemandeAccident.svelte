@@ -1,7 +1,7 @@
 <script lang="ts">
 	let myFile = "";
 	const showname = () => {
-		var input = <HTMLInputElement>document.getElementById("fileID");
+		let input = <HTMLInputElement>document.getElementById("fileID");
 		myFile = input.files[0].name;
 	}
 </script>

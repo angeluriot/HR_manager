@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { link } from "svelte-spa-router";
 
-
 	let routes = [{link:"/#/", item:"Accueil"},
 				{link:"/#/statistics", item:"Statistiques"},
 				{link:"/#/requests", item:"Demandes"},

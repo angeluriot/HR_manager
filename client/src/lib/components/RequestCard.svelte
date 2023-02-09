@@ -1,13 +1,13 @@
-<script>
-	export let id;
-	export let type;
-	export let first_name;
-	export let last_name;
-	export let state;
-	export let days;
-	export let start;
-	export let end;
-	export let comments;
+<script lang="ts">
+	export let id: number;
+	export let type: string;
+	export let first_name: string;
+	export let last_name: string;
+	export let state: string;
+	export let days: string[];
+	export let start: string;
+	export let end: string;
+	export let comments: string;
 	import { PencilSquare } from "svelte-bootstrap-icons";
 
 	export let colors = ["#FFFFFF", "#FF00FF", "#00FF00"];

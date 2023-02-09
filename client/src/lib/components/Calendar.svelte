@@ -8,7 +8,7 @@
 
 	function show_popup_info(absence)
 	{
-		var popup = document.getElementById("info_popup");
+		let popup = document.getElementById("info_popup");
 		document.getElementById("info_popup_close").style.visibility = "visible";
 		popup.style.visibility = "visible";
 		popup.textContent = "test";

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import Calendar from "../components/Calendar.svelte";
 
-	var days = [];
+	let days = [];
 	let now = new Date();
 	let year = now.getFullYear();
 	let month = now.getMonth();
 	let day = now.getDate();
 	let day_of_the_week = now.getDay();
-	let this_monday;
+	let this_monday: number;
 
 	if (day - day_of_the_week > 0)
 		this_monday = day - day_of_the_week;
@@ -20,7 +20,7 @@
 
 	$:is_month_mode, this_monday, month, year, update_calendar();
 
-	var raw_absences = [
+	let raw_absences = [
 		{title: "A. Didot (RTT)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "conge", shown: true},
 		{title: "C. Moray (AM)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie", shown: true},
 		{title: "D. Hopol (AM)", date: new Date(2023, 0, 5), section_date: new Date(2023, 0, 5), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie", shown: true},
@@ -30,9 +30,9 @@
 		{title: "G. Evian (T)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true}
 	];
 
-	var absences_week = [];
-	var absences_week_month = [];
-	var absences = [];
+	let absences_week = [];
+	let absences_week_month = [];
+	let absences = [];
 
 	init_calendar();
 
@@ -93,10 +93,10 @@
 		days = [];
 		absences = [];
 
-		var first_day = new Date(year, month, 0).getDay();
-		var days_in_this_month = new Date(year, month + 1, 0).getDate();
-		var days_in_last_month = new Date(year, month, 0).getDate();
-		var prev_month = month == 0 ? 11 : month - 1;
+		let first_day = new Date(year, month, 0).getDay();
+		let days_in_this_month = new Date(year, month + 1, 0).getDate();
+		let days_in_last_month = new Date(year, month, 0).getDate();
+		let prev_month = month == 0 ? 11 : month - 1;
 
 		if (is_month_mode)
 		{

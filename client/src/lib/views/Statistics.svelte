@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { scaleLinear } from 'd3-scale';
 
-	var points = [
+	let points: any = [
 		{ year: 1990, birthrate: 16.7 },
 		{ year: 1995, birthrate: 14.6 },
 		{ year: 2000, birthrate: 14.4 },
