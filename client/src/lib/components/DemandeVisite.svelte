@@ -10,7 +10,7 @@
 		<div class = "w-full">
 			<label for="commentaire">Lieu de la visite</label>
 			<input type="text" id="lieu" class = "w-80">
-		</div>	
+		</div>
 	</div>
 	<div class = "flex flex-row">
 		<div class = "h-full w-full justify-start">
@@ -54,21 +54,21 @@
 </div>
 
 <style>
-div{
-	@apply w-full;
-}
-input{
-	@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
-}
+	div{
+		@apply w-full;
+	}
+	input{
+		@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
+	}
 
-label{
-	@apply my-[10px] text-left;
-}
+	label{
+		@apply my-[10px] text-left;
+	}
 
-button{
-	@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
-}
-.card{
-	@apply p-1 bg-[#dcdada79] rounded-md shadow-[0px_2px_4px_rgba(6,88,239,0.42)];
-}
+	button{
+		@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
+	}
+	.card{
+		@apply p-1 bg-[#dcdada79] rounded-md shadow-[0px_2px_4px_rgba(6,88,239,0.42)];
+	}
 </style>

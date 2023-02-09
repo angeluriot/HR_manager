@@ -14,12 +14,12 @@
 <div class = "gap-8">
 	<div class = "flex flex-row gap-32">
 		<div class = "!w-[30%]">
-			<button id = "ponctuel" 
-				class = "!h-[30px] w-[150] !rounded-[25px] !py-0 bg-[{color1}]" 
+			<button id = "ponctuel"
+				class = "!h-[30px] w-[150] !rounded-[25px] !py-0 bg-[{color1}]"
 				on:click={() => flipColor()}>ponctuel</button>
 		</div>
 		<div class = "!w-[30%]">
-			<button id = "répétition" 
+			<button id = "répétition"
 				class = "!h-[30px] w-[150] !rounded-[25px] !py-0 bg-[{color2}]"
 				on:click={() => flipColor()}>répétition</button>
 		</div>
@@ -66,20 +66,19 @@
 </div>
 
 <style>
-div{
-	@apply w-full;
-}
+	div{
+		@apply w-full;
+	}
 
-input{
-	@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
-}
+	input{
+		@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
+	}
 
-label{
-	@apply my-[10px] text-left;
-}
+	label{
+		@apply my-[10px] text-left;
+	}
 
-button{
-	@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
-}
-
+	button{
+		@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
+	}
 </style>

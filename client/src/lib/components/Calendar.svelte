@@ -1,15 +1,16 @@
 <script lang="ts">
 
-	export let day_names;
-	export let days;
-	export let absences;
-	export let is_month_mode;
+	export let days: any[];
+	export let absences: any[];
+	export let is_month_mode: boolean;
+
+	const day_names = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
 	function show_popup_info(absence)
 	{
 		var popup = document.getElementById("info_popup");
 		document.getElementById("info_popup_close").style.visibility = "visible";
-  		popup.style.visibility = "visible";
+		popup.style.visibility = "visible";
 		popup.textContent = "test";
 	}
 

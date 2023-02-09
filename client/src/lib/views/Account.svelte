@@ -4,7 +4,7 @@
 	let firstname = "Prénom";
 	let birthDate = "jj/mm/aa";
 	let department = "service";
-	let position = "poste";									
+	let position = "poste";
 	let mail = "exemple@entreprise.fr";
 	let password = "password"				// A changer, sécurité.
 	let profilePic = "/img/user.png";
@@ -22,9 +22,8 @@
 		}
 		else{
 			document.getElementById("docDisplay").style.display = "none";
-		}		
+		}
 	}
-
 </script>
 
 <div class="flex flex-row gap-6 w-full">
@@ -39,7 +38,7 @@
 			<p> Poste : {position}</p>
 			<p> mail : <a href={mail}>{mail}</a> </p>
 		</div>
-		
+
 		<div>
 			<label for="pass">Mot de passe</label>
 			<input type="password" name="password" id="pass" minlength="8" required value = {password}>
@@ -62,17 +61,16 @@
 </div>
 
 <style>
-input{
-	@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
-}
-label{
-	@apply my-[4px] text-left;
-}
-button{
-	@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
-}
-.card{
-	@apply p-1 bg-[#dcdada79] rounded-md shadow-[0px_2px_4px_rgba(6,88,239,0.42)];
-}
-
+	input{
+		@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
+	}
+	label{
+		@apply my-[4px] text-left;
+	}
+	button{
+		@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
+	}
+	.card{
+		@apply p-1 bg-[#dcdada79] rounded-md shadow-[0px_2px_4px_rgba(6,88,239,0.42)];
+	}
 </style>

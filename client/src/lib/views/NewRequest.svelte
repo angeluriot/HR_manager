@@ -16,7 +16,6 @@
 		activeType = type;
 		console.log(activeType);
 	}
-	
 </script>
 
 <div class=" h-full w-full gap-16" >
@@ -30,7 +29,7 @@
 			{/each}
 		</select>
 	</div>
-	
+
 
 	{#if activeType === "Congés"}
 		<DemandeConge />
@@ -56,12 +55,11 @@
 </div>
 
 <style>
-
-select {
-  width: 300px;
-  height: 35px;
-  padding: 2px 8px;
-  border: 2px solid #007AFF;
-  border-radius: 4px;
-}
+	select {
+		width: 300px;
+		height: 35px;
+		padding: 2px 8px;
+		border: 2px solid #007AFF;
+		border-radius: 4px;
+	}
 </style>

@@ -319,7 +319,7 @@
 				<button class="months_button" on:click={() => right()}>&gt;</button>
 				<span id="days_info">Nombre de jours de congé : 0 </span>
 			</div>
-			<Calendar day_names={["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]} {days} {absences} {is_month_mode}/>
+			<Calendar {days} {absences} {is_month_mode}/>
 		</div>
 	</div>
 	<div id="side_menu">
@@ -338,7 +338,6 @@
 		</div>
 	</div>
 </div>
-
 
 <style>
 	.calendar {
