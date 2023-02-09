@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { TestimonialPlaceholder } from "flowbite-svelte";
 	import Calendar from "../components/Calendar.svelte";
 
 	var days = [];
@@ -440,6 +439,7 @@
 		position: relative;
 		flex-direction: row;
 		display: flex;
+		width: 100%;
 	}
 
 	#calendar_container {
@@ -456,6 +456,7 @@
 		display: flex;
 		align-content: left;
 		bottom: 240px;
+		right: 50px;
 		margin: auto;
 	}
 

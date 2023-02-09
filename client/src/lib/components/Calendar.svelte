@@ -36,6 +36,7 @@
 
 	{#each absences as absence}
 		{#if absence.shown}
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<section class="absence_section {absence.type}" on:click={() => show_popup_info(absence)} style="grid-row: {absence.start_row}; grid-column: {absence.start_col} / span {absence.section_duration}; top: {absence.position * 25 - 5}px">
 				<span class="absence_title">{absence.title}</span>
 			</section>
