@@ -36,6 +36,10 @@
 
 	let month_names = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
 
+	let public_holidays = [[3, 10], [4, 1], [4, 8], [4, 18], [4, 29], [6, 14], [7, 15], [10, 1], [11, 25]];
+
+	let calendar_title: string;
+
 	let is_month_mode = true;
 
 	$:is_month_mode, this_monday, month, year, update_calendar();
@@ -50,6 +54,7 @@
 		{title: "G. Evian (T)", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "physique", shown: true}
 	];
 
+	let absences_holidays = [];
 	let absences_week = [];
 	let absences_week_month = [];
 	let absences = [];
@@ -59,10 +64,78 @@
 	// Initialize all the calendar sections
 	function init_calendar()
 	{
-		// Split all absences into sub-absences to display the sections correctly
 		for (let absence of raw_absences)
 		{
-			let current_duration = absence.duration;
+			let this_holidays = [];
+
+			if (absence.section_date.getDay() == 0)
+				absence.section_date = new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + 1);
+
+			else if (absence.section_date.getDay() == 6)
+				absence.section_date = new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + 2);
+
+			if (absence.section_date.getFullYear() == 2023 &&
+				((absence.section_date.getMonth() == 3 && absence.section_date.getDate() == 10) ||
+				 (absence.section_date.getMonth() == 4 && absence.section_date.getDate() == 1) ||
+				 (absence.section_date.getMonth() == 4 && absence.section_date.getDate() == 8) ||
+				 (absence.section_date.getMonth() == 5 && absence.section_date.getDate() == 29) ||
+				 (absence.section_date.getMonth() == 11 && absence.section_date.getDate() == 25)))
+				absence.section_date = new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + 1);
+
+			let weekend_days = get_weekend_days(absence.section_date, absence.section_duration, true, absence.title == "test");
+
+			let end_date = new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + absence.section_duration + weekend_days);
+			let this_section_date = absence.section_date;
+			let this_section_duration;
+
+			for (let holiday of public_holidays)
+				if ((holiday[0] > absence.section_date.getMonth() || (holiday[0] == absence.section_date.getMonth() && holiday[1] >= absence.section_date.getDate())) &&
+					(end_date.getFullYear() > 2023 || holiday[0] < end_date.getMonth() || (holiday[0] == end_date.getMonth() && holiday[1] <= end_date.getDate())) &&
+					absence.section_date.getFullYear() <= 2023 && end_date.getFullYear() >= 2023)
+					this_holidays.push(holiday);
+
+			let first_section: boolean = true;
+
+			if (this_holidays.length > 0)
+			{
+				let holiday_surplus: number = Math.floor(this_holidays.length / 7) * 2;
+				let h: number = end_date.getDay() + this_holidays.length + holiday_surplus;
+
+				//if (h > 5)
+					//holiday_surplus += 2;
+
+				end_date = new Date(end_date.getFullYear(), end_date.getMonth(), end_date.getDate() + this_holidays.length + holiday_surplus);
+
+				for (let holiday of this_holidays)
+				{
+					this_section_duration = Math.round(((new Date(2023, holiday[0], holiday[1])).getTime() - this_section_date.getTime()) / (1000 * 60 * 60 * 24));
+					this_section_duration -= get_weekend_days(this_section_date, this_section_duration, false);
+
+					if (first_section && absence.date.getDay() == 0)
+						this_section_duration--;
+
+					if (this_section_duration > 0)
+						absences_holidays.push({title: absence.title, date: absence.date, section_date: this_section_date, duration: absence.duration, section_duration: this_section_duration, start_row: 0, start_col: 0, position: -1, type: absence.type, shown: true});
+
+					this_section_date = new Date(2023, holiday[0], holiday[1] + 1);
+					first_section = false;
+				}
+
+				this_section_duration = Math.round((end_date.getTime() - this_section_date.getTime()) / (1000 * 60 * 60 * 24)) + 1 - (absence.section_date.getDay() == 0 ? 1 : 0);
+
+				this_section_duration -= get_weekend_days(this_section_date, this_section_duration, false);
+
+				absences_holidays.push({title: absence.title, date: absence.date, section_date: this_section_date, duration: absence.duration, section_duration: this_section_duration, start_row: 0, start_col: 0, position: -1, type: absence.type, shown: true});
+			}
+
+			else
+				absences_holidays.push(absence);
+		}
+
+		// Split all absences into sub-absences to display the sections correctly
+		for (let absence of absences_holidays)
+		{
+			let current_duration = absence.section_duration;
 			let this_section_duration;
 
 			if (absence.section_date.getDay() == 0)
@@ -89,7 +162,9 @@
 			}
 
 			else
+			{
 				absences_week.push(absence);
+			}
 		}
 
 		// Split into sub-absences if the sub-absence is longer than a month
@@ -113,6 +188,7 @@
 		days = [];
 		absences = [];
 
+
 		let first_day = new Date(year, month, 0).getDay();
 		let days_in_this_month = new Date(year, month + 1, 0).getDate();
 		let days_in_last_month = new Date(year, month, 0).getDate();
@@ -120,6 +196,8 @@
 
 		if (is_month_mode)
 		{
+			calendar_title = month_names[month] + ' ' + year;
+
 			// Days from previous month (same week as the first)
 			for (let i = days_in_last_month - first_day; i < days_in_last_month; i++)
 				days.push({name: '' + (i + 1), this_month: false, date: new Date(prev_month == 11 ? year - 1 : year, prev_month, i + 1)});
@@ -135,14 +213,38 @@
 
 		else
 		{
+			let first_day_date: Date;
+			let last_day_date: Date;
+
 			for (let i = 1; i < 8; i++)
 			{
 				if (this_monday + i <= days_in_this_month)
+				{
+					if (i == 1)
+						first_day_date = new Date(year, month, this_monday + i);
+					else if (i == 7)
+						last_day_date = new Date(year, month, this_monday + i);
+
 					days.push({name: ' ' + (this_monday + i), this_month: true, date: new Date(year, month, this_monday + i)});
+				}
 
 				else
-					days.push({name: ' ' + (this_monday + i - days_in_this_month), this_month: true, date: new Date(year, month, this_monday + i - days_in_this_month)});
+				{
+					if (i == 1)
+						first_day_date = new Date(year, month + 1, this_monday + i - days_in_this_month);
+					else if (i == 7)
+						last_day_date = new Date(year, month + 1, this_monday + i - days_in_this_month);
+
+					days.push({name: ' ' + (this_monday + i - days_in_this_month), this_month: true, date: new Date(year, month + 1, this_monday + i - days_in_this_month)});
+				}
 			}
+
+			calendar_title = (first_day_date.getDate() < 10 ? "0" : "") + first_day_date.getDate() + "/" +
+							(first_day_date.getMonth() + 1 < 10 ? "0" : "") + (first_day_date.getMonth() + 1) + "/" +
+							first_day_date.getFullYear() + " - " +
+							(last_day_date.getDate() < 10 ? "0" : "") + last_day_date.getDate() + "/" +
+							(last_day_date.getMonth() + 1 < 10 ? "0" : "") + (last_day_date.getMonth() + 1) + "/" +
+							last_day_date.getFullYear();
 		}
 
 		// Compute the correct rows and columns of the calendar to display each section
@@ -212,6 +314,47 @@
 			return duration1 > date2 - date1;
 
 		return duration2 > date1 - date2;
+	}
+
+	function get_weekend_days(date: Date, duration: number, b: boolean, b2: boolean = false)
+	{
+		if (b)
+		{
+			let final_res: number = 0;
+			let res: number;
+			let rest: number;
+			let this_day: number = date.getDay();
+
+			if (this_day == 0)
+				this_day = 1;
+
+			while (duration > 0)
+			{
+				res = Math.floor(duration / 7);
+				rest = duration % 7;
+
+				if (this_day + rest > 5)
+				{
+					res++;
+					this_day = 1;
+				}
+
+				duration = res * 2;
+				final_res += res;
+			}
+
+			return final_res * 2;
+		}
+
+		else
+		{
+			let res = Math.floor(duration / 7);
+			let rest = duration % 7;
+			if (date.getDay() + rest > 5)
+				res ++;
+
+			return res * 2;
+		}
 	}
 
 	function left()
@@ -336,11 +479,11 @@
 					<input type="button" on:click={() => month_mode()} class="mode_button_checked" id="month_mode_button" value="Mois">
 
 					<button class="months_button" on:click={() => left()}>&lt;</button>
-					<h1 id="titre">{month_names[month] + ' ' + year}</h1>
+					<h1 id="titre">{calendar_title}</h1>
 					<button class="months_button" on:click={() => right()}>&gt;</button>
-					<span id="days_info">Nombre de jours de congé : 0 </span>
+					<span id="days_info">Jours de congé : 0 </span>
 				</div>
-				<Calendar {days} {absences} {is_month_mode}/>
+				<Calendar {public_holidays} {days} {absences} {is_month_mode}/>
 			</div>
 		</div>
 		<div id="side_menu">

@@ -1,5 +1,6 @@
 <script lang="ts">
 
+	export let public_holidays: any[];
 	export let days: any[];
 	export let absences: any[];
 	export let is_month_mode: boolean;
@@ -20,6 +21,22 @@
 		document.getElementById("info_popup_close").style.visibility = "hidden";
 	}
 
+	function is_holiday(day)
+	{
+		if (day.date.getFullYear() != 2023)
+			return false;
+
+		for (let i = 0; i < public_holidays.length; i++)
+		{
+			if (day.date.getMonth() == public_holidays[i][0] && day.date.getDate() == public_holidays[i][1])
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 </script>
 
 <div class="calendar_content">
@@ -29,7 +46,7 @@
 
 	{#each days as day}
 		{#if day.this_month}
-			<span class="day">{day.name}</span>
+			<span class="day">{(is_holiday(day) ? "(Férié) " : "") + day.name}</span>
 		{:else}
 			<span class="day not_this_month">{day.name}</span>
 		{/if}
@@ -77,10 +94,10 @@
 		background: #1640D4;
 	}
 
-	.absence_section
-
 	.absence_title {
 		font-size: 10px bold;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 	.calendar_content {
@@ -103,7 +120,7 @@
 		color: #526581;
 		position: relative;
 		z-index: 1;
-		padding-bottom: 87px; 					/* ADAPTER !!! */
+		padding-bottom: 87px;
 	}
 
 	.not_this_month {
