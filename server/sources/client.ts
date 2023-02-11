@@ -2,6 +2,7 @@ import express from 'express';
 import Global from './Global.js';
 import * as Connection from './users/connection.js';
 import fs from 'fs';
+import * as Request from './models/request.js';
 
 export function requests()
 {
@@ -65,5 +66,33 @@ export function requests()
 
 		else
 			res.sendFile("/resources/photos/default.jpg", { root: '.' });
+	});
+
+	Global.app.post('/add-request', async (req: express.Request, res: express.Response) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		try 
+		{
+			var request = await Request.add(req.body.request_data);
+		}
+
+		catch (error: any)
+		{
+			console.log("ERROR:", error.message);
+			process.exit(1);
+		}
+
+		console.log("Request created with id:", request.id);
+		process.exit(0);
 	});
 }

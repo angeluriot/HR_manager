@@ -4,6 +4,9 @@
 		let input = <HTMLInputElement>document.getElementById("fileID");
 		myFile = input.files[0].name;
 	}
+	const addRequest = () => {
+		
+	}
 </script>
 
 <div class = "flex flex-row">
@@ -60,7 +63,7 @@
 <div class = "flex flex-row gap-28 mt-3">
 	<button class = "bg-[#555]">ANNULER</button>
 	<button class = "bg-[#1DCF5A]">ENREGISTRER</button>
-	<button class = "bg-[#007AFF]">SOUMETTRE</button>
+	<button class = "bg-[#007AFF]" on:click={addRequest}>SOUMETTRE</button>
 </div>
 
 <style>
