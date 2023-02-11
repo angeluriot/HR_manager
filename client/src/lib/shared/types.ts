@@ -15,8 +15,9 @@ export type RequestData = {
 	type: number;
 	concerned: UserData;
 	state: number;
-	days_remote: Array<String>;
-	half_days: Array<[Date, boolean]>; // [Date, 0 pour matin / 1 pour aprem]
+	days_remote: [Array<String>, Number];
+	start: [Date, boolean]; // [Date, 0 pour matin / 1 pour aprem]
+    end: [Date, boolean];
 	subject_ext: string;
     place_ext: string;
     proof: number; //TODO : file

@@ -7,8 +7,9 @@ export interface RequestInterface extends mongoose.Document
 	type: number;
 	concerned: mongoose.Types.ObjectId;
 	state: number;
-	days_remote: Array<String>;
-	half_days: Array<[Date, boolean]>; // [Date, 0 pour matin / 1 pour aprem]
+	days_remote: [Array<String>, number]; // [Array des jours de télétravail, nombre de répétitions]
+	start: [Date, boolean]; // [Date, 0 pour matin / 1 pour aprem]
+    end: [Date, boolean];
 	subject_ext: string;
     place_ext: string;
     proof: number; //TODO : file
@@ -37,8 +38,12 @@ const request_schema = new mongoose.Schema(
 	days_remote: {
 		type: Array
 	},
-	half_days: {
-		type: Array,
+	start: {
+		type: Date,
+		required: true
+	},
+    end: {
+		type: Date,
 		required: true
 	},
 	subject_ext: {
@@ -84,8 +89,9 @@ export type RequestData = {
 	type: number;
 	concerned: User.UserData;
 	state: number;
-	days_remote: Array<String>;
-	half_days: Array<[Date, boolean]>; // [Date, 0 pour matin / 1 pour aprem]
+	days_remote: [Array<String>, Number];
+	start: [Date, boolean]; // [Date, 0 pour matin / 1 pour aprem]
+    end: [Date, boolean];
 	subject_ext: string;
     place_ext: string;
     proof: number; //TODO : file
@@ -118,7 +124,8 @@ export async function get_data(request: RequestInterface): Promise<RequestData>
         concerned: concerned_data,
         state: request.state,
         days_remote: request.days_remote,
-        half_days: request.half_days, // [Date, 0 pour matin / 1 pour aprem]
+        start: request.start, // [Date, 0 pour matin / 1 pour aprem]
+        end: request.end,
         subject_ext: request.subject_ext,
         place_ext: request.place_ext,
         proof: request.proof, //TODO : file
@@ -152,7 +159,8 @@ export async function add(data: RequestData): Promise<RequestInterface>
         concerned: concerned_id,
         state: data.state,
         days_remote: data.days_remote,
-        half_days: data.half_days, // [Date, 0 pour matin / 1 pour aprem]
+        start: data.start, // [Date, 0 pour matin / 1 pour aprem]
+        end: data.end,
         subject_ext: data.subject_ext,
         place_ext: data.place_ext,
         proof: data.proof, //TODO : file
@@ -162,6 +170,7 @@ export async function add(data: RequestData): Promise<RequestInterface>
         comments: data.comments,
 	});
 
+    console.log("request added !");
 	//@ts-ignore
 	return await request.save();
 }

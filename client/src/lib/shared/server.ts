@@ -91,8 +91,7 @@ export async function post(url: string, params: any, body: any)
 
 	try
 	{
-		let temp = new URLSearchParams({ token }) + params ? '&' + new URLSearchParams(params) : '';
-
+		let temp = new URLSearchParams({ token }) + params ? new URLSearchParams({ token })  + '&' + new URLSearchParams(params) : '';
 		var response = await fetch(Global.server_url + url + "?" + temp,
 		{
 			method: "POST",

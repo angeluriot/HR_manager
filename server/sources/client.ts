@@ -70,6 +70,14 @@ export function requests()
 
 	Global.app.post('/add-request', async (req: express.Request, res: express.Response) =>
 	{
+		res.header("Access-Control-Allow-Origin", "*");
+
+		if (req.body) {
+			console.log(req.body);
+			res.send("Body received!");
+		  } else {
+			res.status(400).send("No body found in request");
+		  }
 		try
 		{
 			var email = Connection.verify_token(req.query.token);
@@ -93,6 +101,7 @@ export function requests()
 		}
 
 		console.log("Request created with id:", request.id);
+		res.send(JSON.stringify(request))
 		process.exit(0);
 	});
 }
