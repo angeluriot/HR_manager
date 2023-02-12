@@ -1,0 +1,7 @@
+POST http://localhost:3000/add-request  HTTP/1.1
+Content-Type:application/json
+
+{
+    "type": 0,
+    "comments": "my comments"
+}
