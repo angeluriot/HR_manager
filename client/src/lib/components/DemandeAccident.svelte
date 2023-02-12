@@ -1,10 +1,10 @@
 <script lang="ts">
 
 	let myFile = "";
+	let upload: HTMLInputElement;
 
-	const showname = () => {
-		let input = <HTMLInputElement>document.getElementById("fileID");
-		myFile = input.files[0].name;
+	function showname(){
+		myFile = upload.files[0].name;
 	}
 
 	let startMorning = true;
@@ -58,8 +58,8 @@
 				<h4>Importer un justificatif</h4>
 			</header>
 			<p class = "text-[#a3a3a3] text-[10px]">Fichiers acceptés: PDF, TEXT, DOC , DOCX</p>
-			<input type="file" class = "hidden" accept=".doc,.docx,.pdf" id="fileID" name="filename" on:change={ () => showname() }>
-			<button class="!w-[100px] !h-[30px] bg-[#007AFF] py-0 text-[10px]" on:click={ () => document.getElementById("fileID").click() }>Parcourir...</button>
+			<input type="file" class = "hidden" accept=".doc,.docx,.pdf" bind:this={upload} on:change={ () => showname() }>
+			<button class="!w-[100px] !h-[30px] bg-[#007AFF] py-0 text-[10px]" on:click={ () => upload.click() }>Parcourir...</button>
 			<p class = "text-[#a3a3a3] text-[10px]">{myFile}</p>
 		</div>
 	</div>
