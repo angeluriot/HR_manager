@@ -31,8 +31,9 @@
 				<Notification/>
 			{/each}
 		</div>
-	</div>
+	</div>	
 {/key}
 
 <style>
+	
 </style>
