@@ -30,7 +30,7 @@
 	});
 
 	let requestTypes = ["Congés", "Arrêt maladie", "RTT", "Congés sans solde", "Télétravail", "Exceptionnel", "Accident", "Formation", "Visite"];
-	let activeType = " ";
+	let activeType = "Congés";
 
 	const changeRequestType = (type:string) => {
 		activeType = type;
@@ -45,9 +45,9 @@
 			<h1 class = "text-xl mr-5">Créer une demande : </h1>
 
 			<select>
-				<option value="">-- Choisir un motif d'absence --</option>
-				{#each requestTypes as type}
-					<option value={type} on:click={() => changeRequestType(type)}>{type}</option>
+				<!-- <option value="">-- Choisir un motif d'absence --</option> -->
+				{#each requestTypes as type}					
+						<option value={type} on:click={() => changeRequestType(type)}>{type}</option>					
 				{/each}
 			</select>
 		</div>
