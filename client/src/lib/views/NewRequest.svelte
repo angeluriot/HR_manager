@@ -20,17 +20,79 @@
 		}
 	});
 
+	let days = [
+		{name: "Lundi",			time: { morning1: false, afternoon1: false}},
+		{name: "Mardi",			time: { morning2: false, afternoon2: false}},
+		{name: "Mercredi",		time: { morning3: false, afternoon3: false}},
+		{name: "Jeudi",			time: { morning4: false, afternoon4: false}},
+		{name: "Vendredi",		time: { morning5: false, afternoon5: false}},
+	];
+
+	const addRequest = () => 
+	{
+		let days_remote = [];
+		let period_days_remote = [];
+		days.forEach(day => {
+			if (day.time[0] || day.time[1]) {
+				let period = 0
+				period += day.time[0] ? 1 : 0;
+				period += day.time[1] ? 2 : 0;
+
+				days_remote.push(day.name);
+				period_days_remote.push(period);
+			}
+		});
+
+	 	const request = {
+			type: activeType,
+			concerned: Global.user,
+			days_remote: days_remote,
+			period_days_remote: period_days_remote,
+			start: start,
+			start_isam: startMorning,
+			end: end,
+			end_isam: endMorning,
+			subject_ext: subject_ext,
+			place_ext: place_ext,
+			proof: 0,
+			cause_accident: cause_accident,
+			head_dep: Global.user, // TODO : get head_dep user
+			hr: Global.user, // TODO : get hr user
+			comments: comments,
+		}
+
+		Server.post('add-request', '', request);
+
+	}
+
 	let requestTypes = ["Congés", "Maladie", "RTT", "Congés sans solde", "Télétravail", "Exceptionnel", "Accident", "Formation", "Visite"];
 	let activeType = "Congés";
-
-	const changeRequestType = (type:string) => {
-		activeType = type;
-	}
 
 	let startMorning = true;
 	$: startAfternoon = !startMorning;
 	let endMorning = true;
 	$: endAfternoon = !endMorning;
+	let start;
+	let end;
+	let subject_ext = '';
+	let place_ext = '';
+	let cause_accident = '';
+	let comments = '';
+
+	let myFile = "";
+	let upload: HTMLInputElement;
+
+	let color1 = "#007AFF";
+	let color2 = "#555";
+
+	let frequency : string;
+	let repeat : HTMLElement;
+	let ponctualStart : HTMLElement;
+	let ponctualEnd : HTMLElement;
+
+	const changeRequestType = (type:string) => {
+		activeType = type;
+	}
 
 	function swapCheck(time : string){
 		if(time == "start"){
@@ -41,28 +103,9 @@
 		}
 	}
 
-	let myFile = "";
-	let upload: HTMLInputElement;
-
 	function showname(){
 		myFile = upload.files[0].name;
 	}
-
-	let color1 = "#007AFF";
-	let color2 = "#555";
-
-	let frequency : string;
-	let repeat : HTMLElement;
-	let ponctualStart : HTMLElement;
-	let ponctualEnd : HTMLElement;
-
-	let days = [
-		{name: "Lundi",			time: { morning1: false, afternoon1: false}},
-		{name: "Mardi",			time: { morning2: false, afternoon2: false}},
-		{name: "Mercredi",		time: { morning3: false, afternoon3: false}},
-		{name: "Jeudi",			time: { morning4: false, afternoon4: false}},
-		{name: "Vendredi",		time: { morning5: false, afternoon5: false}},
-	];
 
 	const flipColor = (freq : string) => {
 		if(freq != frequency){
@@ -107,7 +150,7 @@
 					{:else if activeType=="Visite"}
 						<label for="motif">Motif de la visite</label>
 					{/if}	
-					<input type="text" class = "w-80">
+					<input type="text" class = "w-80" bind:value={subject_ext}>
 				</div>
 				<div class = "!w-full">
 					{#if activeType=="Formation"}
@@ -115,7 +158,7 @@
 					{:else if activeType=="Visite"}
 						<label for="lieu">Lieu de la visite</label>
 					{/if}
-					<input type="text" class = "w-80">
+					<input type="text" class = "w-80" bind:value={place_ext}>
 				</div>
 			</div>
 		{/if}
@@ -153,7 +196,7 @@
 		<div class = "flex flex-row">			
 			<div class = "h-full w-full justify-start">
 				<label for="début">Début</label>
-				<input type="date" id="début" class = "w-52">
+				<input type="date" id="début" class = "w-52" bind:value={start}>
 				<div class = "flex !flex-row gap-10 my-2" bind:this={ponctualStart}>
 					<span>
 						<input type="checkbox" checked={startMorning} on:change={() => swapCheck("start")}>
@@ -167,7 +210,7 @@
 			</div>
 			<div class = "h-full justify-start">
 				<label for="fin">Fin</label>
-				<input type="date" id="fin" class = "w-52">
+				<input type="date" id="fin" class = "w-52" bind:value={end}>
 				<div class = "flex flex-row gap-10 my-2" bind:this={ponctualEnd}>
 					<span>
 						<input type="checkbox" checked={endMorning} on:change={() => swapCheck("end")}>
@@ -208,18 +251,18 @@
 			{#if activeType=="Accident"}
 				<div class = "!w-[40%]">
 					<label for="commentaire">Cause de l'accident</label>
-					<input type="text" id="cause" class = "w-80 h-12">
+					<input type="text" id="cause" class = "w-80 h-12" bind:value={cause_accident}>
 				</div>
 			{/if}
 			<div class = "!w-[40%]">
 				<label for="commentaire">Commentaire (optionnel)</label>
-				<input type="text" id="commentaire" class = "w-80 h-12">
+				<input type="text" id="commentaire" class = "w-80 h-12" bind:value={comments}>
 			</div>
 		</div>
 		<div class = "flex flex-row gap-28 mt-3">
 			<button class = "bg-[#555]">ANNULER</button>
 			<button class = "bg-[#1DCF5A]">ENREGISTRER</button>
-			<button class = "bg-[#007AFF]">SOUMETTRE</button>
+			<button class = "bg-[#007AFF]" on:click={addRequest}>SOUMETTRE</button>
 		</div>
 	</div>
 {/key}

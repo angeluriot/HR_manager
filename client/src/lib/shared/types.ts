@@ -12,17 +12,20 @@ export type UserData = {
 };
 
 export type RequestData = {
-	type: number;
+	type: string;
 	concerned: UserData;
 	state: number;
-	days_remote: [Array<String>, Number];
-	start: [Date, boolean]; // [Date, 0 pour matin / 1 pour aprem]
-    end: [Date, boolean];
+	days_remote: String[];
+	nb_days_remote: Number;
+	start: String;
+	start_isam: Boolean;
+	end: String;
+	end_isam: Boolean;
 	subject_ext: string;
-    place_ext: string;
-    proof: number; //TODO : file
-    cause_accident: string;
-    head_dep: UserData;
-    hr: UserData;
-    comments: string;
+	place_ext: string;
+	proof: number;
+	cause_accident: string;
+	head_dep: UserData;
+	hr: UserData;
+	comments: string;
 }

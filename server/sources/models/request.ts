@@ -6,9 +6,12 @@ export interface RequestInterface extends mongoose.Document
 	type: string;
 	concerned: mongoose.Types.ObjectId;
 	state: number;
-	days_remote: [Array<String>, number]; // [Array des jours de télétravail, nombre de répétitions]
-	start: [Date, boolean]; // [Date, 0 pour matin / 1 pour aprem]
-	end: [Date, boolean];
+	days_remote: Array<String>;
+	period_days_remote: Array<Number>; // 1 for morning, 2 for afternoon, 3 for twice
+	start: String; 
+	start_isam: boolean;
+	end: String;
+	end_isam: boolean;
 	subject_ext: string;
 	place_ext: string;
 	proof: number; //TODO : file
@@ -21,7 +24,7 @@ export interface RequestInterface extends mongoose.Document
 const request_schema = new mongoose.Schema(
 {
 	type: {
-		type: Number,
+		type: String,
 		required: true
 	},
 	concerned: {
@@ -37,12 +40,23 @@ const request_schema = new mongoose.Schema(
 	days_remote: {
 		type: Array
 	},
+	period_days_remote: {
+		type: Array
+	},
 	start: {
-		type: Date,
+		type: String,
+		required: true
+	},
+	start_isam: {
+		type: Boolean,
 		required: true
 	},
 	end: {
-		type: Date,
+		type: String,
+		required: true
+	},
+	end_isam: {
+		type: Boolean,
 		required: true
 	},
 	subject_ext: {
@@ -88,9 +102,12 @@ export type RequestData = {
 	type: string;
 	concerned: User.UserData;
 	state: number;
-	days_remote: [String[], Number];
-	start: [Date, boolean]; // [Date, 0 pour matin / 1 pour aprem]
-	end: [Date, boolean];
+	days_remote: String[];
+	period_days_remote: Number[];
+	start: String;
+	start_isam: Boolean;
+	end: String;
+	end_isam: Boolean;
 	subject_ext: string;
 	place_ext: string;
 	proof: number; //TODO : file
@@ -124,11 +141,14 @@ export async function get_data(request: RequestInterface): Promise<RequestData>
 		concerned: concerned_data,
 		state: request.state,
 		days_remote: request.days_remote,
-		start: request.start, // [Date, 0 pour matin / 1 pour aprem]
+		period_days_remote: request.period_days_remote,
+		start: request.start,
+		start_isam: request.start_isam,
 		end: request.end,
+		end_isam: request.end_isam,
 		subject_ext: request.subject_ext,
 		place_ext: request.place_ext,
-		proof: request.proof, //TODO : file
+		proof: request.proof,
 		cause_accident: request.cause_accident,
 		head_dep: head_dep_data,
 		hr: hr_data,
@@ -160,11 +180,14 @@ export async function add(data: RequestData): Promise<RequestInterface>
 		concerned: concerned_id,
 		state: data.state,
 		days_remote: data.days_remote,
-		start: data.start, // [Date, 0 pour matin / 1 pour aprem]
+		period_days_remote: data.period_days_remote,
+		start: data.start,
+		start_isam: data.start_isam,
 		end: data.end,
+		end_isam: data.end_isam,
 		subject_ext: data.subject_ext,
 		place_ext: data.place_ext,
-		proof: data.proof, //TODO : file
+		proof: data.proof, 
 		cause_accident: data.cause_accident,
 		head_dep: head_dep_id,
 		hr: hr_id,
