@@ -70,15 +70,6 @@ export function requests()
 
 	Global.app.post('/add-request', async (req: express.Request, res: express.Response) =>
 	{
-		res.header("Access-Control-Allow-Origin", "*");
-
-		if (req.body) {
-			console.log(req.body);
-			res.send(JSON.stringify({ message: "Body received!" }));
-		} else {
-			res.status(400).send(JSON.stringify({ message: "No body found in request" }));
-		}
-		
 		try
 		{
 			var email = Connection.verify_token(req.query.token);
@@ -90,19 +81,20 @@ export function requests()
 			return;
 		}
 
-		try 
+		// Check if emal is the same as the one in the request
+
+		try
 		{
 			var request = await Request.add(req.body);
 		}
 
 		catch (error: any)
 		{
-			console.log("ERROR:", error.message);
-			process.exit(1);
+			res.status(400).send(error.message);
+			return;
 		}
 
 		console.log("Request created with id:", request.id);
-		res.send(JSON.stringify(request))
-		process.exit(0);
+		res.send(JSON.stringify(Request.get_data(request)));
 	});
 }

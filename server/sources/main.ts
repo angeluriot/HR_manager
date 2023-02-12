@@ -4,6 +4,7 @@ import { connect_mongodb } from './utils.js';
 import Global from './Global.js';
 import * as Client from './client.js';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 
 
 config();
@@ -11,6 +12,7 @@ const port = process.env.PORT || 3000;
 
 Global.app = express();
 Global.app.use(cors());
+Global.app.use(express.json());
 
 Client.requests();
 

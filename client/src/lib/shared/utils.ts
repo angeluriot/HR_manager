@@ -4,13 +4,13 @@ export function test()
 }
 
 export enum Absences {
-	accident = 0,
-	conge,
-	exceptionnel,
-	formation,
-	maladie,
-	rtt,
-	sansSolde,
-	teletravail,
-	visite
+	accident = "accident",
+	conge = "conge",
+	exceptionnel = "exceptionnel",
+	formation = "formation",
+	maladie = "maladie",
+	rtt = "rtt",
+	sansSolde = "sansSolde",
+	teletravail = "teletravail",
+	visite = "visite"
 }

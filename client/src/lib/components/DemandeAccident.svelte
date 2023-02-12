@@ -8,23 +8,33 @@
 		myFile = input.files[0].name;
 	}
 
-	let start = new Date();
+	let start = "";
 	let start_is_am = true;
 	let start_is_pm = false;
-	let end = new Date();
+	let end = "";
 	let end_is_am = true;
 	let end_is_pm = false;
 	let cause = "";
 	let comments = "";
 
-	const addRequest = () => {
+	const addRequest = async () => {
+
+		let start_date = new Date(start);
+		let end_date = new Date(end);
+
 		let requestAbsence = {
 			type: Absences.accident,
 			concerned: null, // TODO
 			state: 0,
-			days_remote: Array(),
-			start: [start, start_is_pm], // [Date, 0 pour matin / 1 pour aprem]
-			end: [end, end_is_pm], // [Date, 0 pour matin / 1 pour aprem]
+			days_remote: [],
+			start: {
+				day: start_date.toUTCString(),
+				pm: start_is_pm
+			},
+			end: {
+				day: end_date.toUTCString(),
+				pm: end_is_pm
+			},
 			subject_ext: "",
 			place_ext: "",
 			proof: myFile, //TODO : file
@@ -33,8 +43,18 @@
 			hr: null, // TODO
 			comments: comments
 		};
-		console.log("here demande");
-		Server.post("add-request", '', requestAbsence);
+
+		try
+		{
+			var data = await Server.post("add-request", '', requestAbsence);
+		}
+
+		catch (err: any)
+		{
+			console.error(err);
+		}
+
+		console.log(data);
 	};
 </script>
 
