@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { Absences } from "../shared/utils";
 	import * as Server from "../shared/server";
+
 	let myFile = "";
 	const showname = () => {
 		let input = <HTMLInputElement>document.getElementById("fileID");
 		myFile = input.files[0].name;
 	}
+
 	let start = new Date();
 	let start_is_am = true;
 	let start_is_pm = false;
@@ -14,6 +16,7 @@
 	let end_is_pm = false;
 	let cause = "";
 	let comments = "";
+
 	const addRequest = () => {
 		let requestAbsence = {
 			type: Absences.accident,
@@ -21,6 +24,7 @@
 			state: 0,
 			days_remote: Array(),
 			start: [start, start_is_pm], // [Date, 0 pour matin / 1 pour aprem]
+			end: [end, end_is_pm], // [Date, 0 pour matin / 1 pour aprem]
 			subject_ext: "",
 			place_ext: "",
 			proof: myFile, //TODO : file
@@ -30,7 +34,7 @@
 			comments: comments
 		};
 		console.log("here demande");
-		Server.post("add-request", '', {request_data: requestAbsence});
+		Server.post("add-request", '', requestAbsence);
 	};
 </script>
 

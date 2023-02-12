@@ -74,10 +74,11 @@ export function requests()
 
 		if (req.body) {
 			console.log(req.body);
-			res.send("Body received!");
-		  } else {
-			res.status(400).send("No body found in request");
-		  }
+			res.send(JSON.stringify({ message: "Body received!" }));
+		} else {
+			res.status(400).send(JSON.stringify({ message: "No body found in request" }));
+		}
+		
 		try
 		{
 			var email = Connection.verify_token(req.query.token);
@@ -91,7 +92,7 @@ export function requests()
 
 		try 
 		{
-			var request = await Request.add(req.body.request_data);
+			var request = await Request.add(req.body);
 		}
 
 		catch (error: any)

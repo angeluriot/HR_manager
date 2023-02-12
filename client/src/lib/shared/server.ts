@@ -81,6 +81,8 @@ export async function get(url: string, params: any = {})
 
 export async function post(url: string, params: any, body: any)
 {
+
+	console.log("body",JSON.stringify(body));
 	let token = Cookie.get_token();
 
 	if (!token)
@@ -89,24 +91,19 @@ export async function post(url: string, params: any, body: any)
 		return;
 	}
 
-	try
+	let temp = new URLSearchParams({ token }) + params ? new URLSearchParams({ token })  + '&' + new URLSearchParams(params) : '';
+	var response = await fetch(Global.server_url + url + "?" + temp,
 	{
-		let temp = new URLSearchParams({ token }) + params ? new URLSearchParams({ token })  + '&' + new URLSearchParams(params) : '';
-		var response = await fetch(Global.server_url + url + "?" + temp,
-		{
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(body)
-		});
-	}
-
-	catch (error: any)
-	{
-		throw new Error("Connection error.");
-	}
-
-	if (!response.ok)
-		throw new Error(await response.text());
-
-	return await response.json();
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(body)
+	})
+	.then(response => response.json())
+	.then(responseData => {
+		console.log(responseData);
+	})
+	.catch(error => {
+		console.error(error);
+	});
+	
 }
