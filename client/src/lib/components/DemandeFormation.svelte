@@ -1,4 +1,19 @@
 <script lang="ts">
+
+let startMorning = true;
+	$: startAfternoon = !startMorning;
+	let endMorning = true;
+	$: endAfternoon = !endMorning;
+
+	function swapCheck(time : string){
+		if(time == "start"){
+			startMorning = !startMorning;
+		}
+		else{
+			endMorning = !endMorning;
+		}
+	}
+
 </script>
 
 <div class = "gap-6">
@@ -18,11 +33,11 @@
 			<input type="date" id="début" class = "w-52">
 			<div class = "flex flex-row gap-10 my-2">
 				<span>
-					<input type="checkbox" id="matin" name="matin" checked>
+					<input type="checkbox" checked={startMorning} on:change={() => swapCheck("start")}>
 					<label for="matin">matin</label>
 				</span>
 				<span>
-					<input type="checkbox" id="après-midi" name="après-midi">
+					<input type="checkbox" checked={startAfternoon} on:change={() => swapCheck("start")}>
 					<label for="après-midi">après-midi</label>
 				</span>
 			</div>
@@ -32,11 +47,11 @@
 			<input type="date" id="fin" class = "w-52">
 			<div class = "flex flex-row gap-10 my-2">
 				<span>
-					<input type="checkbox" id="matin" checked>
+					<input type="checkbox" checked={endMorning} on:change={() => swapCheck("end")}>
 					<label for="matin">matin</label>
 				</span>
 				<span>
-					<input type="checkbox" id="après-midi">
+					<input type="checkbox" checked={endAfternoon} on:change={() => swapCheck("end")}>
 					<label for="après-midi">après-midi</label>
 				</span>
 			</div>
@@ -57,6 +72,11 @@
 	div{
 		@apply w-full;
 	}
+
+	span{
+		@apply my-6;
+	}
+	
 	input{
 		@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
 	}
