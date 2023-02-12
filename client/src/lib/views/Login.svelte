@@ -32,7 +32,7 @@
 
 		try
 		{
-			var connection_data = await Server.login(email.trim(), password.trim());
+			await Server.login(email.trim(), password.trim());
 		}
 
 		catch (err: any)
@@ -40,10 +40,6 @@
 			error = err.message;
 			return;
 		}
-
-		Global.user = connection_data.user_data;
-		Cookie.save_token(connection_data.token, connection_data.expires);
-		window.location.href = "#/";
 	}
 
 </script>

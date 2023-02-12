@@ -2,6 +2,7 @@ import express from 'express';
 import Global from './Global.js';
 import * as Connection from './users/connection.js';
 import fs from 'fs';
+import * as Users from './models/user.js';
 
 export function requests()
 {
@@ -30,7 +31,7 @@ export function requests()
 
 		try
 		{
-			var user_data = await Connection.auto_login(token, req.ip === "::1" ? "127.0.0.1" : req.ip);
+			var connection_data = await Connection.auto_login(token, req.ip === "::1" ? "127.0.0.1" : req.ip);
 		}
 
 		catch (error: any)
@@ -39,7 +40,7 @@ export function requests()
 			return;
 		}
 
-		res.send(JSON.stringify(user_data));
+		res.send(JSON.stringify(connection_data));
 	});
 
 	Global.app.get('/photo', async (req: express.Request, res: express.Response) =>

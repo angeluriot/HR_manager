@@ -6,7 +6,7 @@
 	import { routes } from './routes.js';
 </script>
 
-<main>
+<main class="flex flex-row justify-start items-center">
 	<Router routes={routes}/>
 </main>
 

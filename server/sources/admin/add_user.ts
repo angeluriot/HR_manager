@@ -34,11 +34,9 @@ async function main()
 		var user = await User.add({
 			email: email,
 			hashed_password: hashed,
-			first_name: 'default',
-			last_name: 'default',
-			department: {
-				name: 'Default'
-			},
+			first_name: 'none',
+			last_name: 'none',
+			department: 'none',
 			employees: []
 		});
 	}

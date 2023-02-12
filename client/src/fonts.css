@@ -9,3 +9,15 @@
 	font-family: "Nunito-Bold";
 	src: url("./assets/fonts/Nunito/Nunito-Bold.ttf") format("truetype");
 }
+
+@font-face
+{
+	font-family: "Roboto-SemiBold";
+	src: url("./assets/fonts/Roboto/Roboto-SemiBold.ttf") format("truetype");
+}
+
+@font-face
+{
+	font-family: "Roboto-Bold";
+	src: url("./assets/fonts/Roboto/Roboto-Bold.ttf") format("truetype");
+}
