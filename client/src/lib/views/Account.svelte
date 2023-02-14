@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
+	import * as Cookie from "../shared/cookie.js";
 	import * as Server from "../shared/server.js";
 
 	let unique = {};
@@ -20,81 +21,33 @@
 		}
 	});
 
-	// A remplacer par le contenu de la BDD
-	let name = "Nom";
-	let firstname = "Prénom";
-	let birthDate = "jj/mm/aa";
-	let department = "service";
-	let position = "poste";
-	let mail = "exemple@entreprise.fr";
-	let password = "password"				// A changer, sécurité.
-	let profilePic = "/img/user.png";
-	let docs = ["doc1.pdf", "doc2.pdf", "doc3.docx"];
-	let activeDoc = "";
+	let token = Cookie.get_token();
 
-	const changePassword = () => {
-		// charger page changement de mot de passe (même que pour mot de passe oublié au login)
-	}
+	if (!token)
+		Server.logout();
 
-	const changeDoc = (doc:string) => {
-		if (doc !=""){
-			activeDoc = "/img/" + doc;
-			document.getElementById("docDisplay").style.display = "block";
-		}
-		else{
-			document.getElementById("docDisplay").style.display = "none";
-		}
-	}
+	let photo_url = Global.server_url + "photo?" + new URLSearchParams({ token });
 </script>
 
 {#key unique}
-	<Menu active="Compte"/>
-	<div class="flex flex-row gap-6 w-full">
-		<div class = "card gap-4 !w-2/5 h-[90%]">
-			<img src={profilePic} alt="Avatar" class = "rounded-xl w-32 h-32">
+	{#if Global.user}
+		<Menu active="Compte"/>
+		<div class="flex flex-col justify-center items-center w-full gap-6">
+			<img src={photo_url} alt="Avatar" class = "rounded-full w-32 h-32"/>
 			<div>
-				<h1> {name} {firstname}</h1>
-				<p> Date de naissance : {birthDate}</p>
+				<h1> {Global.user.first_name} {Global.user.last_name}</h1>
 			</div>
 			<div>
-				<h2 class = "text-lg font-semibold">Service : {department}</h2>
-				<p> Poste : {position}</p>
-				<p> mail : <a href={mail}>{mail}</a> </p>
+				<h2 class = "text-lg font-semibold">Service : {Global.user.department}</h2>
+				<p> mail : <a href={Global.user.email}>{Global.user.email}</a> </p>
 			</div>
-
-			<div>
-				<label for="pass">Mot de passe</label>
-				<input type="password" name="password" id="pass" minlength="8" required value = {password}>
-				<button class = "!h-[30px] w-[100] my-3 !rounded-[25px] !py-0 bg-[#007AFF]"
-						on:click={() => changePassword()} >modifier
-				</button>
-			</div>
-
-			<select class = "w-[300px] h-[35px] py-[2px] px-2 border-[2px] border-[#007AFF] rounded-[4px]">
-				<option value="" on:click={() => changeDoc("")}>-- mes documents --</option>
-				{#each docs as doc}
-					<option value={doc} on:click={() => changeDoc(doc)}>{doc}</option>
-				{/each}
-			</select>
 		</div>
-
-		<div class = "card !w-[600px] h-[90%] hidden" id="docDisplay">
-			<embed src={activeDoc} class = "w-full h-full" />
-		</div>
-	</div>
+	{/if}
 {/key}
 
 <style>
-	input{
-		@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
-	}
-	label{
-		@apply my-[4px] text-left;
-	}
-	button{
-		@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
-	}
-	.card{
-		@apply p-1 bg-[#dcdada79] rounded-md shadow-[0px_2px_4px_rgba(6,88,239,0.42)];
+	h1
+	{
+		font-family: "Roboto-Bold";
 	}
 </style>

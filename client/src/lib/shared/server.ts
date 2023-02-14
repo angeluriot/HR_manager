@@ -2,7 +2,17 @@ import Global from './Global.js';
 import type * as Types from './types.js';
 import * as Cookie from './cookie.js';
 
-export async function login(email: string, password: string): Promise<{ token: string, expires: string, user_data: Types.UserData }>
+export function logout()
+{
+	Global.user = null;
+	Global.nb_notifications = 0;
+	Global.request_pending = false;
+
+	Cookie.erase_token();
+	window.location.href = "#/login";
+}
+
+export async function login(email: string, password: string): Promise<any>
 {
 	try
 	{
@@ -17,7 +27,15 @@ export async function login(email: string, password: string): Promise<{ token: s
 	if (!response.ok)
 		throw new Error(await response.text());
 
-	return await response.json();
+	let connection_data = await response.json();
+
+	Cookie.save_token(connection_data.token, connection_data.expires);
+
+	Global.user = connection_data.user;
+	Global.days_left = connection_data.days_left;
+	Global.nb_notifications = connection_data.nb_notifications;
+
+	window.location.href = "#/";
 }
 
 export async function auto_login()
@@ -26,7 +44,7 @@ export async function auto_login()
 
 	if (!token)
 	{
-		window.location.href = "#/login";
+		logout();
 		return;
 	}
 
@@ -37,19 +55,21 @@ export async function auto_login()
 
 	catch (error: any)
 	{
-		Cookie.erase_token();
-		window.location.href = "#/login";
+		logout();
 		return;
 	}
 
 	if (!response.ok)
 	{
-		Cookie.erase_token();
-		window.location.href = "#/login";
+		logout();
 		return;
 	}
 
-	Global.user = await response.json();
+	let connection_data = await response.json();
+
+	Global.user = connection_data.user;
+	Global.days_left = connection_data.days_left;
+	Global.nb_notifications = connection_data.nb_notifications;
 }
 
 export async function get(url: string, params: any = {})
@@ -58,7 +78,7 @@ export async function get(url: string, params: any = {})
 
 	if (!token)
 	{
-		window.location.href = "#/login";
+		logout();
 		return;
 	}
 
@@ -85,7 +105,7 @@ export async function post(url: string, params: any, body: any)
 
 	if (!token)
 	{
-		window.location.href = "#/login";
+		logout();
 		return;
 	}
 

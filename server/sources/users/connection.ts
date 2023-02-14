@@ -57,7 +57,9 @@ export async function login(email: any, password: any, ip: string)
 	return {
 		token: token,
 		expires: date.toUTCString(),
-		user_data: await Users.get_data(user)
+		user: await Users.get_data(user),
+		days_left: 5,
+		nb_notifications: 3
 	};
 }
 
@@ -71,5 +73,9 @@ export async function auto_login(token: any, ip: string)
 
 	console.log('[' + new Date().toTimeString().split(' ')[0] + '] User auto logged (' + ip + ') : ' + email);
 
-	return await Users.get_data(user);
+	return {
+		user: await Users.get_data(user),
+		days_left: 5,
+		nb_notifications: 3
+	};
 }

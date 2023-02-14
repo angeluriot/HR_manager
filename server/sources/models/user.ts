@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import * as Department from './department.js';
 
 export interface UserInterface extends mongoose.Document
 {
@@ -7,8 +6,8 @@ export interface UserInterface extends mongoose.Document
 	hashed_password: string;
 	first_name: string;
 	last_name: string;
-	department: mongoose.Types.ObjectId;
-	employees: mongoose.Types.ObjectId[];
+	department: string;
+	manager: string;
 }
 
 const user_schema = new mongoose.Schema(
@@ -32,15 +31,13 @@ const user_schema = new mongoose.Schema(
 		required: true
 	},
 	department: {
-		type: mongoose.Types.ObjectId,
-		ref: 'departments',
+		type: String,
 		required: true
 	},
-	employees: [{
-		type: mongoose.Types.ObjectId,
-		ref: 'users',
-		default: []
-	}]
+	manager: {
+		type: String,
+		required: true
+	}
 }, { timestamps: true });
 
 export const User = mongoose.model('users', user_schema);
@@ -60,60 +57,24 @@ export type UserData = {
 	hashed_password: string,
 	first_name: string,
 	last_name: string,
-	department: Department.DepartmentData,
-	employees: UserData[]
+	department: string,
+	manager: string
 };
 
 export async function get_data(user: UserInterface): Promise<UserData>
 {
-	let department = await Department.get({ _id: user.department });
-
-	if (!department)
-		throw new Error(`Department (id: ${user.department.toString()}) not found`);
-
-	let department_data = await Department.get_data(department);
-	let employees_data: UserData[] = [];
-
-	for (let i = 0; i < user.employees.length; i++)
-	{
-		let employee = await get({ _id: user.employees[i] });
-
-		if (!employee)
-			throw new Error(`Employee (id: ${user.employees[i].toString()}) not found`);
-
-		employees_data.push(await get_data(employee));
-	}
-
 	return {
 		email: user.email,
 		hashed_password: user.hashed_password,
 		first_name: user.first_name,
 		last_name: user.last_name,
-		department: department_data,
-		employees: employees_data
+		department: user.department,
+		manager: user.manager
 	};
 }
 
 export async function add(data: UserData): Promise<UserInterface>
 {
-	let department = await Department.get({ name: data.department.name });
-
-	if (!department)
-		throw new Error(`Department (name: ${data.department.name}) not found`);
-
-	let department_id = department._id;
-	let employees_id: any[] = [];
-
-	for (let i = 0; i < data.employees.length; i++)
-	{
-		let employee = await get({ email: data.employees[i].email });
-
-		if (!employee)
-			throw new Error(`Employee (email: ${data.employees[i].email}) not found`);
-
-		employees_id.push(employee._id);
-	}
-
 	if (await get({ email: data.email }))
 		throw new Error(`User (email: ${data.email}) already exists`);
 
@@ -122,8 +83,8 @@ export async function add(data: UserData): Promise<UserInterface>
 		hashed_password: data.hashed_password,
 		first_name: data.first_name,
 		last_name: data.last_name,
-		department: department_id,
-		employees: employees_id
+		department: data.department,
+		manager: data.manager
 	});
 
 	//@ts-ignore

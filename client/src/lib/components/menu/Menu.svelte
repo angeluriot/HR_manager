@@ -4,6 +4,7 @@
 	import Logo from './Logo.svelte';
 	import Logout from '../../../assets/shapes/Logout.svg';
 	import * as Cookie from '../../shared/cookie.js';
+	import * as Server from '../../shared/server.js';
 
 	export let active: string;
 
@@ -19,19 +20,12 @@
 	let token = Cookie.get_token();
 
 	if (!token)
-		window.location.href = "#/login";
+		Server.logout();
 
 	let photo_url = Global.server_url + "photo?" + new URLSearchParams({ token });
-
-	function logout()
-	{
-		Global.user = null;
-		Cookie.erase_token();
-		window.location.href = "#/login";
-	}
 </script>
 
-<nav class="flex flex-col left-0 top-0 justify-between items-center p-6 h-full">
+<nav class="flex flex-col left-0 top-0 justify-between items-center p-6 h-full gap-8">
 	<div class="flex flex-col justify-start items-center gap-3 select-none">
 		<a href="#/" class="flex flex-row justify-center items-center gap-3 m-3 mb-5">
 			<img src={PolytechLogo} alt="Logo" class="w-7">
@@ -71,7 +65,7 @@
 				<span class="email-text">{Global.user.email}</span>
 			</div>
 		</a>
-		<button class="logout-div flex justify-center items-center select-none" on:click={logout}>
+		<button class="logout-div flex justify-center items-center select-none" on:click={Server.logout}>
 			<img src={Logout} alt="logout" class="logout"/>
 		</button>
 		{/if}
@@ -82,6 +76,8 @@
 	nav
 	{
 		box-shadow: 0px 0px 40px rgb(193, 195, 206);
+		z-index: 999;
+		background-color: white;
 	}
 
 	#logo

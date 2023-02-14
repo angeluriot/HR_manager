@@ -10,12 +10,12 @@
 
 html, body, main
 {
-	@apply absolute m-0 p-0 flex flex-row justify-center w-full h-full;
+	@apply absolute top-0 left-0 m-0 p-0 flex flex-row justify-center w-full h-full;
 }
 
 body
 {
-	@apply bg-slate-50;
+	@apply bg-white;
 }
 
 div
