@@ -503,10 +503,10 @@
 					Absence physique (télétravail, formation...)<br>
 					Demande en cours</span>
 				</div>
-				<button class="request_button" on:click={() => window.location.href="#/requests/new"}>Nouvelle demande</button>				
+				<button class="request_button" on:click={() => window.location.href="#/requests/new"}>Nouvelle demande</button>
 			</div>
-			<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comments={"None"} purpose={"valider"}/>
-		</div>		
+			<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comment={""} action={"Valider"}/>
+		</div>
 	</div>
 {/key}
 

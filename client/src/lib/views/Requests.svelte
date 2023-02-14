@@ -1,7 +1,5 @@
 <script lang="ts">
 	import RequestCard from "../components/RequestCard.svelte";
-	import { Plus } from "svelte-bootstrap-icons";
-	import NewRequest from "./NewRequest.svelte";
 	import { onMount } from "svelte";
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
@@ -29,43 +27,79 @@
 
 {#key unique}
 	<Menu active="Demandes"/>
-	<div class="main flex flex-col w-full gap-12">
-		<div class="main flex flex-row gap-12">
-			<div class="flex flex-col gap-12">
-				<h1>Demandes personnelles</h1>
-				<div class="list gap-2 flex flex-col justify-start overflow-auto">
-					{#each Array(nb_personal_requests) as _}
-						<RequestCard id={101} type={"Télétravail"} first_name={""} last_name={""} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comments={"None"} purpose={"consulter"}/>
-					{/each}
-				</div>
-			</div>
-			<div class="flex flex-col gap-12">
-				<h1>Demandes à valider</h1>
-				<div class="list gap-2 flex flex-col justify-start overflow-auto">
-					{#each Array(nb_incoming_requests) as _}
-						<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comments={"None"} purpose={"consulter"}/>
-					{/each}
-				</div>
+	<div class="main flex flex-row justify-evenly items-end w-full h-full pl-10 pr-10">
+		<div class="flex flex-col justify-start w-full">
+			<h1 class="mb-8">Demandes personnelles</h1>
+			<a href="#/requests/new" class="custom-margin"><button class="bg-[#007AFF] cursor-pointer rounded-xl text-white">
+				Nouvelle demande
+			</button></a>
+			<div class="list">
+				{#each Array(nb_personal_requests) as _}
+					<RequestCard id={101} type={"Télétravail"} first_name={""} last_name={""} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comment={""} action={"Consulter"}/>
+				{/each}
 			</div>
 		</div>
-		<a href="#/requests/new">
-			<button class="bg-[#007AFF]">
-				Nouvelle demande
+		<div class="vl"></div>
+		<div class="flex flex-col justify-start w-full">
+			<h1 class="mb-8">Demandes à valider</h1>
+			<button disabled class="bg-[#ADB1CC] rounded-xl text-white custom-margin">
+				*filtres*
 			</button>
-		</a>
+			<div class="list">
+				{#each Array(nb_incoming_requests) as _}
+					<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comment={""} action={"Consulter"}/>
+				{/each}
+			</div>
+		</div>
 	</div>
 {/key}
 
 <style>
-	.list
+	.vl
 	{
-		height: 60vh;
-	}
-	button{
-		@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
+		height: calc(100vh - 3vw - 20px);
+		border-left: 2px solid #C1CBDA;
 	}
 
-	button:hover{
-		@apply bg-[#005CC0];
+	h1
+	{
+		font-family: "Nunito-Bold";
+		font-size: 27px;
+		color: #09244B;
+	}
+
+	.list
+	{
+		@apply gap-8 flex flex-col justify-start overflow-auto w-full pt-5 pb-8;
+		height: calc(100vh - 3vw - 160px);
+		padding-left: calc(5vw - 10px);
+		padding-right: calc(5vw - 10px);
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	.list::-webkit-scrollbar
+	{
+		display: none;
+	}
+
+	button
+	{
+		@apply select-none;
+		width: 240px;
+		height: 50px;
+		font-family: "Nunito-Bold";
+		font-size: 18px;
+		line-height: 0px;
+	}
+
+	a button:hover
+	{
+		background-color: #005CC0;
+	}
+
+	.custom-margin
+	{
+		margin-bottom: calc(1vw + 30px);
 	}
 </style>

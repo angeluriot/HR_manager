@@ -2,7 +2,6 @@
 
 	import * as Server from '../shared/server.js';
 	import Global from '../shared/Global.js';
-	import * as Cookie from '../shared/cookie.js';
 	import { onMount } from "svelte";
 
 	let unique = {};

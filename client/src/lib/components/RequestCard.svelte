@@ -1,4 +1,7 @@
 <script lang="ts">
+	import Edit from "../../assets/shapes/Edit.svg"
+	import Yes from "../../assets/shapes/Yes.svg"
+	import { onMount } from "svelte";
 
 	export let id: number;
 	export let type: string;
@@ -8,71 +11,171 @@
 	export let days: string[];
 	export let start: string;
 	export let end: string;
-	export let comments: string;
-	export let purpose: string;
-	import { PencilSquare } from "svelte-bootstrap-icons";
+	export let comment: string = "";
+	export let action: string;
 
-	export let colors = ["#FFFFFF", "#FF00FF", "#00FF00"];
+	let state_color = "";
+
+	if (state == "Brouillon")
+		state_color = "#ADB1CC";
+	// TODO
+
+	let button_color = "";
+	let button_color_hover = "";
+	let button_logo = "";
+
+	if (action == "Consulter")
+	{
+		button_color = "#007AFF";
+		button_color_hover = "#0062CC";
+		button_logo = Edit;
+	}
+
+	else if (action == "Valider")
+	{
+		button_color = "#19C97F";
+		button_color_hover = "#0ca86f";
+		button_logo = Yes;
+	}
+	// TODO
+
+	console.log(button_color);
 </script>
 
-<div id="card" class={purpose}>
-	<div id="header">
-		<h2 id="title"><b>{type}</b></h2>
-		<div id="state" style="--color : {colors[2]}">{state}</div>
-	</div>
-	<div id="body" class={purpose}>
-		{#if first_name != ""}
-			<nobr><b>Nom :</b> {last_name} &nbsp; <b>Prénom :</b> {first_name}</nobr>
-		{/if}
-		{#if type == "Télétravail"}
-			<nobr><b>Jours :</b> {#each days as _day}{_day} {/each}</nobr>
-		{/if}
-		<nobr><b>Début :</b> {start} &nbsp; <b>Fin :</b> {end}</nobr>
-	</div>
-	<div id="footer" class={purpose}>
-		<nobr><b>Commentaires :</b> {comments}</nobr>
-		<a href="#/">
-		<div id="btn-consulting">
-			<PencilSquare />
-			&nbsp; {purpose}
+<div id="card" class="flex flex-col justify-start items-start w-full rounded-3xl p-5 gap-2 relative {action}">
+	<header class="flex flex-row w-full justify-between mb-2">
+		<h2>{type}</h2>
+		<div id="state" class="rounded-full" style="--color: {state_color};">{state}</div>
+	</header>
+	{#if first_name != ""}
+		<div class="line">
+			<span class="label">Auteur :</span>
+			<span class="value">{first_name} {last_name}</span>
 		</div>
-		</a>
+	{/if}
+	{#if type == "Télétravail"}
+		<div class="line">
+			<span class="label">Jours :</span>
+			<span class="value">
+				{#each days as day, i}
+					{day + (i < days.length - 1 ? "," : "")}
+				{/each}</span>
+		</div>
+	{/if}
+	<div class="flex flex-row gap-4">
+		<div class="line">
+			<span class="label">Début :</span>
+			<span class="value">{start}</span>
+		</div>
+		<div class="line">
+			<span class="label">Fin :</span>
+			<span class="value">{end}</span>
+		</div>
 	</div>
+	<div class="line mb-2">
+		<span class="label">Commentaire :</span>
+		<span class="value">{comment == "" ? "(vide)" : comment}</span>
+	</div>
+	<a href="#/" class="button-a {action == "Consulter" ? "absolute" : "ml-auto"}">
+		<button class="flex flex-row justify-center items-center gap-2" style="--color: {button_color}; --hover-color: {button_color_hover};">
+			<img src={button_logo} alt="edit"/>
+			<span>{action}</span>
+		</button>
+	</a>
 </div>
 
 <style>
-	#card.consulter{	
-		@apply bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.25)] rounded-[10px] p-[5px] m-[10px] w-[30vw] text-left;	 
+	div, span, a, button
+	{
+		white-space: nowrap;
+		text-decoration: none;
 	}
-	#card.valider{
-		@apply bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.25)] rounded-[10px] p-2 w-full h-[47%] gap-12 text-left;
+
+	#card
+	{
+		box-shadow: 0px 6px 25px rgb(193, 195, 206);
+		max-width: 550px;
 	}
-	#header{
-		@apply flex flex-row w-full justify-between;
+
+	#card.consulter
+	{
+		margin: 10px;
+		width: 30vw;
+		text-align: left;
 	}
-	#title{
-		@apply font-[1.2em];
+
+	#card.valider
+	{
+		width: 100%;
+		height: 47%;
+		text-align: left;
 	}
-	#state{
-		@apply bg-[var(--color)] shadow-[0px_2px_4px_rgba(0,0,0,0.25)] p-[5px] rounded-[15px] text-sm;
+
+	h2
+	{
+		font-family: "Nunito-Bold";
+		font-size: 20px;
+		color: #09244B;
 	}
-	#body.consulter{
-		@apply w-full leading-[2em];
+
+	#state
+	{
+		font-family: "Nunito-SemiBold";
+		font-size: 15px;
+		line-height: 0px;
+		color: white;
+		padding: 0px 10px 0px 10px;
+		background-color: var(--color);
 	}
-	#body.valider{
-		@apply w-full gap-6;
+
+	.line
+	{
+		@apply flex flex-row justify-start items-center gap-2;
 	}
-	#btn-consulting{
-		@apply flex flex-row bg-[#007AFF] text-white p-[5px] rounded-lg font-medium text-lg; 
+
+	.label
+	{
+		font-family: "Nunito-Bold";
+		font-size: 18px;
+		color: #09244B;
 	}
-	#btn-consulting:hover{
-		@apply bg-[#0062CC];
+
+	.value
+	{
+		font-family: "Roboto-Regular";
+		font-size: 16px;
+		color: #09244B;
 	}
-	
-	#footer.consulter{
-		@apply flex flex-row w-full justify-between px-[2em] mb-[1em] ;
+
+	.button-a
+	{
+		right: 1.25rem;
+		bottom: 1.25rem;
 	}
-	#footer.valider{
-		@apply flex flex-col w-full justify-between gap-8 mb-4 ;
+
+	button
+	{
+		padding: 10px 17px 10px 14px;
+		border-radius: 10px;
+		background-color: var(--color);
+	}
+
+	button span
+	{
+		color: white;
+		line-height: 0px;
+		margin-bottom: -1px;
+		font-family: "Nunito-SemiBold";
+		font-size: 15px;
+	}
+
+	button img
+	{
+		width: 21px;
+	}
+
+	button:hover
+	{
+		background-color: var(--hover-color);
 	}
 </style>
