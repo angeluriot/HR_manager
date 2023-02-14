@@ -7,7 +7,7 @@ export interface UserInterface extends mongoose.Document
 	first_name: string;
 	last_name: string;
 	department: string;
-	employees: string[];
+	manager: string;
 }
 
 const user_schema = new mongoose.Schema(
@@ -34,10 +34,10 @@ const user_schema = new mongoose.Schema(
 		type: String,
 		required: true
 	},
-	employees: [{
-		type: [String],
-		default: []
-	}]
+	manager: {
+		type: String,
+		required: true
+	}
 }, { timestamps: true });
 
 export const User = mongoose.model('users', user_schema);
@@ -58,7 +58,7 @@ export type UserData = {
 	first_name: string,
 	last_name: string,
 	department: string,
-	employees: string[]
+	manager: string
 };
 
 export async function get_data(user: UserInterface): Promise<UserData>
@@ -69,7 +69,7 @@ export async function get_data(user: UserInterface): Promise<UserData>
 		first_name: user.first_name,
 		last_name: user.last_name,
 		department: user.department,
-		employees: user.employees
+		manager: user.manager
 	};
 }
 
@@ -84,7 +84,7 @@ export async function add(data: UserData): Promise<UserInterface>
 		first_name: data.first_name,
 		last_name: data.last_name,
 		department: data.department,
-		employees: data.employees
+		manager: data.manager
 	});
 
 	//@ts-ignore

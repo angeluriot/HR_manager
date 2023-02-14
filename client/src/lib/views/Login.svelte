@@ -45,13 +45,13 @@
 </script>
 
 {#key unique}
-	<div class="main gap-10">
+	<div class="flex flex-col justify-center items-center w-full h-full gap-20">
 		<h1>Login</h1>
 		<div class="flex flex-col">
 			<label for="email">Email</label>
-			<input type="email" id="email" class="mb-6" bind:value={email}/>
+			<input type="email" id="email" class="mb-6 bg-slate-100 rounded-lg" bind:value={email}/>
 			<label for="password">Password</label>
-			<input type="password" id="password" class="mb-6" bind:value={password} />
+			<input type="password" id="password" class="mb-6 bg-slate-100 rounded-lg" bind:value={password} />
 			<span class="text-red-500 mb-6">{error}</span>
 			<button on:click={onClick} class="bg-blue-500 text-white p-2 rounded">Login</button>
 		</div>

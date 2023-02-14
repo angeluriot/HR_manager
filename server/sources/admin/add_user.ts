@@ -37,7 +37,7 @@ async function main()
 			first_name: 'none',
 			last_name: 'none',
 			department: 'none',
-			employees: []
+			manager: 'none'
 		});
 	}
 
