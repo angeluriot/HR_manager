@@ -35,7 +35,7 @@
 				<h1>Demandes personnelles</h1>
 				<div class="list gap-2 flex flex-col justify-start overflow-auto">
 					{#each Array(nb_personal_requests) as _}
-						<RequestCard id={101} type={"Télétravail"} first_name={""} last_name={""} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comments={"None"}/>
+						<RequestCard id={101} type={"Télétravail"} first_name={""} last_name={""} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comments={"None"} purpose={"consulter"}/>
 					{/each}
 				</div>
 			</div>
@@ -43,7 +43,7 @@
 				<h1>Demandes à valider</h1>
 				<div class="list gap-2 flex flex-col justify-start overflow-auto">
 					{#each Array(nb_incoming_requests) as _}
-						<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comments={"None"}/>
+						<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comments={"None"} purpose={"consulter"}/>
 					{/each}
 				</div>
 			</div>
