@@ -7,7 +7,7 @@ export interface RequestInterface extends mongoose.Document
 	concerned: mongoose.Types.ObjectId;
 	state: number;
 	days_remote: Array<String>;
-	period_days_remote: Array<Number>; // 1 for morning, 2 for afternoon, 3 for twice
+	period_days_remote: Array<Number>; // 1 for morning, 2 for afternoon, 3 for both
 	start: String; 
 	start_isam: boolean;
 	end: String;

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Calendar from "../components/Calendar.svelte";
+	import RequestCard from "../components/RequestCard.svelte";
 	import { onMount } from "svelte";
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
@@ -20,6 +21,8 @@
 			restart();
 		}
 	});
+
+	let showRequest = false;
 
 	let days = [];
 	let now = new Date();
@@ -328,7 +331,7 @@
 
 {#key unique}
 	<Menu active="Accueil"/>
-	<div id="container" class="main gap-10">
+	<div id="container" class="flex flex-row gap-40">
 		<div id="calendar_container" class="main gap-10">
 			<div class="calendar">
 				<div class="calendar_header">
@@ -341,23 +344,26 @@
 					<span id="days_info">Nombre de jours de congé : 0 </span>
 				</div>
 				<Calendar {days} {absences} {is_month_mode}/>
-			</div>
+			</div>			
 		</div>
-		<div id="side_menu">
-			<button class="request_button" on:click={() => window.location.href="#/requests"}>Nouvelle demande</button>
-			<div class="legend">
-				<div class="dots_column">
-					<span id="green_dot" class="dot"></span>
-					<span id="red_dot" class="dot"></span>
-					<span id="blue_dot" class="dot"></span>
-					<span id="gray_dot" class="dot"></span>
+		<div class="gap-8 h-full">
+			<div id="side_menu" class="gap-12 h-[35%]">
+				<div class="legend">
+					<div class="dots_column">
+						<span id="green_dot" class="dot"></span>
+						<span id="red_dot" class="dot"></span>
+						<span id="blue_dot" class="dot"></span>
+						<span id="gray_dot" class="dot"></span>
+					</div>
+					<span class="legend_text">Congé (congé payé, RTT...)<br>
+					Maladie (accident, arrêt maladie...)<br>
+					Absence physique (télétravail, formation...)<br>
+					Demande en cours</span>
 				</div>
-				<span class="legend_text">Congé (congé payé, RTT...)<br>
-				Maladie (accident, arrêt maladie...)<br>
-				Absence physique (télétravail, formation...)<br>
-				Demande en cours</span>
+				<button class="request_button" on:click={() => window.location.href="#/requests/new"}>Nouvelle demande</button>				
 			</div>
-		</div>
+			<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comments={"None"} purpose={"valider"}/>
+		</div>		
 	</div>
 {/key}
 
@@ -415,7 +421,6 @@
 		flex-direction: row;
 		display: flex;
 
-		right: 65px;
 		font-size: 20px;
 		color: white;
 		background: #007AFF;
@@ -468,17 +473,12 @@
 		flex-direction: column;
 		display: flex;
 		height: 100vh;
-		margin-left: 300px;
 	}
 
 	#side_menu {
 		position: relative;
 		flex-direction: column;
 		display: flex;
-		align-content: left;
-		bottom: 240px;
-		right: 50px;
-		margin: auto;
 	}
 
 	#month_mode_button {
