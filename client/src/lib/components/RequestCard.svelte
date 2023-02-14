@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Home from "../views/Home.svelte";
 
 	export let id: number;
 	export let type: string;
