@@ -2,7 +2,7 @@
 	import Calendar from "../components/Calendar.svelte";
 	import RequestCard from "../components/RequestCard.svelte";
 	import { onMount } from "svelte";
-	import { onDestroy } from "svelte/types/runtime/internal/lifecycle";
+	import { onDestroy } from "svelte";
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
@@ -22,6 +22,8 @@
 			restart();
 		}
 	});
+
+	onDestroy(() => Global.index = -1);
 
 	let days = [];
 	let now = new Date();

@@ -77,7 +77,7 @@
 		<span class="label">Commentaire :</span>
 		<span class="value">{comment == "" ? "(vide)" : comment}</span>
 	</div>
-	<a href="#/" class="button-a {action == "Consulter" ? "absolute" : "ml-auto"}" on:click={ () => Global.index = -1}>
+	<a href="#/" class="button-a {action == "Consulter" ? "absolute" : "ml-auto"}" on:click={ () => Global.index = 1}>
 		<button class="flex flex-row justify-center items-center gap-2" style="--color: {button_color}; --hover-color: {button_color_hover};">
 			<img src={button_logo} alt="edit"/>
 			<span>{action}</span>
