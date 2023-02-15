@@ -2,6 +2,7 @@
 	import Calendar from "../components/Calendar.svelte";
 	import RequestCard from "../components/RequestCard.svelte";
 	import { onMount } from "svelte";
+	import { onDestroy } from "svelte/types/runtime/internal/lifecycle";
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
@@ -21,8 +22,6 @@
 			restart();
 		}
 	});
-
-	let showRequest = false;
 
 	let days = [];
 	let now = new Date();
@@ -505,7 +504,9 @@
 				</div>
 				<button class="request_button" on:click={() => window.location.href="#/requests/new"}>Nouvelle demande</button>
 			</div>
-			<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comment={""} action={"Valider"}/>
+			{#if Global.index != -1}
+				<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comment={""} action={"Valider"}/>
+			{/if}
 		</div>
 	</div>
 {/key}
