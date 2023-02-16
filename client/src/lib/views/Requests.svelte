@@ -33,10 +33,12 @@
 		action: string;
 	};
 
-	let myRequests: displayableRequest[] = [];
+	let myRequests : displayableRequest[] = [];
 	let employeesRequests : displayableRequest[] = [];
 
-	Server.get('get-requests').then((results) => {
+	let myRequestsPromise = Server.get('get-requests');
+
+	myRequestsPromise.then((results) => {
 		console.log('Results:', results);
 		// display the ID of each request found
 		results.forEach((result) => {
@@ -74,9 +76,14 @@
 				Nouvelle demande
 			</button></a>
 			<div class="list">
-				{#each myRequests as myRequest}
-					<RequestCard request={myRequest}/>
-				{/each}
+				{#await myRequestsPromise}
+					<p>...waiting</p>
+				{:then myRequests} 
+					{#each myRequests as myRequest}
+						<RequestCard request={myRequest}/>
+					{/each}
+				{/await}
+				
 			</div>
 		</div>
 		<div class="vl"></div>
