@@ -4,20 +4,34 @@
 	import Yes from "../../assets/shapes/Yes.svg"
 	import { onMount } from "svelte";
 
-	export let id: number;
-	export let type: string;
-	export let first_name: string;
-	export let last_name: string;
-	export let state: string;
-	export let days: string[];
-	export let start: string;
-	export let end: string;
-	export let comment: string = "";
-	export let action: string;
+	// export let id: number;
+	// export let type: string;
+	// export let first_name: string;
+	// export let last_name: string;
+	// export let state: string;
+	// export let days: string[];
+	// export let start: string;
+	// export let end: string;
+	// export let comment: string = "";
+	// export let action: string;
+
+	interface displayableRequest {
+		id: string;
+		type: string;
+		author: string;
+		state: number;
+		days: string[];
+		start: string;
+		end: string;
+		comments: string;
+		action: string;
+	};
+
+	export let request : displayableRequest;
 
 	let state_color = "";
 
-	if (state == "Brouillon")
+	if (request.state == 0)
 		state_color = "#ADB1CC";
 	// TODO
 
@@ -25,14 +39,14 @@
 	let button_color_hover = "";
 	let button_logo = "";
 
-	if (action == "Consulter")
+	if (request.action == "Consulter")
 	{
 		button_color = "#007AFF";
 		button_color_hover = "#0062CC";
 		button_logo = Edit;
 	}
 
-	else if (action == "Valider")
+	else if (request.action == "Valider")
 	{
 		button_color = "#19C97F";
 		button_color_hover = "#0ca86f";
@@ -43,44 +57,44 @@
 	console.log(button_color);
 </script>
 
-<div id="card" class="flex flex-col justify-start items-start w-full rounded-3xl p-5 gap-2 relative {action}">
+<div id="card" class="flex flex-col justify-start items-start w-full rounded-3xl p-5 gap-2 relative {request.action}">
 	<header class="flex flex-row w-full justify-between mb-2">
-		<h2>{type}</h2>
-		<div id="state" class="rounded-full" style="--color: {state_color};">{state}</div>
+		<h2>{request.type}</h2>
+		<div id="state" class="rounded-full" style="--color: {state_color};">{request.state}</div>
 	</header>
-	{#if first_name != ""}
+	{#if request.author != ""}
 		<div class="line">
 			<span class="label">Auteur :</span>
-			<span class="value">{first_name} {last_name}</span>
+			<span class="value">{request.author}</span>
 		</div>
 	{/if}
-	{#if type == "Télétravail"}
+	{#if request.type == "Télétravail"}
 		<div class="line">
 			<span class="label">Jours :</span>
 			<span class="value">
-				{#each days as day, i}
-					{day + (i < days.length - 1 ? "," : "")}
+				{#each request.days as day, i}
+					{day + (i < request.days.length - 1 ? "," : "")}
 				{/each}</span>
 		</div>
 	{/if}
 	<div class="flex flex-row gap-4">
 		<div class="line">
 			<span class="label">Début :</span>
-			<span class="value">{start}</span>
+			<span class="value">{request.start}</span>
 		</div>
 		<div class="line">
 			<span class="label">Fin :</span>
-			<span class="value">{end}</span>
+			<span class="value">{request.end}</span>
 		</div>
 	</div>
 	<div class="line mb-2">
 		<span class="label">Commentaire :</span>
-		<span class="value">{comment == "" ? "(vide)" : comment}</span>
+		<span class="value">{request.comments == "" ? "(vide)" : request.comments}</span>
 	</div>
-	<a href="#/" class="button-a {action == "Consulter" ? "absolute" : "ml-auto"}" on:click={ () => Global.index = 1}>
+	<a href="#/" class="button-a {request.action == "Consulter" ? "absolute" : "ml-auto"}" on:click={ () => Global.index = 1}>
 		<button class="flex flex-row justify-center items-center gap-2" style="--color: {button_color}; --hover-color: {button_color_hover};">
 			<img src={button_logo} alt="edit"/>
-			<span>{action}</span>
+			<span>{request.action}</span>
 		</button>
 	</a>
 </div>

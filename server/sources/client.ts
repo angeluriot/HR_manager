@@ -97,4 +97,11 @@ export function requests()
 		console.log("Request created with id:", request.id);
 		res.send(JSON.stringify(Request.get_data(request)));
 	});
+
+	Global.app.get('/get-requests', async (req, res) => {
+		console.log("get-server");
+		const email = req.query.email;
+		const requests = await Request.get({ email: email });
+		res.json(requests);
+	});
 }

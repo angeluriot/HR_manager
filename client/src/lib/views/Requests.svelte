@@ -21,8 +21,48 @@
 		}
 	});
 
+	interface displayableRequest {
+		id: string;
+		type: string;
+		author: string;
+		state: number;
+		days: string[];
+		start: string;
+		end: string;
+		comments: string;
+		action: string;
+	};
+
+	let myRequests: displayableRequest[] = [];
+	let employeesRequests : displayableRequest[] = [];
+
+	Server.get('get-requests').then((results) => {
+		console.log('Results:', results);
+		// display the ID of each request found
+		results.forEach((result) => {
+			const request: displayableRequest = { 
+				id: result._id,
+				type: result.type,
+				author: Global.user.first_name + ' ' + Global.user.last_name,
+				state: result.state, 
+				days:["Jeudi", "Mardi"],
+				start: result.start,
+				end: result.end,
+				comments: result.comments,
+				action: "consulter"
+			};
+			myRequests.push(request)
+			console.log('Request ID:', result._id);
+		});
+		console.log(myRequests[0]);
+	})
+	.catch((error) => {
+		console.error('Error:', error);
+	});
+
 	let nb_personal_requests = 7; // From db
 	let nb_incoming_requests = 2; // From db
+
 </script>
 
 {#key unique}
@@ -34,8 +74,8 @@
 				Nouvelle demande
 			</button></a>
 			<div class="list">
-				{#each Array(nb_personal_requests) as _}
-					<RequestCard id={101} type={"Télétravail"} first_name={""} last_name={""} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comment={""} action={"Consulter"}/>
+				{#each myRequests as myRequest}
+					<RequestCard request={myRequest}/>
 				{/each}
 			</div>
 		</div>
@@ -47,7 +87,7 @@
 			</button>
 			<div class="list">
 				{#each Array(nb_incoming_requests) as _}
-					<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comment={""} action={"Consulter"}/>
+					<!-- <RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comment={""} action={"Consulter"}/> -->
 				{/each}
 			</div>
 		</div>

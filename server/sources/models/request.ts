@@ -88,9 +88,10 @@ const request_schema = new mongoose.Schema(
 
 export const Request = mongoose.model('requests', request_schema);
 
-export async function get(filter: any): Promise<RequestInterface | null>
+export async function get(filter: any): Promise<RequestInterface[] | null>
 {
-	return await Request.findOne(filter);
+	console.log("get-request");
+	return await Request.find(filter);
 }
 
 export async function remove(filter: any)
