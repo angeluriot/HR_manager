@@ -4,8 +4,11 @@
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
+	import type { RequestData } from "../shared/types.js";
 
 	let unique = {};
+	let user_requests: RequestData[] = [];
+	let manager_requests: RequestData[] = [];
 
 	function restart()
 	{
@@ -19,57 +22,20 @@
 			await Server.auto_login();
 			restart();
 		}
+
+		try
+		{
+			user_requests = await Server.get('user-requests');
+			manager_requests = await Server.get('manager-requests');
+
+			console.log(manager_requests);
+		}
+
+		catch(err)
+		{
+			console.error(err);
+		}
 	});
-
-	interface displayableRequest {
-		id: string;
-		type: string;
-		author: string;
-		state: number;
-		days: string[];
-		start: string;
-		end: string;
-		comments: string;
-		action: string;
-	};
-
-	let myRequests : displayableRequest[] = [];
-
-	let myRequestsPromise = Server.get('get-requests', Global.user);
-	//console.log(Global.user.first_name);
-	myRequestsPromise.then((results) => {
-		//console.log('Results:', results);
-		// display the ID of each request found
-		results.forEach((result) => {
-			const request: displayableRequest = { 
-				id: result._id,
-				type: result.type,
-				author: Global.user.first_name + ' ' + Global.user.last_name,
-				state: result.state, 
-				days:["Jeudi", "Mardi"],
-				start: result.start,
-				end: result.end,
-				comments: result.comments,
-				action: "Consulter",
-			};
-			myRequests.push(request)
-			//console.log('Request ID:', result._id);
-		});
-		//console.log(myRequests[0]);
-	})
-	.catch((error) => {
-		console.error('Error:', error);
-	});
-
-	let employeesRequests : displayableRequest[] = [];
-
-	let employeesRequestsPromise = Server.get('get-users-by-manager', Global.user);
-	console.log(employeesRequestsPromise);
-
-
-	let nb_personal_requests = 7; // From db
-	let nb_incoming_requests = 2; // From db
-
 </script>
 
 {#key unique}
@@ -81,13 +47,9 @@
 				Nouvelle demande
 			</button></a>
 			<div class="list">
-				{#await myRequestsPromise}
-					<p>...waiting</p>
-				{:then _} 
-					{#each myRequests as myRequest}
-						<RequestCard request={myRequest}/>
-					{/each}
-				{/await}				
+				{#each user_requests as user_request}
+					<RequestCard data={user_request} user={true} action="Consulter"/>
+				{/each}
 			</div>
 		</div>
 		<div class="vl"></div>
@@ -97,8 +59,8 @@
 				*filtres*
 			</button>
 			<div class="list">
-				{#each Array(nb_incoming_requests) as _}
-					<!-- <RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comment={""} action={"Consulter"}/> -->
+				{#each manager_requests as manager_request}
+					<RequestCard data={manager_request} user={false} action="Consulter"/>
 				{/each}
 			</div>
 		</div>

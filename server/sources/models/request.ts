@@ -1,24 +1,22 @@
 import mongoose from 'mongoose';
+import type { UserData } from './user.js';
 import * as User from './user.js';
 
 export interface RequestInterface extends mongoose.Document
 {
 	type: string;
-	concerned: string;
-	state: number;
-	days_remote: Array<String>;
-	period_days_remote: Array<Number>; // 1 for morning, 2 for afternoon, 3 for both
-	start: String; 
-	start_isam: boolean;
-	end: String;
-	end_isam: boolean;
-	subject_ext: string;
-	place_ext: string;
-	proof: number; //TODO : file
-	cause_accident: string;
-	head_dep: mongoose.Types.ObjectId;
-	hr: mongoose.Types.ObjectId;
-	comments: string;
+	author: string;
+	state: string;
+	manager: string;
+	hr: string;
+	start: { day: string, pm: boolean };
+	end: { day: string, pm: boolean };
+	remote: { day: string, am: boolean, pm: boolean }[];
+	subject: string;
+	place: string;
+	proof: string;
+	cause: string;
+	comment: string;
 }
 
 const request_schema = new mongoose.Schema(
@@ -27,70 +25,65 @@ const request_schema = new mongoose.Schema(
 		type: String,
 		required: true
 	},
-	concerned: {
+	author: {
 		type: String,
-		ref: 'users',
 		required: true
 	},
 	state: {
-		type: Number,
-		required: true,
-		default: 0
-	},
-	days_remote: {
-		type: Array
-	},
-	period_days_remote: {
-		type: Array
-	},
-	start: {
 		type: String,
 		required: true
 	},
-	start_isam: {
-		type: Boolean,
+	manager: {
+		type: String,
+		default: ""
+	},
+	hr: {
+		type: String,
+		default: ""
+	},
+	start: {
+		type: { day: String, pm: Boolean },
 		required: true
 	},
 	end: {
-		type: String,
+		type: { day: String, pm: Boolean },
 		required: true
 	},
-	end_isam: {
-		type: Boolean,
-		required: true
+	remote: {
+		type: [{ day: String, am: Boolean, pm: Boolean }],
+		default: []
 	},
-	subject_ext: {
+	subject: {
 		type: String,
+		default: ""
 	},
-	place_ext: {
-		type: String
+	place: {
+		type: String,
+		default: ""
 	},
 	proof: {
-		type: Number
+		type: String,
+		default: ""
 	},
-	cause_accident: {
-		type: String
+	cause: {
+		type: String,
+		default: ""
 	},
-	head_dep: {
-		type: mongoose.Types.ObjectId,
-		ref: 'users',
-		required: true
-	},
-	hr: {
-		type: mongoose.Types.ObjectId,
-		ref: 'users',
-		required: true
-	},
-	comments: {
-		type: String
+	comment: {
+		type: String,
+		default: ""
 	}
 }, { timestamps: true });
 
 export const Request = mongoose.model('requests', request_schema);
 
-export async function get(filter: any): Promise<RequestInterface[] | null>
+export async function get(filter: any): Promise<RequestInterface | null>
 {
-	console.log("get-request");
+	return await Request.findOne(filter);
+}
+
+export async function getAll(filter: any): Promise<RequestInterface[] | null>
+{
 	return await Request.find(filter);
 }
 
@@ -100,102 +93,88 @@ export async function remove(filter: any)
 }
 
 export type RequestData = {
-	type: string;
-	concerned: String;
-	state: number;
-	days_remote: String[];
-	period_days_remote: Number[];
-	start: String;
-	start_isam: Boolean;
-	end: String;
-	end_isam: Boolean;
-	subject_ext: string;
-	place_ext: string;
-	proof: number; //TODO : file
-	cause_accident: string;
-	head_dep: User.UserData;
-	hr: User.UserData;
-	comments: string;
+	type: string,
+	author: { email: string, first_name: string, last_name: string, department: string },
+	state: string,
+	manager: { email: string, first_name: string, last_name: string } | null,
+	hr: { email: string, first_name: string, last_name: string } | null,
+	start: { day: string, pm: boolean },
+	end: { day: string, pm: boolean },
+	remote: { day: string, am: boolean, pm: boolean }[],
+	subject: string,
+	place: string,
+	proof: string,
+	cause: string,
+	comment: string
 }
 
 export async function get_data(request: RequestInterface): Promise<RequestData>
 {
-	// check if the users are in the db
-	// let concerned = await User.get({email: request.concerned});
-	let head_dep = await User.get({_id: request.head_dep});
-	let hr = await User.get({_id: request.hr});
+	let author = await User.get({ email: request.author });
 
-	// if (!concerned)
-	// 	throw new Error(`User (id: ${request.concerned}) not found`);
-	if (!head_dep)
-		throw new Error(`User (id: ${request.head_dep}) not found`);
-	if (!hr)
-		throw new Error(`User (id: ${request.hr}) not found`);
+	if (!author)
+		throw new Error("Author not found");
 
-	// get the users data
-	// let concerned_data = await User.get_data(concerned);
-	let head_dep_data = await User.get_data(head_dep);
-	let hr_data = await User.get_data(hr);
+	let author_data = User.get_data(author);
+	let manager_data = null;
+
+	if (request.manager != "")
+	{
+		var manager = await User.get({ email: request.manager });
+
+		if (!manager)
+			throw new Error("Manager not found");
+
+		manager_data = User.get_data(manager);
+	}
+
+	let hr_data = null;
+
+	if (request.hr != "")
+	{
+		var hr = await User.get({ email: request.hr });
+
+		if (!hr)
+			throw new Error("HR not found");
+
+		hr_data = User.get_data(hr);
+	}
 
 	return {
 		type: request.type,
-		concerned: request.concerned,
+		author: { email: author_data.email, first_name: author_data.first_name, last_name: author_data.last_name, department: author_data.department },
 		state: request.state,
-		days_remote: request.days_remote,
-		period_days_remote: request.period_days_remote,
-		start: request.start,
-		start_isam: request.start_isam,
-		end: request.end,
-		end_isam: request.end_isam,
-		subject_ext: request.subject_ext,
-		place_ext: request.place_ext,
+		manager: manager_data ? { email: manager_data.email, first_name: manager_data.first_name, last_name: manager_data.last_name } : null,
+		hr: hr_data ? { email: hr_data.email, first_name: hr_data.first_name, last_name: hr_data.last_name } : null,
+		start: { day: request.start.day, pm: request.start.pm },
+		end: { day: request.end.day, pm: request.end.pm },
+		remote: request.remote.map(e => { return { day: e.day, am: e.am, pm: e.pm } }),
+		subject: request.subject,
+		place: request.place,
 		proof: request.proof,
-		cause_accident: request.cause_accident,
-		head_dep: head_dep_data,
-		hr: hr_data,
-		comments: request.comments,
+		cause: request.cause,
+		comment: request.comment
 	};
 }
 
 export async function add(data: RequestData): Promise<RequestInterface>
 {
-	// check if the users are in the db
-	let concerned = await User.get({email: data.concerned});
-	let head_dep = await User.get({email: data.head_dep.email});
-	let hr = await User.get({email: data.hr.email});
-
-	if (!concerned)
-		throw new Error(`User (${data.concerned}) not found`);
-	if (!head_dep)
-		throw new Error(`User (${data.head_dep.email}) not found`);
-	if (!hr)
-		throw new Error(`User (${data.hr.email}) not found`);
-
-	// get the users data
-	let concerned_id = concerned._id;
-	let head_dep_id = head_dep._id;
-	let hr_id = hr._id;
-
 	const request = new Request({
 		type: data.type,
-		concerned: concerned_id,
+		author: data.author.email,
 		state: data.state,
-		days_remote: data.days_remote,
-		period_days_remote: data.period_days_remote,
+		manager: data.manager ? data.manager.email : "",
+		hr: data.hr ? data.hr.email : "",
 		start: data.start,
-		start_isam: data.start_isam,
 		end: data.end,
-		end_isam: data.end_isam,
-		subject_ext: data.subject_ext,
-		place_ext: data.place_ext,
-		proof: data.proof, 
-		cause_accident: data.cause_accident,
-		head_dep: head_dep_id,
-		hr: hr_id,
-		comments: data.comments,
+		remote: data.remote,
+		subject: data.subject,
+		place: data.place,
+		proof: data.proof,
+		cause: data.cause,
+		comment: data.comment
 	});
 
-	console.log("request added !");
 	//@ts-ignore
 	return await request.save();
 }

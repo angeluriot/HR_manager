@@ -66,7 +66,7 @@ export type UserData = {
 	manager: string
 };
 
-export async function get_data(user: UserInterface): Promise<UserData>
+export function get_data(user: UserInterface): UserData
 {
 	return {
 		email: user.email,

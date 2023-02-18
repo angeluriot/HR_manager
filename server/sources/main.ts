@@ -25,7 +25,7 @@ async function main()
 
 	catch (error: any)
 	{
-		console.log("ERROR:", error.message);
+		console.error("ERROR:", error.message);
 		process.exit(1);
 	}
 

@@ -9,7 +9,7 @@ async function main()
 
 	if (!email || !password || typeof email != 'string' || typeof password != 'string' || email.trim() == '' || password.trim() == '')
 	{
-		console.log("ERROR: email or password is missing (usage: npm run add-user <email> <password>)");
+		console.error("ERROR: email or password is missing (usage: npm run add-user <email> <password>)");
 		process.exit(1);
 	}
 
@@ -23,7 +23,7 @@ async function main()
 
 	catch (error: any)
 	{
-		console.log("ERROR:", error.message);
+		console.error("ERROR:", error.message);
 		process.exit(1);
 	}
 
@@ -43,7 +43,7 @@ async function main()
 
 	catch (error: any)
 	{
-		console.log("ERROR:", error.message);
+		console.error("ERROR:", error.message);
 		process.exit(1);
 	}
 

@@ -8,20 +8,17 @@ export type UserData = {
 };
 
 export type RequestData = {
-	type: string;
-	concerned: UserData;
-	state: number;
-	days_remote: String[];
-	nb_days_remote: Number;
-	start: String;
-	start_isam: Boolean;
-	end: String;
-	end_isam: Boolean;
-	subject_ext: string;
-	place_ext: string;
-	proof: number;
-	cause_accident: string;
-	head_dep: UserData;
-	hr: UserData;
-	comments: string;
+	type: string,
+	author: { email: string, first_name: string, last_name: string, department: string },
+	state: string,
+	manager: { email: string, first_name: string, last_name: string } | null,
+	hr: { email: string, first_name: string, last_name: string } | null,
+	start: { day: string, pm: boolean },
+	end: { day: string, pm: boolean },
+	remote: { day: string, am: boolean, pm: boolean }[],
+	subject: string,
+	place: string,
+	proof: string,
+	cause: string,
+	comment: string
 }
