@@ -53,8 +53,6 @@
 		{
 			console.error(err);
 		}
-
-		console.log(data);
 	};
 </script>
 

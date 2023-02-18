@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import type { UserData } from './user.js';
 import * as User from './user.js';
 
 export interface RequestInterface extends mongoose.Document
@@ -93,6 +92,7 @@ export async function remove(filter: any)
 }
 
 export type RequestData = {
+	id: string,
 	type: string,
 	author: { email: string, first_name: string, last_name: string, department: string },
 	state: string,
@@ -141,6 +141,7 @@ export async function get_data(request: RequestInterface): Promise<RequestData>
 	}
 
 	return {
+		id: request._id,
 		type: request.type,
 		author: { email: author_data.email, first_name: author_data.first_name, last_name: author_data.last_name, department: author_data.department },
 		state: request.state,

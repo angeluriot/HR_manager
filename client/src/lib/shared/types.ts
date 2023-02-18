@@ -8,6 +8,7 @@ export type UserData = {
 };
 
 export type RequestData = {
+	id: string,
 	type: string,
 	author: { email: string, first_name: string, last_name: string, department: string },
 	state: string,

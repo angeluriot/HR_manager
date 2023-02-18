@@ -27,8 +27,6 @@
 		{
 			user_requests = await Server.get('user-requests');
 			manager_requests = await Server.get('manager-requests');
-
-			console.log(manager_requests);
 		}
 
 		catch(err)
