@@ -34,12 +34,11 @@
 	};
 
 	let myRequests : displayableRequest[] = [];
-	let employeesRequests : displayableRequest[] = [];
 
-	let myRequestsPromise = Server.get('get-requests');
-
+	let myRequestsPromise = Server.get('get-requests', Global.user);
+	//console.log(Global.user.first_name);
 	myRequestsPromise.then((results) => {
-		console.log('Results:', results);
+		//console.log('Results:', results);
 		// display the ID of each request found
 		results.forEach((result) => {
 			const request: displayableRequest = { 
@@ -51,16 +50,22 @@
 				start: result.start,
 				end: result.end,
 				comments: result.comments,
-				action: "consulter"
+				action: "Consulter",
 			};
 			myRequests.push(request)
-			console.log('Request ID:', result._id);
+			//console.log('Request ID:', result._id);
 		});
-		console.log(myRequests[0]);
+		//console.log(myRequests[0]);
 	})
 	.catch((error) => {
 		console.error('Error:', error);
 	});
+
+	let employeesRequests : displayableRequest[] = [];
+
+	let employeesRequestsPromise = Server.get('get-users-by-manager', Global.user);
+	console.log(employeesRequestsPromise);
+
 
 	let nb_personal_requests = 7; // From db
 	let nb_incoming_requests = 2; // From db
@@ -78,12 +83,11 @@
 			<div class="list">
 				{#await myRequestsPromise}
 					<p>...waiting</p>
-				{:then myRequests} 
+				{:then _} 
 					{#each myRequests as myRequest}
 						<RequestCard request={myRequest}/>
 					{/each}
-				{/await}
-				
+				{/await}				
 			</div>
 		</div>
 		<div class="vl"></div>

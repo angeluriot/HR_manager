@@ -3,6 +3,7 @@ import Global from './Global.js';
 import * as Connection from './users/connection.js';
 import fs from 'fs';
 import * as Request from './models/request.js';
+import * as User from './models/user.js';
 
 export function requests()
 {
@@ -99,9 +100,28 @@ export function requests()
 	});
 
 	Global.app.get('/get-requests', async (req, res) => {
+
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+		
+		const id = req.query._id; // id du user
+		const requests = await Request.get({ _id: id }); // requêtes dont le "concerned" correspond à cet id
+		res.json(requests);
+	});
+
+	Global.app.get('/get-users-by-manager', async (req, res) => {
 		console.log("get-server");
 		const email = req.query.email;
-		const requests = await Request.get({ email: email });
-		res.json(requests);
+		const users = await User.getAll({ manager: email });	
+		console.log("hi "+email);
+		res.json(users);
 	});
 }

@@ -4,7 +4,7 @@ import * as User from './user.js';
 export interface RequestInterface extends mongoose.Document
 {
 	type: string;
-	concerned: mongoose.Types.ObjectId;
+	concerned: string;
 	state: number;
 	days_remote: Array<String>;
 	period_days_remote: Array<Number>; // 1 for morning, 2 for afternoon, 3 for both
@@ -28,7 +28,7 @@ const request_schema = new mongoose.Schema(
 		required: true
 	},
 	concerned: {
-		type: mongoose.Types.ObjectId,
+		type: String,
 		ref: 'users',
 		required: true
 	},
@@ -101,7 +101,7 @@ export async function remove(filter: any)
 
 export type RequestData = {
 	type: string;
-	concerned: User.UserData;
+	concerned: String;
 	state: number;
 	days_remote: String[];
 	period_days_remote: Number[];
@@ -121,25 +121,25 @@ export type RequestData = {
 export async function get_data(request: RequestInterface): Promise<RequestData>
 {
 	// check if the users are in the db
-	let concerned = await User.get({_id: request.concerned});
+	// let concerned = await User.get({email: request.concerned});
 	let head_dep = await User.get({_id: request.head_dep});
 	let hr = await User.get({_id: request.hr});
 
-	if (!concerned)
-		throw new Error(`User (id: ${request.concerned}) not found`);
+	// if (!concerned)
+	// 	throw new Error(`User (id: ${request.concerned}) not found`);
 	if (!head_dep)
 		throw new Error(`User (id: ${request.head_dep}) not found`);
 	if (!hr)
 		throw new Error(`User (id: ${request.hr}) not found`);
 
 	// get the users data
-	let concerned_data = await User.get_data(concerned);
+	// let concerned_data = await User.get_data(concerned);
 	let head_dep_data = await User.get_data(head_dep);
 	let hr_data = await User.get_data(hr);
 
 	return {
 		type: request.type,
-		concerned: concerned_data,
+		concerned: request.concerned,
 		state: request.state,
 		days_remote: request.days_remote,
 		period_days_remote: request.period_days_remote,
@@ -160,12 +160,12 @@ export async function get_data(request: RequestInterface): Promise<RequestData>
 export async function add(data: RequestData): Promise<RequestInterface>
 {
 	// check if the users are in the db
-	let concerned = await User.get({email: data.concerned.email});
+	let concerned = await User.get({email: data.concerned});
 	let head_dep = await User.get({email: data.head_dep.email});
 	let hr = await User.get({email: data.hr.email});
 
 	if (!concerned)
-		throw new Error(`User (${data.concerned.email}) not found`);
+		throw new Error(`User (${data.concerned}) not found`);
 	if (!head_dep)
 		throw new Error(`User (${data.head_dep.email}) not found`);
 	if (!hr)

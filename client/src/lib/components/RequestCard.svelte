@@ -32,8 +32,11 @@
 	let state_color = "";
 
 	if (request.state == 0)
+	{
 		state_color = "#ADB1CC";
-	// TODO
+		// TODO
+	}
+		
 
 	let button_color = "";
 	let button_color_hover = "";
@@ -45,7 +48,6 @@
 		button_color_hover = "#0062CC";
 		button_logo = Edit;
 	}
-
 	else if (request.action == "Valider")
 	{
 		button_color = "#19C97F";

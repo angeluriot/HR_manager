@@ -47,6 +47,11 @@ export async function get(filter: any): Promise<UserInterface | null>
 	return await User.findOne(filter);
 }
 
+export async function getAll(filter: any): Promise<UserInterface[] | null>
+{
+	return await User.find(filter);
+}
+
 export async function remove(filter: any)
 {
 	await User.findOneAndRemove(filter);
