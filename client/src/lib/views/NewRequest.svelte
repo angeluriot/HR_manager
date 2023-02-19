@@ -44,7 +44,7 @@
 	let request_start_pm = false;
 	let request_end_date = tomorrow.toISOString().substring(0, 10);
 	let request_end_pm = true;
-	let request_remote = [];
+	$: request_remote = remote_days.filter( d => d.am==true || d.pm==true);
 	let request_subject = "";
 	let request_place = "";
 	let request_proof = "";

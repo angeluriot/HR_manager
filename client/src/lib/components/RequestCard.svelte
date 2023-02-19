@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Edit from "../../assets/shapes/Edit.svg"
 	import Yes from "../../assets/shapes/Yes.svg"
+	import Global from "../shared/Global"
+	import * as Server from "../shared/server"
 	import type { RequestData } from "../shared/types.js";
 
 	export let data: RequestData;
@@ -66,7 +68,7 @@
 			<span class="label">Jours :</span>
 			<span class="value">
 				{#each data.remote as day, i}
-					{day.day + (i < data.remote.length - 1 ? ", " : "")}
+					{day.day + (day.am && day.pm ? "" : (day.am ? " (matin)" : "") + (day.pm ? " (après-midi)" : "")) + (i < data.remote.length - 1 ? ", " : "")}
 				{/each}
 			</span>
 		</div>
@@ -86,7 +88,8 @@
 		<span class="value">{data.comment == "" ? "(vide)" : data.comment}</span>
 	</div>
 	<a href="#/" class="button-a {action == "Consulter" ? "absolute" : "ml-auto"}">
-		<button class="flex flex-row justify-center items-center gap-2" style="--color: {button_color}; --hover-color: {button_color_hover};">
+		<button class="flex flex-row justify-center items-center gap-2" style="--color: {button_color}; --hover-color: {button_color_hover};"
+				on:click={ async() => {action == "Consulter" ? Global.displayed= data : await Server.post('accept-request', {_id: data.id}, {accept: true});}}>
 			<img src={button_logo} alt="edit"/>
 			<span>{action}</span>
 		</button>

@@ -23,7 +23,7 @@
 		}
 	});
 
-	onDestroy(() => Global.index = -1);
+	onDestroy(() => Global.displayed = null);
 
 	let days = [];
 	let now = new Date();
@@ -506,8 +506,8 @@
 				</div>
 				<button class="request_button" on:click={() => window.location.href="#/requests/new"}>Nouvelle demande</button>
 			</div>
-			{#if Global.index != -1}
-				<RequestCard id={23} type={"Télétravail"} first_name={"Jean"} last_name={"Dupont"} state={"Brouillon"} days={["Jeudi", "Mardi"]} start={"01/12/2022"} end={"31/12/2022"} comment={""} action={"Valider"}/>
+			{#if Global.displayed != null}
+			<RequestCard data={Global.displayed} user={false} action="Valider"/>
 			{/if}
 		</div>
 	</div>
