@@ -26,6 +26,11 @@
 		return false;
 	}
 
+	function truc(absence)
+	{
+		update_card(absence);
+	}
+
 </script>
 
 <div class="calendar_content">
@@ -44,7 +49,7 @@
 	{#each absences as absence}
 		{#if absence.shown}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<section class="absence_section {absence.type}" on:click={() => update_card(absence)} style="grid-row: {absence.start_row}; grid-column: {absence.start_col} / span {absence.section_duration}; top: {absence.position * 25 - 5}px">
+			<section class="absence_section {absence.type} {absence.selected ? "selected" : ""}" on:click={() => truc(absence)} style="grid-row: {absence.start_row}; grid-column: {absence.start_col} / span {absence.section_duration}; top: {absence.position * 25 - 5}px">
 				<span class="absence_title">{absence.title}</span>
 			</section>
 		{/if}
@@ -61,6 +66,8 @@
 		align-self: center;
 		z-index: 2;
 
+		cursor: pointer;
+
 		border: 0;
 		border-radius: 14px;
 		color: white;
@@ -70,16 +77,44 @@
 		background: #0AD443;
 	}
 
+	.conge.selected {
+		z-index: 3;
+		border: solid;
+		border-color: #0AD443;
+		background: #00FF47;
+	}
+
 	.maladie {
 		background: #F62942;
+	}
+
+	.maladie.selected {
+		z-index: 3;
+		border: solid;
+		border-color: #F62942;
+		background: #FF7787;
 	}
 
 	.physique {
 		background: #1640D4;
 	}
 
+	.physique.selected {
+		z-index: 3;
+		border: solid;
+		border-color: #1640D4;
+		background: #6688FF;
+	}
+
 	.en_cours {
 		background: #AEB4C3;
+	}
+
+	.en_cours.selected {
+		z-index: 3;
+		border: solid;
+		border-color: #AEB4C3;
+		background: #C6CDDD;
 	}
 
 	.absence_title {
