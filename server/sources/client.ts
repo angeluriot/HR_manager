@@ -69,7 +69,7 @@ export function requests()
 			res.sendFile("/resources/photos/default.jpg", { root: '.' });
 	});
 
-	Global.app.post('/add-request', async (req: express.Request, res: express.Response) =>
+	Global.app.post('/save-request', async (req: express.Request, res: express.Response) =>
 	{
 		try
 		{
@@ -82,7 +82,13 @@ export function requests()
 			return;
 		}
 
-		// Check if emal is the same as the one in the request
+		let request_data = req.body;
+
+		if (request_data.author.email !== email)
+		{
+			res.status(400).send("Invalid token");
+			return;
+		}
 
 		try
 		{
@@ -95,8 +101,46 @@ export function requests()
 			return;
 		}
 
-		console.log("Request created with id:", request.id);
-		res.send(JSON.stringify(Request.get_data(request)));
+		console.log(`Request saved by ${request.author} with id: ${request.id}`);
+		res.send({ message: "Request saved" });
+	});
+
+	Global.app.post('/send-request', async (req: express.Request, res: express.Response) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let request_data = req.body;
+
+		if (request_data.author.email !== email)
+		{
+			res.status(400).send("Invalid token");
+			return;
+		}
+
+		try
+		{
+			var request = await Request.add(req.body);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		// TODO: Notifications and stuff
+
+		console.log(`Request sended by ${request.author} with id: ${request.id}`);
+		res.send({ message: "Request sended" });
 	});
 
 	Global.app.get('/user-requests', async (req, res) =>

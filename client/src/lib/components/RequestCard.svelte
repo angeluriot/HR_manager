@@ -15,6 +15,10 @@
 			state_color = "#ADB1CC";
 			break;
 
+		case "En attente":
+			state_color = "#E8A525";
+			break;
+
 		default:
 			state_color = "#ADB1CC";
 			break;
