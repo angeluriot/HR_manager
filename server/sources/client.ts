@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { query } from 'express';
 import Global from './Global.js';
 import * as Connection from './users/connection.js';
 import fs from 'fs';
@@ -139,8 +139,65 @@ export function requests()
 
 		// TODO: Notifications and stuff
 
-		console.log(`Request sended by ${request.author} with id: ${request.id}`);
-		res.send({ message: "Request sended" });
+		console.log(`Request sent by ${request.author} with id: ${request.id}`);
+		res.send({ message: "Request sent" });
+	});
+
+	Global.app.post('/accept-request', async (req: express.Request, res: express.Response) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let request = await Request.get({_id: req.query.id});
+
+		if (!request) {
+			res.status(400).send("Request not found");
+			return;
+		}
+
+		let current_user = await User.get({email: email});
+		let user = await User.get({email: request?.author});
+
+		if ( user?.manager !== email && current_user?.department!== "HR") 
+		{
+			res.status(400).send("Invalid token");
+			return;
+		}
+
+		try
+		{
+			if(user?.manager == email)
+			{
+				request.manager = email;
+				req.body.accept ? request.state="Validée manager" : request.state="Refusée";
+			}
+			else if(current_user?.department == "HR")
+			{
+				request.hr = email;
+				req.body.accept ? request.state="Validée RH" : request.state="Refusée";
+			}
+
+			request.save();
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		// TODO: Notifications and stuff
+
+		console.log(`Request answered by ${email} with id: ${request?.id}`);
+		res.send({ message: "Request answered" });
 	});
 
 	Global.app.get('/user-requests', async (req, res) =>
@@ -179,7 +236,29 @@ export function requests()
 		}
 
 		let users = await User.getAll({ manager: email }) ?? [];
-		let requests = await Request.getAll({ author: { $in: users.map(user => user.email) } }) ?? [];
+		let requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: "En attente"}) ?? [];
+		let requests_data = [];
+
+		for (let request of requests)
+			requests_data.push(await Request.get_data(request));
+
+		res.send(JSON.stringify(requests_data));
+	});
+
+	Global.app.get('/HR-requests', async (req, res) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let requests = await Request.getAll({author: {$ne:email}, state: "Validée manager"}) ?? [];
 		let requests_data = [];
 
 		for (let request of requests)

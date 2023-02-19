@@ -89,7 +89,7 @@
 	</div>
 	<a href="#/" class="button-a {action == "Consulter" ? "absolute" : "ml-auto"}">
 		<button class="flex flex-row justify-center items-center gap-2" style="--color: {button_color}; --hover-color: {button_color_hover};"
-				on:click={ async() => {action == "Consulter" ? Global.displayed= data : await Server.post('accept-request', {_id: data.id}, {accept: true});}}>
+				on:click={ async() => {action == "Consulter" ? Global.displayed= data : await Server.post('accept-request', {id: data.id}, {accept: true});}}>
 			<img src={button_logo} alt="edit"/>
 			<span>{action}</span>
 		</button>

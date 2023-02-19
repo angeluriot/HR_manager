@@ -8,7 +8,7 @@
 
 	let unique = {};
 	let user_requests: RequestData[] = [];
-	let manager_requests: RequestData[] = [];
+	let validation_requests: RequestData[] = [];
 
 	function restart()
 	{
@@ -26,7 +26,7 @@
 		try
 		{
 			user_requests = await Server.get('user-requests');
-			manager_requests = await Server.get('manager-requests');
+			validation_requests = Global.user.department == "HR" ? await Server.get('HR-requests') : await Server.get('manager-requests');			
 		}
 
 		catch(err)
@@ -57,8 +57,8 @@
 				*filtres*
 			</button>
 			<div class="list">
-				{#each manager_requests as manager_request}
-					<RequestCard data={manager_request} user={false} action="Consulter"/>
+				{#each validation_requests as validation_request}
+					<RequestCard data={validation_request} user={false} action="Consulter"/>
 				{/each}
 			</div>
 		</div>
