@@ -32,3 +32,8 @@ h1
 {
 	@apply text-4xl font-bold text-center;
 }
+
+span
+{
+	white-space: nowrap;
+}

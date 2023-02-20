@@ -5,6 +5,7 @@
 	import * as Server from "../shared/server.js";
 	import type { RequestData } from "../shared/types.js";
 	import * as Utils from "../shared/utils.js";
+	import File from "../../assets/shapes/File.svg";
 
 	let unique = {};
 
@@ -18,11 +19,22 @@
 		if (!Global.user)
 		{
 			await Server.auto_login();
+			update_days();
 			restart();
 		}
 	});
 
-	const remote_days = [
+	const types = ["Télétravail", "Congé payé", "Congé exceptionnel", "Congé sans solde", "RTT", "Formation", "Visite extérieure", "Arrêt maladie", "Arrêt de travail", "Accident du travail"];
+
+	// Request data
+	let request_type = types[0];
+	let request_state = "Brouillon";
+	let request_start_date = (new Date()).toISOString().substring(0, 10);
+	let request_start_pm = false;
+	let request_end_date = (new Date()).toISOString().substring(0, 10);
+	let request_end_pm = true;
+
+	let request_remote = [
 		{ day: "Lundi",		am: false, pm: false },
 		{ day: "Mardi",		am: false, pm: false },
 		{ day: "Mercredi",	am: false, pm: false },
@@ -32,33 +44,18 @@
 		{ day: "Dimanche",	am: false, pm: false }
 	];
 
-	const types = ["Congés", "Maladie", "RTT", "Congés sans solde", "Télétravail", "Exceptionnel", "Accident", "Formation", "Visite"];
-
-	let today = new Date();
-	let tomorrow = new Date();
-	tomorrow.setDate(today.getDate() + 1);
-
-	// Request data
-	let request_type = types[0];
-	let request_start_date = today.toISOString().substring(0, 10);
-	let request_start_pm = false;
-	let request_end_date = tomorrow.toISOString().substring(0, 10);
-	let request_end_pm = true;
-	let request_remote = [];
 	let request_subject = "";
 	let request_place = "";
 	let request_proof = "";
 	let request_cause = "";
 	let request_comment = "";
 
+	let requested_days = 1;
+	let remaining_days = 1;
+	let requested_rtt = 1;
+	let remaining_rtt = 1;
 	let upload: HTMLInputElement;
-	let file: string;
-	let color1 = "#007AFF";
-	let color2 = "#555";
-	let frequency : string;
-	let repeat : HTMLElement;
-	let ponctualStart : HTMLElement;
-	let ponctualEnd : HTMLElement;
+	let repeat = false;
 
 	async function send_request(action: string)
 	{
@@ -71,7 +68,7 @@
 			hr: null,
 			start: { day: Utils.date_to_string(new Date(request_start_date)), pm: request_start_pm },
 			end: { day: Utils.date_to_string(new Date(request_end_date)), pm: request_end_pm },
-			remote: request_remote,
+			remote: request_remote.filter(day => day.am || day.pm),
 			subject: request_subject,
 			place: request_place,
 			proof: request_proof,
@@ -83,201 +80,558 @@
 		window.location.href = "#/requests";
 	}
 
-	function show_name()
+	function update_days()
 	{
-		file = upload.files[0].name;
-	}
-
-	function flip_color(freq: string)
-	{
-		if (freq != frequency)
+		if (request_type == "Congé payé" || request_type == "Congé exceptionnel" || request_type == "RTT")
 		{
-			frequency = freq;
+			let start = new Date(request_start_date);
+			let end = new Date(request_end_date);
+			let days = 0;
 
-			let tmp = color1;
-			color1 = color2;
-			color2 = tmp;
-
-			if (frequency == "ponctual")
+			for (let i = start.getTime(); i <= end.getTime(); i += 86400000)
 			{
-				repeat.style.display = "none";
-				ponctualStart.style.display = "flex";
-				ponctualEnd.style.display = "flex";
+				let day = new Date(i).getDay();
+
+				if (day == 0 || day == 6)
+					continue;
+
+				days++;
 			}
 
-			else
-			{
-				repeat.style.display = "flex";
-				ponctualStart.style.display = "none";
-				ponctualEnd.style.display = "none";
-			}
+			days -= 0.5;
+
+			if (request_end_pm)
+				days += 0.5;
+
+			if (request_start_pm)
+				days -= 0.5;
+
+			requested_rtt = days;
+			remaining_rtt = Global.rtt_left - requested_rtt;
+			requested_days = days;
+			remaining_days = Global.days_left - requested_days;
+		}
+
+		else
+		{
+			let start = new Date(request_start_date);
+			let end = new Date(request_end_date);
+			let valid = end.getTime() >= start.getTime();
+
+			if (end.getTime() == start.getTime() && request_start_pm && !request_end_pm)
+				valid = false;
+
+			requested_days = valid ? 1 : -1;
+			remaining_days = valid ? 1 : -1;
 		}
 	}
-
 </script>
 
 {#key unique}
 	<Menu active="Demandes"/>
-	<div class="h-full w-full gap-14">
-		<div class="flex flex-row">
-			<h1 class="text-xl mr-5">Créer une demande :</h1>
+	<div class="h-full w-full gap-14 flex flex-col justify-start items-center py-20 overflow-auto">
+		<h1 class="mb-5">Créer une demande d'absence</h1>
 
-			<select class="w-72 h-11 px-1 py-2 border-solid border-[2px] border-[#007AFF] rounded" bind:value={request_type}>
-				{#each types as type}
-					<option value={type}>{type}</option>
-				{/each}
-			</select>
+		<div class="line flex flex-row justify-center items-center">
+			<div class="input-container enabled flex relative w-full">
+				<select bind:value={request_type}>
+					{#each types as type}
+						<option value={type}>{type}</option>
+					{/each}
+				</select>
+				<span>Type d'absence</span>
+				<svg width=24 height=24 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M17 10L12 15L7 10L17 10Z"/>
+				</svg>
+			</div>
+			<div class="input-container disabled flex relative w-full">
+				<input type="text" value={request_state}/>
+				<span>État de la demande</span>
+			</div>
 		</div>
 
-		{#if request_type == "Formation" || request_type == "Visite"}
-			<div class="flex flex-row">
-				<div class="w-full">
-					{#if request_type == "Formation"}
-						<label for="nom">Nom de la formation</label>
-					{:else if request_type == "Visite"}
-						<label for="motif">Motif de la visite</label>
-					{/if}
-					<input type="text" class="w-80" bind:value={request_subject}>
+		{#if request_type == "Congé payé" || request_type == "Congé exceptionnel"}
+			<div class="line flex flex-row justify-center items-center">
+				<div class="input-container disabled flex relative w-full {requested_days <= 0 ? "invalid" : ""}">
+					<input type="text" value={requested_days <= 0 ? "???" : requested_days}/>
+					<span>Nombre de jours de congés demandés</span>
 				</div>
-				<div class="!w-full">
-					{#if request_type == "Formation"}
-						<label for="lieu">Lieu de la formation</label>
-					{:else if request_type == "Visite"}
-						<label for="lieu">Lieu de la visite</label>
-					{/if}
-					<input type="text" class="w-80" bind:value={request_place}>
+				<div class="input-container disabled flex relative w-full {remaining_days < 0 || requested_days <= 0 ? "invalid" : ""}">
+					<input type="text" value={requested_days <= 0 ? "???" : remaining_days}/>
+					<span>Nombre de jours de congés restants</span>
 				</div>
 			</div>
 		{/if}
+
+		{#if request_type == "RTT"}
+			<div class="line flex flex-row justify-center items-center">
+				<div class="input-container disabled flex relative w-full {requested_rtt <= 0 ? "invalid" : ""}">
+					<input type="text" value={requested_rtt <= 0 ? "???" : requested_rtt}/>
+					<span>Nombre de RTT demandés</span>
+				</div>
+				<div class="input-container disabled flex relative w-full {remaining_rtt < 0 || requested_rtt <= 0 ? "invalid" : ""}">
+					<input type="text" value={requested_rtt <= 0 ? "???" : remaining_rtt}/>
+					<span>Nombre de RTT restants</span>
+				</div>
+			</div>
+		{/if}
+
 		{#if request_type == "Télétravail"}
-			<div class="flex flex-row gap-32">
-				<div class="!w-[30%]">
-					<button id = "ponctuel"
-						class="!h-[30px] w-[150] !rounded-[25px] !py-0 bg-[{color1}]"
-						on:click={() => flip_color("ponctual")}>ponctuel</button>
+			<div class="remote flex flex-col justify-center items-center w-full gap-10 mt-4 mb-2">
+				<div class="flex flex-row justify-center items-center gap-[80px]">
+					<button class="rounded-full {repeat ? "" : "selected"}" on:click={() => { repeat = false }}>Ponctuel</button>
+					<button class="rounded-full {repeat ? "selected" : ""}" on:click={() => { repeat = true }}>Répétition</button>
 				</div>
-				<div class="!w-[30%]">
-					<button id = "répétition"
-						class="!h-[30px] w-[150] !rounded-[25px] !py-0 bg-[{color2}]"
-						on:click={() => flip_color("repetition")}>répétition</button>
-				</div>
-			</div>
-			<div class="flex-row gap-10 hidden" bind:this={repeat}>
-				{#each remote_days as remote_day}
-					<div class= "!w-[15%] my-4">
-						<label for={remote_day.day}>{remote_day.day}</label>
-						<div class="flex flex-row !gap-1 my-2">
-							<div>
-								<input type="checkbox" id="matin" bind:checked={remote_day.am}>
-								<label for="matin">matin</label>
-							</div>
-							<div>
-								<input type="checkbox" id="après-midi" bind:checked={remote_day.pm}>
-								<label for="après-midi">après-midi</label>
-							</div>
-						</div>
+				<div class="remote-days flex-row w-full justify-center items-center {repeat ? "" : "hidden"}">
+					<div class="flex flex-col justify-end items-start h-full gap-[17px]">
+						<span>Matin</span>
+						<span class="mb-[-2px]">Après-midi</span>
 					</div>
-				{/each}
+					{#each request_remote as day}
+					<div class="flex flex-col justify-center items-center gap-4">
+						<span>{day.day}</span>
+						<input type="checkbox" bind:checked={day.am}/>
+						<input type="checkbox" bind:checked={day.pm}/>
+					</div>
+					{/each}
+				</div>
 			</div>
 		{/if}
-		<div class="flex flex-row">
-			<div class="h-full w-full justify-start">
-				<label for="début">Début</label>
-				<input type="date" id="début" class="w-52" bind:value={request_start_date}>
-				<div class="flex !flex-row gap-10 my-2" bind:this={ponctualStart}>
-					<span>
-						<input type="radio" bind:group={request_start_pm} name="start" value={false}>
-						<label for="matin">matin</label>
-					</span>
-					<span>
-						<input type="radio" bind:group={request_start_pm} name="start" value={true}>
-						<label for="après-midi">après-midi</label>
-					</span>
+
+		{#if request_type == "Formation"}
+			<div class="line flex flex-row justify-center items-center">
+				<div class="input-container enabled flex relative w-full">
+					<input type="text" bind:value={request_subject}/>
+					<span>Nom de la formation</span>
+				</div>
+				<div class="input-container enabled flex relative w-full">
+					<input type="text" value={request_place}/>
+					<span>Lieu de la formation</span>
 				</div>
 			</div>
-			<div class="h-full justify-start">
-				<label for="fin">Fin</label>
-				<input type="date" id="fin" class="w-52" bind:value={request_end_date}>
-				<div class="flex flex-row gap-10 my-2" bind:this={ponctualEnd}>
-					<span>
-						<input type="radio" bind:group={request_end_pm} name="end" value={false}>
-						<label for="matin">matin</label>
-					</span>
-					<span>
-						<input type="radio" bind:group={request_end_pm} name="end" value={true}>
-						<label for="après-midi">après-midi</label>
-					</span>
+		{/if}
+
+		{#if request_type == "Visite extérieure"}
+			<div class="line flex flex-row justify-center items-center">
+				<div class="input-container enabled flex relative w-full">
+					<input type="text" bind:value={request_subject}/>
+					<span>Sujet de la visite</span>
+				</div>
+				<div class="input-container enabled flex relative w-full">
+					<input type="text" value={request_place}/>
+					<span>Lieu de la visite</span>
 				</div>
 			</div>
-			{#if request_type == "Congés" || request_type == "RTT" || request_type == "Congés sans solde" || request_type == "Exceptionnel"}
-				<div class="h-full">
-					<div class="card h-full !w-3/5">
-						<ul class="italic font-light">
-							<li>jours acquis :<strong class="text-[#007AFF]">11</strong></li>
-							<li>jours consommés :<strong class="text-[#007AFF]">5</strong></li>
-							<li>jours restants :<strong class="text-[#007AFF]">6</strong></li>
-							<li>jours demandés :<strong class="text-[#007AFF]">3</strong></li>
-						</ul>
+		{/if}
+
+		<div class="line flex flex-row justify-center items-center">
+			<div class="date flex flex-col justify-center items-center w-full gap-6">
+				<div class="day flex relative w-full">
+					<span class="absolute">Date de début</span>
+					<input type="date" class="w-full" bind:value={request_start_date} on:change={update_days}/>
+				</div>
+				<div class="hour flex flex-row justify-evenly items-center w-full mt-2">
+					<div class="flex flex-row justify-center items-center gap-3">
+						<input type="radio" bind:group={request_start_pm} name="start" value={false} on:change={update_days}>
+						<span>Matin</span>
+					</div>
+					<div class="flex flex-row justify-center items-center gap-3">
+						<input type="radio" bind:group={request_start_pm} name="start" value={true} on:change={update_days}>
+						<span>Après-midi</span>
 					</div>
 				</div>
-			{:else if request_type == "Maladie" || request_type == "Accident"}
-				<div class="h-full">
-					<div class="h-full !w-[70%] gap-2 border-dotted border-[#a3a3a3] border-[2px]">
-						<header>
-							<h4>Importer un justificatif</h4>
-						</header>
-						<p class="text-[#a3a3a3] text-[10px]">Fichiers acceptés: PDF, TEXT, DOC, DOCX</p>
-						<input type="file" class="hidden" accept=".doc,.docx,.pdf" bind:this={upload} on:change={ () => show_name() }>
-						<button class="!w-[100px] !h-[30px] bg-[#007AFF] py-0 text-[10px]" on:click={ () => upload.click() }>Parcourir...</button>
-						<p class="text-[#a3a3a3] text-[10px]">{file}</p>
+			</div>
+			<div class="date flex flex-col justify-center items-center w-full gap-6">
+				<div class="day flex relative w-full">
+					<span class="absolute">Date de fin</span>
+					<input type="date" class="w-full" bind:value={request_end_date} on:change={update_days}/>
+				</div>
+				<div class="hour flex flex-row justify-evenly items-center w-full mt-2">
+					<div class="flex flex-row justify-center items-center gap-3">
+						<input type="radio" bind:group={request_end_pm} name="end" value={false} on:change={update_days}>
+						<span>Matin</span>
+					</div>
+					<div class="flex flex-row justify-center items-center gap-3">
+						<input type="radio" bind:group={request_end_pm} name="end" value={true} on:change={update_days}>
+						<span>Après-midi</span>
 					</div>
 				</div>
-			{/if}
-		</div>
-		<div class="flex flex-row">
-			{#if request_type == "Accident"}
-				<div class="!w-[40%]">
-					<label for="commentaire">Cause de l'accident</label>
-					<input type="text" id="cause" class="w-80 h-12" bind:value={request_cause}>
-				</div>
-			{/if}
-			<div class="!w-[40%]">
-				<label for="commentaire">Commentaire (optionnel)</label>
-				<input type="text" id="commentaire" class="w-80 h-12" bind:value={request_comment}>
 			</div>
 		</div>
-		<div class="flex flex-row gap-28 mt-3">
-			<button class="bg-[#555]" on:click={() => { window.location.href = "#/requests"; }}>ANNULER</button>
-			<button class="bg-[#1DCF5A]" on:click={() => send_request("save")}>ENREGISTRER</button>
-			<button class="bg-[#007AFF]" on:click={() => send_request("send")}>SOUMETTRE</button>
+
+		{#if request_type == "Accident du travail"}
+			<div class="line flex flex-row justify-center items-center">
+				<div class="comment flex justify-start items-start relative w-full">
+					<span>Cause de l'accident</span>
+					<textarea rows=5 bind:value={request_cause}/>
+				</div>
+				<div class="proof flex flex-col h-full w-full justify-start items-start" on:click={ () => upload.click() } on:keyup={ () => upload.click() }>
+					<span>Certificat médical</span>
+					<div class="file flex flex-col h-full justify-center items-center w-full">
+						<img src={File} alt="file"/>
+						<div class="flex flex-row w-full gap-[5px]">
+							<h2 class="link">Cliquer pour importer</h2>
+							<h2>ou glisser-déposer</h2>
+						</div>
+						<span>PDF, PNG ou JPG (max. 3MB)</span>
+						<input type="file" class="hidden" accept=".pdf,.png,.jpg,.jpeg" bind:this={upload}>
+					</div>
+				</div>
+			</div>
+		{/if}
+
+		{#if request_type == "Arrêt maladie" || request_type == "Arrêt de travail"}
+			<div class="line flex flex-row justify-center items-center">
+				<div class="proof flex flex-col h-full w-full justify-start items-start" on:click={ () => upload.click() } on:keyup={ () => upload.click() }>
+					<span>Certificat médical</span>
+					<div class="file flex flex-col h-full justify-center items-center w-full">
+						<img src={File} alt="file"/>
+						<div class="flex flex-row w-full gap-[5px]">
+							<h2 class="link">Cliquer pour importer</h2>
+							<h2>ou glisser-déposer</h2>
+						</div>
+						<span>PDF, PNG ou JPG (max. 3MB)</span>
+						<input type="file" class="hidden" accept=".pdf,.png,.jpg,.jpeg" bind:this={upload}>
+					</div>
+				</div>
+				<div class="comment flex justify-start items-start relative w-full">
+					<span>Commentaire (optionnel)</span>
+					<textarea rows=5 bind:value={request_comment}/>
+				</div>
+			</div>
+		{:else}
+		<div class="line flex flex-row justify-center items-center">
+			<div class="comment flex justify-start items-start relative w-full">
+				<span>Commentaire (optionnel)</span>
+				<textarea rows=3 bind:value={request_comment}/>
+			</div>
+		</div>
+		{/if}
+
+		<div class="buttons flex flex-row gap-20 mt-5">
+			<button class="bg-[#9092A6] hover:bg-[#77788a]" on:click={() => { window.location.href = "#/requests"; }}>ANNULER</button>
+			{#if request_type == "RTT"}
+				<button class="bg-[#1DCF5A] hover:bg-[#1cb75c] {remaining_rtt < 0 || requested_rtt <= 0 ? "invalid" : ""}" on:click={() => send_request("save")}>ENREGISTRER</button>
+				<button class="bg-[#007AFF] hover:bg-[#1a6bdc] {remaining_rtt < 0 || requested_rtt <= 0 ? "invalid" : ""}" on:click={() => send_request("send")}>SOUMETTRE</button>
+			{:else}
+				<button class="bg-[#1DCF5A] hover:bg-[#1cb75c] {remaining_days < 0 || requested_days <= 0 ? "invalid" : ""}" on:click={() => send_request("save")}>ENREGISTRER</button>
+				<button class="bg-[#007AFF] hover:bg-[#1a6bdc] {remaining_days < 0 || requested_days <= 0 ? "invalid" : ""}" on:click={() => send_request("send")}>SOUMETTRE</button>
+			{/if}
 		</div>
 	</div>
 {/key}
 
 <style>
-
-	div{
-		@apply w-full;
+	h1
+	{
+		font-family: "Nunito-Bold";
+		font-size: 27px;
+		color: #09244B;
 	}
 
-	span{
-		@apply my-6;
+	.line
+	{
+		width: calc(50% + 280px);
+		max-width: 1200px;
+		gap: calc(38% - 220px);
 	}
 
-	input{
-		@apply rounded-md bg-[#dcdada79] border-[1px] border-[#61a3eb];
+	.input-container.disabled
+	{
+		pointer-events: none;
 	}
 
-	label{
-		@apply my-[10px] text-left;
+	.input-container select, .input-container input
+	{
+		border: 2px solid #6D6E7A;
+		padding: 13px 17px 11px 17px;
+		border-radius: 5px;
+		font-family: "Roboto-Regular";
+		font-size: 17px;
+		appearance: none;
+		-moz-appearance: none;
+		text-align: left;
+		width: 100%;
+		background-color: white;
 	}
 
-	button{
-		@apply border-0 w-[200px] h-[40px] cursor-pointer rounded-md py-2 px-3 font-bold text-white shadow-[1px_2px_3px_rgba(0,0,0,0.2)];
+	.input-container.disabled select, .input-container.disabled input
+	{
+		border: 2px solid #E4E5ED;
+		color: #9092A6;
 	}
 
-	.card{
-		@apply p-1 bg-[#dcdada79] rounded-md shadow-[0px_2px_4px_rgba(6,88,239,0.42)];
+	.input-container select
+	{
+		outline: none;
+		cursor: pointer;
+		user-select: none;
 	}
 
+	.input-container.enabled select:focus, .input-container.enabled input:focus
+	{
+		outline: none;
+		border: 2px solid #007AFF;
+	}
+
+	.input-container option
+	{
+		font: "Roboto-Regular" sans-serif;
+		font-size: 17px;
+		text-align: left;
+	}
+
+	.input-container span
+	{
+		pointer-events: none;
+		position: absolute;
+		top: -6px;
+		left: 10px;
+		font-family: "Roboto-Medium";
+		color: #6D6E7A;
+		font-size: 14px;
+		line-height: 14px;
+		background-color: white;
+		padding: 0px 4px 0px 4px;
+	}
+
+	.input-container.disabled span
+	{
+		color: #9092A6;
+		font-family: "Roboto-Regular";
+	}
+
+	.input-container.enabled:focus-within span
+	{
+		color: #007AFF;
+	}
+
+	.input-container svg
+	{
+		cursor: pointer;
+		position: absolute;
+		right: 12px;
+		fill: #6D6E7A;
+		pointer-events: none;
+	}
+
+	.input-container.enabled:focus-within svg
+	{
+		fill: #007AFF;
+	}
+
+	.input-container.invalid input
+	{
+		border: 2px solid #ff3a305e;
+		color: #ff3a30a3;
+	}
+
+	.input-container.invalid span
+	{
+		color: #ff3a30a3;
+	}
+
+	.day
+	{
+		padding: 28px 15px 6px 13px;
+		border-radius: 5px;
+		font-family: "Roboto-Regular";
+		font-size: 17px;
+		text-align: left;
+		width: 100%;
+		background-color: #e9ecee;
+		text-align: left;
+	}
+
+	.day input
+	{
+		outline: none;
+		border: none;
+		background: none;
+		user-select: none;
+		text-align: left;
+	}
+
+	.day input::-webkit-calendar-picker-indicator
+	{
+		opacity: 0.6;
+		cursor: pointer;
+		width: 20px;
+		height: 20px;
+	}
+
+	.day span
+	{
+		position: absolute;
+		top: 10px;
+		left: 13px;
+		font-family: "Roboto-Medium";
+		font-size: 14px;
+		line-height: 14px;
+		pointer-events: none;
+		color: black;
+		opacity: 0.6;
+	}
+
+	.day input:hover
+	{
+		outline: none;
+	}
+
+	input[type="radio"], input[type="checkbox"]
+	{
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+
+		width: 26px;
+		height: 26px;
+		cursor: pointer;
+		border: 2px solid #B1B3C5;
+		border-radius: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	input[type="radio"]:checked::after, input[type="checkbox"]:checked::after
+	{
+		content: "";
+		display: block;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background-color: #007AFF;
+	}
+
+	.hour span
+	{
+		font-family: "Nunito-SemiBold";
+		color: #526581;
+		font-size: 17px;
+		line-height: 0px;
+		margin-top: 1px;
+	}
+
+	.comment span, .proof span
+	{
+		pointer-events: none;
+		font-family: "Roboto-Medium";
+		color: #6D6E7A;
+		font-size: 14px;
+		margin-bottom: 5px;
+	}
+
+	.comment textarea
+	{
+		resize: none;
+		outline: none;
+		width: 100%;
+		text-align: left;
+		font-family: "Roboto-Regular";
+		font-size: 17px;
+		appearance: none;
+		-moz-appearance: none;
+		padding-left: 1px;
+		border-bottom: 2px solid #6D6E7A;
+	}
+
+	.comment textarea:focus
+	{
+		outline: none;
+		border-bottom: 2px solid #007AFF;
+	}
+
+	.comment:focus-within span
+	{
+		color: #007AFF;
+	}
+
+	.proof .file
+	{
+		border: 2px dashed #e1e3e7;
+		border-radius: 8px;
+		cursor: pointer;
+		gap: 3px;
+		padding-top: 5px;
+	}
+
+	.proof .file h2
+	{
+		font-family: "Roboto-Medium";
+		color: rgb(71, 72, 79);
+		font-size: 16px;
+		margin-top: 4px;
+	}
+
+	.proof .file h2.link
+	{
+		color: #007AFF;
+	}
+
+	.proof .file span
+	{
+		font-family: "Roboto-Regular";
+		font-size: 14px;
+	}
+
+	.proof .file:hover
+	{
+		background-color: #f8f9fac0;
+	}
+
+	.buttons button
+	{
+		padding: 27px 50px 26px 50px;
+		border-radius: 10px;
+		color: white;
+		font-family: "Roboto-Medium";
+		line-height: 0px;
+	}
+
+	.buttons button.invalid
+	{
+		opacity: 0.3;
+		pointer-events: none;
+	}
+
+	.remote button
+	{
+		padding: 23px 50px 22px 50px;
+		line-height: 0px;
+		font-family: "Nunito-SemiBold";
+		font-size: 17px;
+		color: #526581;
+		user-select: none;
+	}
+
+	.remote button:hover
+	{
+		background-color: #e0efff;
+	}
+
+	.remote button.selected
+	{
+		background-color: #007AFF;
+		color: white;
+		pointer-events: none;
+	}
+
+	.remote-days
+	{
+		gap: min(calc(5% - 10px), 60px);
+	}
+
+	.remote-days span
+	{
+		font-family: "Nunito-SemiBold";
+		font-size: 17px;
+		color: #526581;
+	}
+
+	span
+	{
+		pointer-events: none;
+		user-select: none;
+	}
 </style>
