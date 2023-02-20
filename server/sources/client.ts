@@ -4,6 +4,7 @@ import * as Connection from './users/connection.js';
 import fs from 'fs';
 import * as Request from './models/request.js';
 import * as User from './models/user.js';
+import * as Notification from './models/notification.js';
 
 export function requests()
 {
@@ -180,7 +181,25 @@ export function requests()
 			if(user?.manager == email)
 			{
 				request.manager = email;
-				req.body.accept ? request.state="Validée manager" : request.state="Refusée";
+				if (req.body.accept) {
+					request.state="Validée manager";
+					// Notification to author of the request
+					let notification : Notification.NotificationData;
+					notification = {
+						owner : {
+							email: user.email,
+							first_name: user.first_name,
+							last_name: user.last_name,
+							department: user.department
+						},
+						request: request._id.toString(),
+						text: "Validée par manager : "
+					}
+					var notif = await Notification.add(notification);
+				} 
+				else {
+					request.state="Refusée";
+				}
 			}
 			//HR validation
 			else if(current_user?.department == "HR")
@@ -199,6 +218,7 @@ export function requests()
 		}
 
 		// TODO: Notifications and stuff
+		
 
 		console.log(`Request answered by ${email} with id: ${request?.id}`);
 		res.send({ message: "Request answered" });
