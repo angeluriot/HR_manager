@@ -55,6 +55,13 @@
 	let card_comment: string = "";
 	let card_action: string = "";
 
+	let filters = [
+		{name: "Validées", checked: true},
+		{name: "Refusées", checked: true},
+		{name: "En cours", checked: true},
+		{name: "Brouillon", checked: true}
+	]
+
 	let raw_absences = [
 		{id: 0, title: "A. Didot (RTT)", first_name: "Anne", last_name: "Didot", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), end_date: new Date(2023, 0, 5), duration: 3, section_duration: 3, start_row: 0, start_col: 0, position: -1, type: "conge", sub_type: "RTT", shown: true, comment: "", state: "Brouillon", days: [], selected: false},
 		{id: 1, title: "C. Moray (AM)", first_name: "Charles", last_name: "Moray", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), end_date: new Date(2023, 0, 4), duration: 2, section_duration: 2, start_row: 0, start_col: 0, position: -1, type: "maladie", sub_type: "Arrêt maladie", shown: true, comment: "", state: "Brouillon", days: [], selected: false},
@@ -70,7 +77,7 @@
 	let absences_week_month = [];
 	let absences = [];
 
-	$: is_month_mode, this_monday, month, year, update_calendar();
+	$: filters, is_month_mode, this_monday, month, year, update_calendar();
 
 	init_calendar();
 
@@ -198,7 +205,6 @@
 	// Update calendar when month is changed
 	function update_calendar()
 	{
-		console.log("test");
 		days = [];
 		absences = [];
 
@@ -263,21 +269,24 @@
 		// Compute the correct rows and columns of the calendar to display each section
 		for (let absence of absences_week_month)
 		{
-			if (is_month_mode && absence.section_date.getFullYear() == year && absence.section_date.getMonth() == month)
+			if (!is_filtered(absence))
 			{
-				absence.start_row = Math.floor((absence.section_date.getDate() + first_day - 1) / 7) + 2;
-				absence.start_col = (absence.section_date.getDate() + first_day - 1) % 7 + 1;
+				if (is_month_mode && absence.section_date.getFullYear() == year && absence.section_date.getMonth() == month)
+				{
+					absence.start_row = Math.floor((absence.section_date.getDate() + first_day - 1) / 7) + 2;
+					absence.start_col = (absence.section_date.getDate() + first_day - 1) % 7 + 1;
 
-				absences.push(absence);
-			}
+					absences.push(absence);
+				}
 
-			else if (!is_month_mode && absence.section_date.getFullYear() == year && absence.section_date.getMonth() == month
-						&& absence.section_date.getDate() > this_monday && absence.section_date.getDate() < this_monday + 5)
-			{
-				absence.start_row = 2;
-				absence.start_col = (absence.section_date.getDate() - this_monday - 1) % 7 + 1;
+				else if (!is_month_mode && absence.section_date.getFullYear() == year && absence.section_date.getMonth() == month
+							&& absence.section_date.getDate() > this_monday && absence.section_date.getDate() < this_monday + 5)
+				{
+					absence.start_row = 2;
+					absence.start_col = (absence.section_date.getDate() - this_monday - 1) % 7 + 1;
 
-				absences.push(absence);
+					absences.push(absence);
+				}
 			}
 		}
 
@@ -481,6 +490,23 @@
 		month_mode_button.style.left = "115px";
 	}
 
+	function is_filtered(absence)
+	{
+		if (absence.state == "Validée" && !filters[0].checked)
+			return true;
+
+		if (absence.state == "Refusée" && !filters[1].checked)
+			return true;
+
+		if (absence.state == "En cours" && !filters[2].checked)
+			return true;
+
+		if (absence.state == "Brouillon" && !filters[3].checked)
+			return true;
+
+		return false;
+	}
+
 	export const update_card = absence =>
 	{
 		for (let abs of absences)
@@ -543,6 +569,7 @@
 		update_calendar();
 	}
 
+
 	update_card(raw_absences[0]);
 </script>
 
@@ -556,7 +583,7 @@
 					<input type="button" on:click={() => month_mode()} class="mode_button_checked" id="month_mode_button" value="Mois">
 
 					<button class="months_button" on:click={() => left()}>&lt;</button>
-					<h1 id="titre">{calendar_title}</h1>
+					<h1 id="title">{calendar_title}</h1>
 					<button class="months_button" on:click={() => right()}>&gt;</button>
 					<span id="days_info">Jours de congé : 0 </span>
 				</div>
@@ -565,6 +592,17 @@
 		</div>
 		<div class="gap-8 h-full">
 			<div id="side_menu" class="gap-12 h-[35%]">
+				<div class="justify-start overflow-y-auto border-2 rounded-xl w-80 h-40">
+					<h2 class="text-xl font-bold">Filtres</h2>
+					<ul class="inline-block text-left">
+						{#each filters as filter}
+						  <li class="relative right-24">
+							<input type="checkbox" bind:checked={filter.checked}/>
+							<span>{filter.name}</span>
+						  </li>
+						{/each}
+					</ul>
+				</div>
 				<div class="legend">
 					<div class="dots_column">
 						<span id="green_dot" class="dot"></span>
@@ -635,8 +673,6 @@
 
 	.request_button {
 		position: relative;
-		flex-direction: row;
-		display: flex;
 
 		font-size: 20px;
 		color: white;
@@ -712,7 +748,7 @@
 		font-size: 20px;
 	}
 
-	#titre {
+	#title {
 		color: #09244B;
 	}
 
