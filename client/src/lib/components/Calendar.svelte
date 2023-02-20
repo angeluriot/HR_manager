@@ -3,7 +3,7 @@
 
 
 	export let update_card;
-	export let public_holidays: any[];
+	export let public_holidays: Date[];
 	export let days: any[];
 	export let absences: any[];
 	export let is_month_mode: boolean;
@@ -17,7 +17,7 @@
 
 		for (let i = 0; i < public_holidays.length; i++)
 		{
-			if (day.date.getMonth() == public_holidays[i][0] && day.date.getDate() == public_holidays[i][1])
+			if (day.date.getMonth() == public_holidays[i].getMonth() && day.date.getDate() == public_holidays[i].getDate())
 			{
 				return true;
 			}
