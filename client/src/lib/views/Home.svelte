@@ -34,7 +34,7 @@
 	let day_of_the_week = now.getDay();
 	let this_monday: number;
 
-	let days_in_db: {start: Date, end: Date};
+	let days_in_db: {start: string, end: string};
 	let requests: RequestData[] = [];
 	$: async () => requests = await Server.get('calendar-requests', { days: days_in_db });
 
@@ -334,7 +334,13 @@
 				}
 			}
 		}
-		days_in_db = {start: days[0].date, end: days[days.length-1].date};
+		let start = (days[0].date.getDate() < 10 ? "0" : "") + days[0].date.getDate() + "-" + (days[0].date.getMonth() + 1 < 10 ? "0" : "") + (days[0].date.getMonth() + 1) + "-" + days[0].date.getFullYear();
+		let end = (days[days.length-1].date.getDate() < 10 ? "0" : "") + days[days.length-1].date.getDate() + "-" + (days[days.length-1].date.getMonth() + 1 < 10 ? "0" : "") + (days[days.length-1].date.getMonth() + 1) + "-" + days[days.length-1].date.getFullYear();
+		days_in_db = {start: start, end: end};
+		// let start = new Date(year, month, days_in_last_month - first_day);
+		// let end = new Date(year, )
+		// days_in_db = {start: days[0].date,
+		// 			  end: days[days.length-1].date};
 		
 		console.log(days_in_db);
 	}
