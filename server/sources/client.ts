@@ -163,9 +163,11 @@ export function requests()
 			return;
 		}
 
+		//get the current user, and the user we are validating the request
 		let current_user = await User.get({email: email});
 		let user = await User.get({email: request?.author});
 
+		//Check if current user is the manager of the person or from Human Ressources
 		if ( user?.manager !== email && current_user?.department!== "HR") 
 		{
 			res.status(400).send("Invalid token");
@@ -174,11 +176,13 @@ export function requests()
 
 		try
 		{
+			//manager validation
 			if(user?.manager == email)
 			{
 				request.manager = email;
 				req.body.accept ? request.state="Validée manager" : request.state="Refusée";
 			}
+			//HR validation
 			else if(current_user?.department == "HR")
 			{
 				request.hr = email;
@@ -258,6 +262,7 @@ export function requests()
 			return;
 		}
 
+		//All requests exept mines, and those which need manager approval
 		let requests = await Request.getAll({author: {$ne:email}, state: "Validée manager"}) ?? [];
 		let requests_data = [];
 
@@ -269,7 +274,6 @@ export function requests()
 
 	Global.app.get('/calendar-requests', async (req, res) =>
 	{
-		console.log("hello");
 		try
 		{
 			var email = Connection.verify_token(req.query.token);
@@ -284,21 +288,42 @@ export function requests()
 		let current_user = await User.get({email: email});
 		let requests: Request.RequestInterface[];
 
+		//HR sees all the sent requests
 		if(current_user?.department == "HR")
 		{
-			requests = await Request.getAll({}) ?? [];
+			requests = await Request.getAll({state: {$ne:"Brouillon"}}) ?? [];
 		}
+		//All my requests and requests of people I manage
 		else
 		{
 			let users = await User.getAll({ manager: email }) ?? [];
-			requests = await Request.getAll({ author: { $in: users.map(user => user.email) }}) ?? [];
+			let manager_requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: {$ne:"Brouillon"} }) ?? [];
+			let my_requests = await Request.getAll({ author: email, state: {$ne:"Brouillon"} }) ?? [];
+			requests = [...manager_requests, ...my_requests];
 		}
 
 		let requests_data = [];
 
+		//Select only the requests in the displayed period of time
 		for (let request of requests)
-			requests_data.push(await Request.get_data(request));
+		{
+			let start = request.start.day;
+			let end = request.end.day;
 
+			let formatted_start = new Date(start.split("/").reverse().join("-"));
+			let formatted_end = new Date(end.split("/").reverse().join("-"));
+
+			if (typeof req.query.start === "string" && typeof req.query.end === "string" ) 
+			{
+				let calendar_start = new Date(req.query.start);
+				let calendar_end = new Date(req.query.end);
+
+				if(formatted_start < calendar_end && formatted_end > calendar_start)
+				{
+					requests_data.push(await Request.get_data(request));
+				}
+			}
+		}		
 		res.send(JSON.stringify(requests_data));
 	});	
 }
