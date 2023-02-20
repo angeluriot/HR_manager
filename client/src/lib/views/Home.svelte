@@ -59,23 +59,24 @@
 		{name: "Brouillon", checked: true}
 	]
 
+	let raw_absences = [];
+
+	/*
 	let raw_absences = [
 		{id: 0, title: "A. Didot (RTT)", first_name: "Anne", last_name: "Didot", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), end_date: new Date(2023, 0, 5), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "conge", sub_type: "RTT", shown: true, comment: "", state: "Brouillon", remote_days: [], selected: false},
-		{id: 1, title: "C. Moray (AM)", first_name: "Charles", last_name: "Moray", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), end_date: new Date(2023, 0, 4), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "maladie", sub_type: "Arrêt maladie", shown: true, comment: "", state: "Brouillon", days: [], selected: false},
-		{id: 2, title: "D. Hopol (AM)", first_name: "Didier", last_name: "Hopol", date: new Date(2023, 0, 5), section_date: new Date(2023, 0, 5), end_date: new Date(2023, 0, 6), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "maladie", sub_type: "Arrêt maladie", shown: true, comment: "", state: "Brouillon", days: [], selected: false},
-		{id: 3, title: "A. Bertrand (T)", first_name: "Arnaud", last_name: "Bertrand", date: new Date(2023, 0, 4), section_date: new Date(2023, 0, 4), end_date: new Date(2023, 0, 5), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "physique", sub_type: "Télétravail", shown: true, comment: "", state: "Brouillon", days: [], selected: false},
-		{id: 4, title: "E. Tessier (T)", first_name: "Emmanuelle", last_name: "Tessier", date: new Date(2023, 0, 30), section_date: new Date(2023, 0, 30), end_date: new Date(2023, 1, 2), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "physique", sub_type: "Télétravail", shown: true, comment: "", state: "Brouillon", days: [], selected: false},
-		{id: 5, title: "F. Guilbault (T)", first_name: "Frédéric", last_name: "Guilbault", date: new Date(2023, 0, 11), section_date: new Date(2023, 0, 11), end_date: new Date(2023, 0, 19), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "physique", sub_type: "Télétravail", shown: true, comment: "", state: "Brouillon", days: [], selected: false},
-		{id: 6, title: "G. Evian (T)", first_name: "Guillaume", last_name: "Evian", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), end_date: new Date(2023, 0, 5), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "en_cours", sub_type: "Télétravail", shown: true, comment: "", state: "Brouillon", days: [], selected: false}
-	];
+		{id: 1, title: "C. Moray (AM)", first_name: "Charles", last_name: "Moray", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), end_date: new Date(2023, 0, 4), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "maladie", sub_type: "Arrêt maladie", shown: true, comment: "", state: "Brouillon", remote_days: [], selected: false},
+		{id: 2, title: "D. Hopol (AM)", first_name: "Didier", last_name: "Hopol", date: new Date(2023, 0, 5), section_date: new Date(2023, 0, 5), end_date: new Date(2023, 0, 6), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "maladie", sub_type: "Arrêt maladie", shown: true, comment: "", state: "Brouillon", remote_days: [], selected: false},
+		{id: 3, title: "A. Bertrand (T)", first_name: "Arnaud", last_name: "Bertrand", date: new Date(2023, 0, 4), section_date: new Date(2023, 0, 4), end_date: new Date(2023, 0, 5), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "physique", sub_type: "Télétravail", shown: true, comment: "", state: "Brouillon", remote_days: [], selected: false},
+		{id: 4, title: "E. Tessier (T)", first_name: "Emmanuelle", last_name: "Tessier", date: new Date(2023, 0, 30), section_date: new Date(2023, 0, 30), end_date: new Date(2023, 1, 2), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "physique", sub_type: "Télétravail", shown: true, comment: "", state: "Brouillon", remote_days: [], selected: false},
+		{id: 5, title: "F. Guilbault (T)", first_name: "Frédéric", last_name: "Guilbault", date: new Date(2023, 0, 11), section_date: new Date(2023, 0, 11), end_date: new Date(2023, 0, 19), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "physique", sub_type: "Télétravail", shown: true, comment: "", state: "Brouillon", remote_days: [], selected: false},
+		{id: 6, title: "G. Evian (T)", first_name: "Guillaume", last_name: "Evian", date: new Date(2023, 0, 3), section_date: new Date(2023, 0, 3), end_date: new Date(2023, 0, 5), section_duration: 0, start_row: 0, start_col: 0, position: -1, type: "en_cours", sub_type: "Télétravail", shown: true, comment: "", state: "Brouillon", remote_days: [], selected: false}
+	];*/
 
 	let absences_week = [];
 	let absences_week_month = [];
 	let absences = [];
 
 	$: filters, is_month_mode, this_monday, month, year, update_calendar();
-
-	init_calendar();
 
 	// Initialize all the calendar sections
 	function init_calendar()
@@ -104,10 +105,7 @@
 						holiday_this_week = holiday;
 
 					else if (holiday.getFullYear() == this_section_date.getFullYear() && holiday.getMonth() == this_section_date.getMonth() && holiday.getDate() == this_section_date.getDate())
-					{
-						console.log(holiday);
 						holiday_today = true;
-					}
 				}
 
 				if (holiday_today)
@@ -120,9 +118,8 @@
 
 				else if (holiday_this_week != null)
 				{
-					console.log(holiday_this_week);
 					let new_end_date: Date = new Date(holiday_this_week.getFullYear(), holiday_this_week.getMonth(), holiday_this_week.getDate() - 1);
-					absences_week.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: this_section_date, end_date: new_end_date, section_duration: Math.abs(new_end_date.getTime() - this_section_date.getTime()) / (1000 * 3600 * 24) + 1, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, days: absence.remote_days, selected: absence.selected});
+					absences_week.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: this_section_date, end_date: new_end_date, section_duration: Math.abs(new_end_date.getTime() - this_section_date.getTime()) / (1000 * 3600 * 24) + 1, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, remote_days: absence.remote_days, selected: absence.selected});
 					if (holiday_this_week.getDay() != 5)
 						this_section_date = new Date(holiday_this_week.getFullYear(), holiday_this_week.getMonth(), holiday_this_week.getDate() + 1);
 					else
@@ -131,7 +128,7 @@
 
 				else
 				{
-					absences_week.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: this_section_date, end_date: absence.end_date, section_duration: Math.abs(this_friday.getTime() - this_section_date.getTime()) / (1000 * 3600 * 24) + 1, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, days: absence.remote_days, selected: absence.selected});
+					absences_week.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: this_section_date, end_date: absence.end_date, section_duration: Math.abs(this_friday.getTime() - this_section_date.getTime()) / (1000 * 3600 * 24) + 1, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, remote_days: absence.remote_days, selected: absence.selected});
 					this_section_date = new Date(this_friday.getFullYear(), this_friday.getMonth(), this_friday.getDate() + 3);
 					this_friday = new Date(this_section_date.getFullYear(), this_section_date.getMonth(), this_section_date.getDate() + (5 - this_section_date.getDay()));
 				}
@@ -146,10 +143,7 @@
 					holiday_this_week = holiday;
 
 				else if (holiday.getFullYear() == this_section_date.getFullYear() && holiday.getMonth() == this_section_date.getMonth() && holiday.getDate() == this_section_date.getDate())
-				{
-					console.log(holiday);
 					holiday_today = true;
-				}
 			}
 
 			if (holiday_today)
@@ -162,16 +156,15 @@
 
 			else if (holiday_this_week != null)
 			{
-				console.log(holiday_this_week);
 				let new_end_date: Date = new Date(holiday_this_week.getFullYear(), holiday_this_week.getMonth(), holiday_this_week.getDate() - 1);
-				absences_week.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: this_section_date, end_date: new_end_date, section_duration: Math.abs(new_end_date.getTime() - this_section_date.getTime()) / (1000 * 3600 * 24) + 1, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, days: absence.remote_days, selected: absence.selected});
+				absences_week.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: this_section_date, end_date: new_end_date, section_duration: Math.abs(new_end_date.getTime() - this_section_date.getTime()) / (1000 * 3600 * 24) + 1, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, remote_days: absence.remote_days, selected: absence.selected});
 				if (holiday_this_week.getDay() != 5)
 					this_section_date = new Date(holiday_this_week.getFullYear(), holiday_this_week.getMonth(), holiday_this_week.getDate() + 1);
 				else
 					this_section_date = new Date(holiday_this_week.getFullYear(), holiday_this_week.getMonth(), holiday_this_week.getDate() + 3);
 			}
 
-			absences_week.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: this_section_date, end_date: absence.end_date, section_duration: Math.abs(absence.end_date.getTime() - this_section_date.getTime()) / (1000 * 3600 * 24) + 1, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, days: absence.remote_days, selected: absence.selected});
+			absences_week.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: this_section_date, end_date: absence.end_date, section_duration: Math.abs(absence.end_date.getTime() - this_section_date.getTime()) / (1000 * 3600 * 24) + 1, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, remote_days: absence.remote_days, selected: absence.selected});
 		}
 
 		// Split into sub-absences if the sub-absence is longer than a month
@@ -180,8 +173,8 @@
 			if (absence.section_duration + absence.section_date.getDate() > new Date(absence.section_date.getFullYear(), absence.section_date.getMonth() + 1, 0).getDate() + 1)
 			{
 				let current_duration = new Date(absence.section_date.getFullYear(), absence.section_date.getMonth() + 1, 0).getDate() - absence.section_date.getDate() + 1;
-				absences_week_month.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: absence.section_date, end_date: absence.end_date, section_duration: current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, days: absence.days, selected: absence.selected});
-				absences_week_month.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + current_duration), end_date: absence.end_date, section_duration: absence.section_duration - current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, days: absence.days, selected: absence.selected});
+				absences_week_month.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: absence.section_date, end_date: absence.end_date, section_duration: current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, remote_days: absence.remote_days, selected: absence.selected});
+				absences_week_month.push({id: absence.id, title: absence.title, first_name: absence.first_name, last_name: absence.last_name, date: absence.date, section_date: new Date(absence.section_date.getFullYear(), absence.section_date.getMonth(), absence.section_date.getDate() + current_duration), end_date: absence.end_date, section_duration: absence.section_duration - current_duration, start_row: 0, start_col: 0, position: -1, type: absence.type, sub_type: absence.sub_type, shown: true, comment: absence.comment, state: absence.state, remote_days: absence.remote_days, selected: absence.selected});
 			}
 
 			else
@@ -315,8 +308,15 @@
 				}
 			}
 		}
+
 		days_in_db = {start: days[0].date, end: days[days.length-1].date};
 		requests = await Server.get('calendar-requests', { start: days_in_db.start, end: days_in_db.end });
+		raw_absences = [];
+
+		for (let request of requests)
+			request_data_to_absence(request);
+
+		init_calendar();
 	}
 
 	function are_overlayed(date1: number, duration1: number, date2: number, duration2: number)
@@ -446,7 +446,7 @@
 		if (absence.state == "Refusée" && !filters[1].checked)
 			return true;
 
-		if (absence.state == "En cours" && !filters[2].checked)
+		if (absence.state == "En attente" && !filters[2].checked)
 			return true;
 
 		if (absence.state == "Brouillon" && !filters[3].checked)
@@ -465,59 +465,71 @@
 			else if (abs.selected)
 				abs.selected = false;
 		}
-		Global.displayed.author = {email: "", first_name: absence.first_name, last_name: absence.last_name, department: ""};
-		Global.displayed.type = absence.sub_type;
-		Global.displayed.state = absence.state;
-		Global.displayed.remote = [];
 
-		for (let day of absence.days)
+		let remote_days = [];
+
+		for (let day of absence.remote_days)
 		{
 			switch(day)
 			{
 				case 1:
 				{
-					Global.displayed.remote.push({day: "Lundi", am: true, pm: false});
+					remote_days.push({day: "Lundi", am: true, pm: false});
 					break;
 				}
 				case 2:
 				{
-					Global.displayed.remote.push({day: "Mardi", am: true, pm: false});
+					remote_days.push({day: "Mardi", am: true, pm: false});
 					break;
 				}
 				case 3:
 				{
-					Global.displayed.remote.push({day: "Mercredi", am: true, pm: false});
+					remote_days.push({day: "Mercredi", am: true, pm: false});
 					break;
 				}
 				case 4:
 				{
-					Global.displayed.remote.push({day: "Jeudi", am: true, pm: false});
+					remote_days.push({day: "Jeudi", am: true, pm: false});
 					break;
 				}
 				case 5:
 				{
-					Global.displayed.remote.push({day: "Vendredi", am: true, pm: false});
+					remote_days.push({day: "Vendredi", am: true, pm: false});
 					break;
 				}
 			}
 		}
 
-		Global.displayed.start[0] = (absence.date.getDate() < 10 ? "0" : "") + absence.date.getDate() + "/" + (absence.date.getMonth() + 1 < 10 ? "0" : "") + (absence.date.getMonth() + 1) + "/" + absence.date.getFullYear();
-		Global.displayed.end[0]= (absence.end_date.getDate() < 10 ? "0" : "") + absence.end_date.getDate() + "/" + (absence.end_date.getMonth() + 1 < 10 ? "0" : "") + (absence.end_date.getMonth() + 1) + "/" + absence.end_date.getFullYear();
-		Global.displayed.comment = absence.comment;
+		Global.displayed =
+		{
+			id: "",
+			type: absence.sub_type,
+			author: {email: "", first_name: absence.first_name, last_name: absence.last_name, department: ""},
+			state: absence.state,
+			manager: null,
+			hr: null,
+			start: {day: (absence.date.getDate() < 10 ? "0" : "") + absence.date.getDate() + "/" + (absence.date.getMonth() + 1 < 10 ? "0" : "") + (absence.date.getMonth() + 1) + "/" + absence.date.getFullYear(), pm: false},
+			end: {day: (absence.end_date.getDate() < 10 ? "0" : "") + absence.end_date.getDate() + "/" + (absence.end_date.getMonth() + 1 < 10 ? "0" : "") + (absence.end_date.getMonth() + 1) + "/" + absence.end_date.getFullYear(), pm: false},
+			remote: remote_days,
+			subject: "",
+			place: "",
+			proof: "",
+			cause: "",
+			comment: absence.comment
+		}
 
 		update_calendar();
 	}
 
 	function request_data_to_absence(request_data)
 	{
-		let title: string = request_data.first_name.substring(0, 1) + ". " + request_data.last_name;
-		let start_date: Date = new Date(Number(request_data.start[0].substring(6)), Number(request_data.start[0].substring(3, 5)), Number(request_data.start[0].substring(0, 2)));
-		let end_date: Date = new Date(Number(request_data.end[0].substring(6)), Number(request_data.end[0].substring(3, 5)), Number(request_data.end[0].substring(0, 2)));
+		let title: string = request_data.author.first_name.substring(0, 1) + ". " + request_data.author.last_name;
+		let start_date: Date = new Date(Number(request_data.start.day.substring(6)), Number(request_data.start.day.substring(3, 5)) - 1, Number(request_data.start.day.substring(0, 2)));
+		let end_date: Date = new Date(Number(request_data.end.day.substring(6)), Number(request_data.end.day.substring(3, 5)) - 1, Number(request_data.end.day.substring(0, 2)));
 		let remote_days: Date[] = [];
 
 		for (let r of request_data.remote)
-			remote_days.push(new Date(Number(r[0].substring(6)), Number(r[0].substring(3, 5)), Number(r[0].substring(0, 2))));
+			remote_days.push(new Date(Number(r.day.substring(6)), Number(r.day.substring(3, 5)), Number(r.day.substring(0, 2))));
 
 		raw_absences.push({
 			id: request_data.id,
@@ -531,7 +543,7 @@
 			start_row: 0,
 			start_col: 0,
 			position: -1,
-			type: "", // TODO
+			type: "en_cours", // TODO
 			sub_type: request_data.type,
 			shown: true,
 			comment: request_data.comment,
@@ -541,7 +553,11 @@
 		})
 	}
 
-	//update_card(raw_absences[0]);
+	(async () => {
+		await (new Promise( resolve => setTimeout(resolve, 100) ));
+		update_calendar();
+	})();
+
 </script>
 
 {#key unique}
@@ -584,12 +600,12 @@
 					<span class="legend_text">Congé (congé payé, RTT...)<br>
 					Maladie (accident, arrêt maladie...)<br>
 					Absence physique (télétravail, formation...)<br>
-					Demande en cours</span>
+					Demande en attente</span>
 				</div>
 				<button class="request_button" on:click={() => window.location.href="#/requests/new"}>Nouvelle demande</button>
 			</div>
 			{#if Global.displayed != null}
-			<RequestCard data={Global.displayed} user={false} action="Valider"/>
+				<RequestCard data={Global.displayed} user={false} action="Valider"/>
 			{/if}
 		</div>
 	</div>

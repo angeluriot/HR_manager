@@ -1,7 +1,6 @@
 <script lang="ts">
     import Home from "../views/Home.svelte";
 
-
 	export let update_card;
 	export let public_holidays: Date[];
 	export let days: any[];
