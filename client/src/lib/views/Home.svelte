@@ -34,9 +34,10 @@
 	let day_of_the_week = now.getDay();
 	let this_monday: number;
 
-	let days_in_db: {start: string, end: string};
+	//days of the current displayed period
+	let days_in_db: {start: Date, end: Date};
+	//requests corresponding to the displayed period
 	let requests: RequestData[] = [];
-	$: async () => requests = await Server.get('calendar-requests', { days: days_in_db });
 
 	if (day - day_of_the_week > 0)
 		this_monday = day - day_of_the_week;
@@ -189,7 +190,7 @@
 	}
 
 	// Update calendar when month is changed
-	function update_calendar()
+	async function update_calendar()
 	{
 		days = [];
 		absences = [];
@@ -314,10 +315,8 @@
 				}
 			}
 		}
-
-		let start = (days[0].date.getDate() < 10 ? "0" : "") + days[0].date.getDate() + "-" + (days[0].date.getMonth() + 1 < 10 ? "0" : "") + (days[0].date.getMonth() + 1) + "-" + days[0].date.getFullYear();
-		let end = (days[days.length-1].date.getDate() < 10 ? "0" : "") + days[days.length-1].date.getDate() + "-" + (days[days.length-1].date.getMonth() + 1 < 10 ? "0" : "") + (days[days.length-1].date.getMonth() + 1) + "-" + days[days.length-1].date.getFullYear();
-		days_in_db = {start: start, end: end};
+		days_in_db = {start: days[0].date, end: days[days.length-1].date};
+		requests = await Server.get('calendar-requests', { start: days_in_db.start, end: days_in_db.end });
 	}
 
 	function are_overlayed(date1: number, duration1: number, date2: number, duration2: number)
