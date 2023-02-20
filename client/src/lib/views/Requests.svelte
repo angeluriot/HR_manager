@@ -41,7 +41,7 @@
 	<div class="main flex flex-row justify-evenly items-end w-full h-full pl-10 pr-10">
 		<div class="flex flex-col justify-start w-full">
 			<h1 class="mb-8">Demandes personnelles</h1>
-			<a href="#/requests/new" class="custom-margin"><button class="bg-[#007AFF] cursor-pointer rounded-xl text-white">
+			<a href="#/requests/new" class="custom-margin"><button class="bg-[#007AFF] cursor-pointer rounded-xl text-white" on:click={() => console.log("23/06/1999" > "15/07/2014")}>
 				Nouvelle demande
 			</button></a>
 			<div class="list">

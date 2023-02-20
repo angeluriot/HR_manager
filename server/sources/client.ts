@@ -266,4 +266,39 @@ export function requests()
 
 		res.send(JSON.stringify(requests_data));
 	});
+
+	Global.app.get('/calendar-requests', async (req, res) =>
+	{
+		console.log("hello");
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let current_user = await User.get({email: email});
+		let requests: Request.RequestInterface[];
+
+		if(current_user?.department == "HR")
+		{
+			requests = await Request.getAll({}) ?? [];
+		}
+		else
+		{
+			let users = await User.getAll({ manager: email }) ?? [];
+			requests = await Request.getAll({ author: { $in: users.map(user => user.email) }}) ?? [];
+		}
+
+		let requests_data = [];
+
+		for (let request of requests)
+			requests_data.push(await Request.get_data(request));
+
+		res.send(JSON.stringify(requests_data));
+	});	
 }

@@ -6,6 +6,7 @@
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
+    import type { RequestData } from "../shared/types";
 
 	let unique = {};
 
@@ -32,6 +33,10 @@
 	let day = now.getDate();
 	let day_of_the_week = now.getDay();
 	let this_monday: number;
+
+	let days_in_db: {start: Date, end: Date};
+	let requests: RequestData[] = [];
+	$: async () => requests = await Server.get('calendar-requests', { days: days_in_db });
 
 	if (day - day_of_the_week > 0)
 		this_monday = day - day_of_the_week;
@@ -192,7 +197,6 @@
 		days = [];
 		absences = [];
 
-
 		let first_day = new Date(year, month, 0).getDay();
 		let days_in_this_month = new Date(year, month + 1, 0).getDate();
 		let days_in_last_month = new Date(year, month, 0).getDate();
@@ -310,6 +314,9 @@
 				}
 			}
 		}
+		days_in_db = {start: days[0].date, end: days[days.length-1].date};
+		
+		console.log(days_in_db);
 	}
 
 	function are_overlayed(date1: number, duration1: number, date2: number, duration2: number)
@@ -410,7 +417,7 @@
 				year++;
 			}
 			else
-				month++;
+				month++;	
 
 			this_monday -= days_in_this_month;
 			while (this_monday < 0)
