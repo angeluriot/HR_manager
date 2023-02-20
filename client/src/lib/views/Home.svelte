@@ -51,15 +51,15 @@
 
 	let is_month_mode = true;
 
-	let card_type: string = "";
-	let card_first_name: string = "";
-	let card_last_name: string = "";
-	let card_state: string = "";
-	let card_days: string[] = [];
-	let card_start: string = "";
-	let card_end: string = "";
-	let card_comment: string = "";
-	let card_action: string = "";
+	// let card_type: string = "";
+	// let card_first_name: string = "";
+	// let card_last_name: string = "";
+	// let card_state: string = "";
+	// let card_days: string[] = [];
+	// let card_start: string = "";
+	// let card_end: string = "";
+	// let card_comment: string = "";
+	// let card_action: string = "";
 
 	let filters = [
 		{name: "Validées", checked: true},
@@ -526,60 +526,58 @@
 			else if (abs.selected)
 				abs.selected = false;
 		}
+		Global.displayed.author = {email: "", first_name: absence.first_name, last_name: absence.last_name, department: ""};
+		Global.displayed.type = absence.sub_type;
+		Global.displayed.state = absence.state;
+		
+		// card_type = absence.sub_type;
+		// card_first_name = absence.first_name;
+		// card_last_name = absence.last_name;
+		// card_state = absence.state;
 
-		card_type = absence.sub_type;
-		card_first_name = absence.first_name;
-		card_last_name = absence.last_name;
-		card_state = absence.state;
-
-		card_days = [];
+		Global.displayed.remote = [];
 		for (let day of absence.days)
 		{
 			switch(day)
 			{
 				case 1:
 				{
-					card_days.push("Lundi");
+					// card_days.push("Lundi");
+					Global.displayed.remote.push({day: "Lundi", am: true, pm: false});
 					break;
 				}
 				case 2:
 				{
-					card_days.push("Mardi");
+					Global.displayed.remote.push({day: "Mardi", am: true, pm: false});
 					break;
 				}
 				case 3:
 				{
-					card_days.push("Mercredi");
+					Global.displayed.remote.push({day: "Mercredi", am: true, pm: false});
 					break;
 				}
 				case 4:
 				{
-					card_days.push("Jeudi");
+					Global.displayed.remote.push({day: "Jeudi", am: true, pm: false});
 					break;
 				}
 				case 5:
 				{
-					card_days.push("Vendredi");
+					Global.displayed.remote.push({day: "Vendredi", am: true, pm: false});
 					break;
 				}
 			}
 		}
 
-		card_start = (absence.date.getDate() < 10 ? "0" : "") + absence.date.getDate() + "/" + (absence.date.getMonth() + 1 < 10 ? "0" : "") + (absence.date.getMonth() + 1) + "/" + absence.date.getFullYear();
-		card_end = (absence.end_date.getDate() < 10 ? "0" : "") + absence.end_date.getDate() + "/" + (absence.end_date.getMonth() + 1 < 10 ? "0" : "") + (absence.end_date.getMonth() + 1) + "/" + absence.end_date.getFullYear();
-		card_comment = absence.comment;
-
-		if (absence.type == "En attente")
-			card_action = "Valider";
-
-		else
-			card_action = "Valider"; // temporaire
+		Global.displayed.start[0] = (absence.date.getDate() < 10 ? "0" : "") + absence.date.getDate() + "/" + (absence.date.getMonth() + 1 < 10 ? "0" : "") + (absence.date.getMonth() + 1) + "/" + absence.date.getFullYear();
+		Global.displayed.end[0]= (absence.end_date.getDate() < 10 ? "0" : "") + absence.end_date.getDate() + "/" + (absence.end_date.getMonth() + 1 < 10 ? "0" : "") + (absence.end_date.getMonth() + 1) + "/" + absence.end_date.getFullYear();
+		Global.displayed.comment = absence.comment;
 
 		update_calendar();
 	}
 
 
-	update_card(raw_absences[0]);
+	//update_card(raw_absences[0]);
 </script>
 
 {#key unique}
