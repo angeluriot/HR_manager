@@ -202,6 +202,27 @@ export function requests()
 				if (req.body.accept) {
 					request.state="Validée manager";
 					notif_text = "Validée par manager : " + email;
+
+					// Notification to all HR to validate
+					let HRs = await User.getAll({ department: "HR" });
+					if (HRs !== null) {
+						HRs.forEach(async (hr) => {
+							if (request !== null) {
+								let notification : Notification.NotificationData;
+								notification = {
+									owner : {
+										email: hr.email,
+										first_name: hr.first_name,
+										last_name: hr.last_name,
+										department: hr.department
+									},
+									request: request._id.toString(),
+									text: "Demande de " + user?.email
+								}
+								var notif = await Notification.add(notification);
+							}
+						});
+					}
 				} 
 				else {
 					request.state="Refusée";
