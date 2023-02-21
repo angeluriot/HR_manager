@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as Users from '../models/user.js';
+import * as Notification from '../models/notification.js';
 import Global from '../Global.js';
 
 export function verify_token(token: any): string
@@ -59,7 +60,7 @@ export async function login(email: any, password: any, ip: string)
 		expires: date.toUTCString(),
 		user: await Users.get_data(user),
 		days_left: 5,
-		nb_notifications: 3
+		nb_notifications: (await Notification.getAll({ owner: email }))?.length
 	};
 }
 
@@ -76,6 +77,6 @@ export async function auto_login(token: any, ip: string)
 	return {
 		user: await Users.get_data(user),
 		days_left: 5,
-		nb_notifications: 3
+		nb_notifications: (await Notification.getAll({ owner: email }))?.length
 	};
 }
