@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import * as User from './user.js';
 import * as Request from './request.js';
+import { ObjectId } from 'mongodb';
 
 export interface NotificationInterface extends mongoose.Document
 {
@@ -48,10 +49,12 @@ export type NotificationData = {
     text: string
 }
 
-export async function get_data(notification: NotificationData): Promise<NotificationData>
+export async function get_data(notification: NotificationInterface): Promise<NotificationData>
 {
 	let owner = await User.get({ email: notification.owner });
-    let request = await Request.get({ _id: notification.request });
+	var request_id = new ObjectId(notification.request);
+	console.log(notification.request);
+    let request = await Request.get({ _id: request_id });
 
 	if (!owner)
 		throw new Error("Owner not found");

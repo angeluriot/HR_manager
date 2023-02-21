@@ -1,66 +1,56 @@
 <script lang="ts">
-	import { onMount } from "svelte";
+	import Edit from "../../assets/shapes/Edit.svg"
 	import Global from "../shared/Global"
 	import * as Server from "../shared/server"
 	import type { NotificationData, RequestData } from "../shared/types.js";
-    var mongoose = require('mongoose');
 
-	let unique = {};
 	export let data: NotificationData;
-	export let user: boolean;
-    
-    var request_id = mongoose.Types.ObjectId(data.request);
-    let request : RequestData = null;
+    let request : RequestData;
 
-    function restart()
-	{
-		unique = {}
-	}
-
-	onMount(async () =>
-	{
-		if (!Global.user)
+    async function onMount() {
+        try
 		{
-			await Server.auto_login();
-			restart();
-		}
-
-		try
-		{
-            request = await Server.get('request-id', { id: request_id });
+			request = await Server.get('request-id', { id: data.request });
 		}
 
 		catch(err)
 		{
 			console.error(err);
 		}
-	});
+    }
+
+    onMount();
+
 </script>
 
-<div id="card" class="flex flex-col justify-start items-start w-full rounded-3xl p-5 gap-2 relative">
-	<header class="flex flex-row w-full justify-between mb-2">
-		<h2>{request.type}</h2>
+{#if request}
+    <div id="card" class="flex flex-col justify-start items-start w-full rounded-3xl p-5 gap-2 relative">
+        <header class="flex flex-row w-full justify-between mb-2">
+            <h2>{data.text}</h2>
+            <a href="#/" class="button-a ml-auto">
+                <button class="flex flex-row justify-center items-center gap-2" style="--color: #007AFF ; --hover-color: #0062CC;"
+                on:click={async() => {Global.displayed= request}}>
+                    <img src={Edit} alt="edit"/>
+                    <span>Consulter</span>
+                </button>
+            </a>
+        </header>
         <div class="line">
-			<span class="value">{data.text}</span>
-		</div>
-	</header>
-	{#if !user}
-		<div class="line">
-			<span class="label">Auteur :</span>
-			<span class="value">{request.author.first_name} {request.author.last_name} ({request.author.department})</span>
-		</div>
-	{/if}
-	<div class="flex flex-row gap-4">
-		<div class="line">
-			<span class="label">Début :</span>
-			<span class="value">{request.start.day} {request.start.pm ? "(après-midi)" : "(matin)"}</span>
-		</div>
-		<div class="line">
-			<span class="label">Fin :</span>
-			<span class="value">{request.end.day} {request.end.pm ? "(après-midi)" : "(matin)"}</span>
-		</div>
-	</div>
-</div>
+            <span class="label">Type :</span>
+            <span class="value">{request.type}</span>
+        </div>
+        <div class="flex flex-row gap-4">
+            <div class="line">
+                <span class="label">Début :</span>
+                <span class="value">{request.start.day} {request.start.pm ? "(après-midi)" : "(matin)"}</span>
+            </div>
+            <div class="line">
+                <span class="label">Fin :</span>
+                <span class="value">{request.end.day} {request.end.pm ? "(après-midi)" : "(matin)"}</span>
+            </div>
+        </div>
+    </div>
+{/if}
 
 <style>
 	div, span, a, button

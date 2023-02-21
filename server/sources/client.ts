@@ -5,6 +5,7 @@ import fs from 'fs';
 import * as Request from './models/request.js';
 import * as User from './models/user.js';
 import * as Notification from './models/notification.js';
+import { ObjectId } from 'mongodb'
 
 export function requests()
 {
@@ -152,7 +153,7 @@ export function requests()
 					department: manager.department
 				},
 				request: request._id.toString(),
-				text: "Demande de " + author.email
+				text: "Demande de " + author.first_name + " " + author.last_name
 			}
 			var notif = await Notification.add(notification);
 		}	
@@ -217,7 +218,7 @@ export function requests()
 										department: hr.department
 									},
 									request: request._id.toString(),
-									text: "Demande de " + user?.email
+									text: "Demande de " + user?.first_name + " " + user?.last_name
 								}
 								var notif = await Notification.add(notification);
 							}
@@ -407,8 +408,33 @@ export function requests()
 			return;
 		}
 
-		let request = await Request.get({ _id : req.body.id });
+		let request_id = new ObjectId(req.query.id?.toString());
+		let request = await Request.get({ _id : request_id });
 
 		res.send(JSON.stringify(request));
+	});
+
+	Global.app.get('/user-notifications', async (req, res) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		//All requests exept mines, and those which need manager approval
+		let notifications = await Notification.getAll({owner: email}) ?? [];
+		let notifications_data = [];
+
+		for (let notif of notifications)
+			notifications_data.push(await Notification.get_data(notif));
+
+		res.send(JSON.stringify(notifications_data));
+
 	});
 }
