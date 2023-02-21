@@ -180,13 +180,13 @@ export function requests()
 			if(user?.manager == email)
 			{
 				request.manager = email;
-				req.body.accept ? request.state="Validée manager" : request.state="Refusée";
+				req.body.accept ? request.state="En attente" : request.state="Refusée";
 			}
 			//HR validation
 			else if(current_user?.department == "HR")
 			{
 				request.hr = email;
-				req.body.accept ? request.state="Validée RH" : request.state="Refusée";
+				req.body.accept ? request.state="Validée" : request.state="Refusée";
 			}
 
 			request.save();
@@ -240,7 +240,7 @@ export function requests()
 		}
 
 		let users = await User.getAll({ manager: email }) ?? [];
-		let requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: "En attente"}) ?? [];
+		let requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: "En attente", manager: ""}) ?? [];
 		let requests_data = [];
 
 		for (let request of requests)
@@ -263,7 +263,7 @@ export function requests()
 		}
 
 		//All requests exept mines, and those which need manager approval
-		let requests = await Request.getAll({author: {$ne:email}, state: "Validée manager"}) ?? [];
+		let requests = await Request.getAll({author: {$ne:email}, state: "En attente", manager: {$ne:""}, hr: ""}) ?? [];
 		let requests_data = [];
 
 		for (let request of requests)
@@ -288,17 +288,17 @@ export function requests()
 		let current_user = await User.get({email: email});
 		let requests: Request.RequestInterface[];
 
-		//HR sees all the sent requests
+		//HR sees all the sent requests exept draws and refused
 		if(current_user?.department == "HR")
 		{
-			requests = await Request.getAll({state: {$ne:"Brouillon"}}) ?? [];
+			requests = await Request.getAll({ state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
 		}
 		//All my requests and requests of people I manage
 		else
 		{
 			let users = await User.getAll({ manager: email }) ?? [];
-			let manager_requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: {$ne:"Brouillon"} }) ?? [];
-			let my_requests = await Request.getAll({ author: email, state: {$ne:"Brouillon"} }) ?? [];
+			let manager_requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
+			let my_requests = await Request.getAll({ author: email, state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
 			requests = [...manager_requests, ...my_requests];
 		}
 
@@ -325,5 +325,33 @@ export function requests()
 			}
 		}		
 		res.send(JSON.stringify(requests_data));
-	});	
+	});
+	
+	Global.app.get('/author-manager', async (req, res) =>
+	{
+		console.log("hi");
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let users = await User.getAll({ manager: email }) ?? [];
+		let manager;
+		// let manager_data = [];
+
+		for (let user of users)
+		{
+			if(user.email == req.query.author)
+			{
+				manager = email;	
+			}
+		}
+		res.send(JSON.stringify({email: manager}));
+	});
 }
