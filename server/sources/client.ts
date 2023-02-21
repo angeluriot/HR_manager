@@ -393,4 +393,22 @@ export function requests()
 		}		
 		res.send(JSON.stringify(requests_data));
 	});	
+
+	Global.app.get('/request-id', async (req, res) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let request = await Request.get({ _id : req.body.id });
+
+		res.send(JSON.stringify(request));
+	});
 }
