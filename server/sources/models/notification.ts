@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import * as User from './user';
-import * as Request from './request';
+import * as User from './user.js';
+import * as Request from './request.js';
 
 export interface NotificationInterface extends mongoose.Document
 {

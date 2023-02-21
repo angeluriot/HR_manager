@@ -138,7 +138,24 @@ export function requests()
 			return;
 		}
 
-		// TODO: Notifications and stuff
+		let author = await User.get({ email: email }); // get the author of the request
+		let manager = await User.get({ email: author?.manager }); // get the manager of the author
+
+		// Notification to manager of the request
+		if (manager !== null && author !== null) {
+			let notification : Notification.NotificationData;
+			notification = {
+				owner : {
+					email: manager.email,
+					first_name: manager.first_name,
+					last_name: manager.last_name,
+					department: manager.department
+				},
+				request: request._id.toString(),
+				text: "Demande de " + author.email
+			}
+			var notif = await Notification.add(notification);
+		}	
 
 		console.log(`Request sent by ${request.author} with id: ${request.id}`);
 		res.send({ message: "Request sent" });
@@ -173,8 +190,9 @@ export function requests()
 		{
 			res.status(400).send("Invalid token");
 			return;
-		}
+		}	
 
+		let notif_text : string = "";
 		try
 		{
 			//manager validation
@@ -183,29 +201,24 @@ export function requests()
 				request.manager = email;
 				if (req.body.accept) {
 					request.state="Validée manager";
-					// Notification to author of the request
-					let notification : Notification.NotificationData;
-					notification = {
-						owner : {
-							email: user.email,
-							first_name: user.first_name,
-							last_name: user.last_name,
-							department: user.department
-						},
-						request: request._id.toString(),
-						text: "Validée par manager : "
-					}
-					var notif = await Notification.add(notification);
+					notif_text = "Validée par manager : " + email;
 				} 
 				else {
 					request.state="Refusée";
+					notif_text = "Refusée par manager : " + email;
 				}
 			}
 			//HR validation
 			else if(current_user?.department == "HR")
 			{
 				request.hr = email;
-				req.body.accept ? request.state="Validée RH" : request.state="Refusée";
+				if (req.body.accept) {
+					request.state="Validée RH";
+					notif_text = "Validée par RH : " + email;
+				} else {
+					request.state="Refusée";
+					notif_text = "Refusée par RH : " + email;
+				}
 			}
 
 			request.save();
@@ -215,10 +228,23 @@ export function requests()
 		{
 			res.status(400).send(error.message);
 			return;
-		}
-
-		// TODO: Notifications and stuff
+		}	
 		
+		// Notification to author of the request
+		if (user !== null) {
+			let notification : Notification.NotificationData;
+			notification = {
+				owner : {
+					email: user.email,
+					first_name: user.first_name,
+					last_name: user.last_name,
+					department: user.department
+				},
+				request: request._id.toString(),
+				text: notif_text
+			}
+			var notif = await Notification.add(notification);
+		}	
 
 		console.log(`Request answered by ${email} with id: ${request?.id}`);
 		res.send({ message: "Request answered" });
