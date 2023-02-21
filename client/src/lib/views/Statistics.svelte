@@ -5,7 +5,20 @@
 	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
 
-	let unique = {};
+    let now = new Date();
+    let current_day = now.getDay();
+    let current_date: int  = now.getDate();
+    let current_month: int = now.getMonth();
+    let current_year: int = now.getYear() +1900;
+
+    const months_list = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
+    const days_list = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+
+    let work_accident_requests = []
+    let sickness_requests = []
+    let remote_work_requests = []
+
+    let unique = {};
 
 	function restart()
 	{
@@ -19,19 +32,22 @@
 			await Server.auto_login();
 			restart();
 		}
+
+		try
+        {
+            work_accident_requests = await Server.get('work-accident-requests');
+            sickness_requests = await Server.get('sickness-requests');
+            remote_work_requests = await Server.get('remote-work-requests');
+        } catch (err) {
+            console.error(err)
+        }
+
+        updateGraph();
 	});
 
-	let points: any = [
-		{ year: 1990, birthrate: 16.7 },
-		{ year: 1995, birthrate: 14.6 },
-		{ year: 2000, birthrate: 14.4 },
-		{ year: 2005, birthrate: 14 },
-		{ year: 2010, birthrate: 13 },
-		{ year: 2015, birthrate: 12.4 }
-	];
-
-	const xTicks = [1990, 1995, 2000, 2005, 2010, 2015];
-	const yTicks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+    let points: any = []
+	let xTicks = [];
+	let yTicks = [];
 	const padding = { top: 20, right: 15, bottom: 20, left: 25 };
 
 	let width = 500;
@@ -42,7 +58,7 @@
 	}
 
 	$: xScale = scaleLinear()
-		.domain([0, chartXLabels.length])
+		.domain([0, points.length])
 		.range([padding.left, width - padding.right]);
 
 	$: yScale = scaleLinear()
@@ -54,60 +70,147 @@
 
 	let selectStatisticType = ["Taux d'arrêt maladie", "Taux d'accident du travail", "Taux de télétravail", "Taux de présence sur site"];
 	let selectTimePeriod = ["Par jour de la semaine", "Par semaine", "Par mois", "Par année"];
-	let selectCollaborators = ["Service 1", "Service 2", "Collaborateur 1", "Collaborateur 2"];
+	let selectCollaborators = ["Tous les collaborateurs", "Service 1", "Service 2", "Collaborateur 1", "Collaborateur 2"];
 
-	let chartXLabels = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
-	let activeStat = "";
-	let activePeriod = "";
-	let activeCollab = "";
+	let activeStat = "Taux d'arrêt maladie";
+	let activePeriod = "Par jour de la semaine";
+	let activeCollab = "Tous les collaborateurs";
 
-	function changeTimePeriod() {
+    function readDate(date_string : string) {
+        let date = new Date();
+        date.setYear(parseInt(date_string.substr(6, 10), 10));
+        date.setMonth(parseInt(date_string.substr(3, 5), 10) - 1);
+        date.setDate(parseInt(date_string.substr(0, 2), 10));
+        date.setHours(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+
+        return date;
+    }
+
+	function updateGraph() {
+	    let request;
+        switch(activeStat) {
+            case "Taux d'arrêt maladie": request = sickness_requests; break;
+            case "Taux d'accident du travail": request = work_accident_requests; break;
+            case "Taux de télétravail": request = remote_work_requests; break;
+            default : return;
+        }
+
 		if(activePeriod === "Par jour de la semaine") {
-			chartXLabels = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
-			points = [
-				{ x: "Lundi", y: 16.7 },
-				{ x: "Mardi", y: 14.6 },
-				{ x: "Mercredi", y: 14.4 },
-				{ x: "Jeudi", y: 14 },
-				{ x: "Vendredi", y: 13 },
-				{ x: "Samedi", y: 12.4 },
-				{ x: "Dimanche", y: 12.4 }
-			];
+			let histo = [0, 0, 0, 0, 0, 0, 0];
+			for(let i = 0; i < request.length; i++) {
+
+                let req_date_end = readDate(request[i].end.day);
+                for(let req_date = readDate(request[i].start.day); req_date.getTime() <= req_date_end.getTime(); req_date.setDate(req_date.getDate() +1))
+                    histo[(req_date.getDay() + 6)%7]++;
+			}
+
+            points = [];
+			for(let i = 0; i < 7; i++)
+                points.push({ x: days_list[i], y: histo[i] });
 		}
 		else if(activePeriod === "Par semaine") {
-			chartXLabels = ["Semaine 1", "Semaine 2"]
-			points = [
-				{ x: "Semaine 1", y: 56.7 },
-				{ x: "Semaine 2", y: 54.6 }
-			];
+		    let date_start = readDate("01/" + (current_month < 9 ? "0" : "") + (current_month+1) + "/" + current_year);
+		    date_start.setDate(date_start.getDate() - date_start.getDay() + 1);
+            let date_start_string = (date_start.getDate() < 10 ? "0" : "") + (date_start.getDate()) + "/" + (date_start.getMonth() < 10 ? "0" : "") + (date_start.getMonth()+1) + "/" + (1900+date_start.getYear());
+            let date_end = readDate(date_start_string);
+
+            let next_month = readDate("01/" + (current_month < 8 ? "0" : "") + (current_month+2) + "/" + current_year);
+
+            date_end.setDate(date_end.getDate() + 7);
+            date_end.setSeconds(date_end.getSeconds() - 1);
+            let date_end_string = (date_end.getDate() < 10 ? "0" : "") + (date_end.getDate()) + "/" + (date_end.getMonth() < 10 ? "0" : "") + (date_end.getMonth()+1) + "/" + (1900+date_end.getYear())
+            points = [];
+            let histo = [];
+
+            let max = 0;
+
+            while(date_start.getTime() <= next_month.getTime()) {
+                histo.push(0);
+                for(let i = 0; i < request.length; i++) {
+                    let req_date_end = readDate(request[i].end.day);
+                    for(let req_date = readDate(request[i].start.day); req_date.getTime() <= req_date_end.getTime(); req_date.setDate(req_date.getDate() +1))
+                        if(date_start.getTime() <= req_date.getTime() && req_date.getTime() < date_end.getTime()) {
+                            histo[points.length]++;
+                            if(histo[points.length] > max)
+                                max = histo[points.length];
+                        }
+                }
+
+                points.push({ x: (date_start_string.substr(0, 5) + " - " + date_end_string.substr(0, 5)), y: histo[points.length] });
+                date_start.setDate(date_start.getDate() + 7);
+                date_end.setDate(date_end.getDate() + 7);
+                date_end_string = (date_end.getDate() < 10 ? "0" : "") + (date_end.getDate()) + "/" + (date_end.getMonth() < 10 ? "0" : "") + (date_end.getMonth()+1) + "/" + (1900+date_end.getYear())
+                date_start_string = (date_start.getDate() < 10 ? "0" : "") + (date_start.getDate()) + "/" + (date_start.getMonth() < 10 ? "0" : "") + (date_start.getMonth()+1) + "/" + (1900+date_start.getYear());
+            }
 		}
 		else if(activePeriod === "Par mois") {
-			chartXLabels = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
-			points = [
-				{ x: "Janvier", y: 16.7 },
-				{ x: "Février", y: 14.6 },
-				{ x: "Mars", y: 14.4 },
-				{ x: "Avril", y: 14 },
-				{ x: "Mai", y: 13 },
-				{ x: "Juin", y: 12.4 },
-				{ x: "Juillet", y: 62.4 },
-				{ x: "Août", y: 52.4 },
-				{ x: "Septembre", y: 42.4 },
-				{ x: "Octobre", y: 32.4 },
-				{ x: "Novembre", y: 22.4 },
-				{ x: "Décembre", y: 2.4 }
-			];
+            let histo = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            for(let i = 0; i < request.length; i++) {
+
+                let req_date_end = readDate(request[i].end.day);
+                for(let req_date = readDate(request[i].start.day); req_date.getTime() <= req_date_end.getTime(); req_date.setDate(req_date.getDate() +1))
+                {
+                    if(req_date.getYear()+1900 === current_year)
+                        histo[req_date.getMonth()]++;
+                }
+            }
+
+            points = [];
+            for(let i = 0; i < 12; i++)
+                points.push({ x: months_list[i], y: histo[i] });
 		}
 		else if(activePeriod === "Par année") {
-			chartXLabels = ["2023", "2024", "2025", "2026"]
-			points = [
-				{ x: 2023, y: 16.7 },
-				{ x: 2024, y: 14.6 },
-				{ x: 2025, y: 14.4 },
-				{ x: 2026, y: 14 }
-			];
+			points = [];
+            for(let i = 0; i < request.length; i++) {
+                let req_date_end = readDate(request[i].end.day);
+                for(let req_date = readDate(request[i].start.day); req_date.getTime() <= req_date_end.getTime(); req_date.setDate(req_date.getDate() +1)) {
+                    let p = 0;
+                    for(; p < points.length; p++)
+                        if(parseInt(points[p].x, 10) === req_date.getYear()+1900) {
+                            points[p].y++;
+                            break;
+                        }
+
+                    if(p == points.length)
+                        points.push({x : (req_date.getYear()+1900).toString(), y : 1});
+                }
+            }
+
+		    points.sort((a, b) => a.x - b.x);
 		}
+
+		yTicks = [0];
+		for(let i = 0; i < points.length; i++)
+            yTicks.push(points[i].y);
 	}
+
+    function goBackMonth() {
+        if(current_month <= 0)
+            current_year--;
+
+        current_month = (current_month + 11)%12;
+        updateGraph();
+	}
+
+	function goFurtherMonth() {
+        if(current_month >= 11)
+            current_year++;
+
+        current_month = (current_month + 1)%12;
+        updateGraph();
+    }
+
+	function goBackYear() {
+        current_year--;
+        updateGraph();
+	}
+
+	function goFurtherYear() {
+        current_year++;
+        updateGraph();
+    }
 </script>
 
 {#key unique}
@@ -115,28 +218,37 @@
 	<div class="main gap-10 w-full">
 		<h1>Statistiques</h1>
 		<div class="flex flex-row gap-6">
-			<select bind:value={activeStat}>
+			<select bind:value={activeStat} on:change={updateGraph}>
 				<option value="" disabled selected>-- Type de Statistiques --</option>
 				{#each selectStatisticType as type}
 					<option value={type}>{type}</option>
 				{/each}
 			</select>
-			<select bind:value={activePeriod} on:change={changeTimePeriod}>
+			<select bind:value={activePeriod} on:change={updateGraph}>
 				<option value="" disabled selected>-- Période --</option>
 				{#each selectTimePeriod as type}
 					<option value={type}>{type}</option>
 				{/each}
 			</select>
-			<select bind:value={activeCollab}>
+			<select bind:value={activeCollab} on:change={updateGraph}>
 				<option value="" disabled selected>-- Services et Collaborateurs --</option>
 				{#each selectCollaborators as type}
 					<option value={type}>{type}</option>
 				{/each}
 			</select>
 		</div>
-
-		<h2>{(activeStat === "" ? "-- Sélectionnez une statistique --" : activeStat + " " + activePeriod)}</h2>
-
+        <div class="flex flex-row gap-6">
+            {#if activePeriod === "Par semaine"}
+                <button class="months_button" on:click={() => goBackMonth()}>&lt;</button>
+                <h1 id="titre">{months_list[current_month]} {current_year}</h1>
+                <button class="months_button" on:click={() => goFurtherMonth()}>&gt;</button>
+            {/if}
+            {#if activePeriod === "Par mois"}
+                <button class="months_button" on:click={() => goBackYear()}>&lt;</button>
+                <h1 id="titre">{current_year}</h1>
+                <button class="months_button" on:click={() => goFurtherYear()}>&gt;</button>
+            {/if}
+        </div>
 		<div class="chart" bind:clientWidth={width} bind:clientHeight={height}>
 			<svg>
 				<!-- y axis -->
@@ -144,7 +256,7 @@
 					{#each yTicks as tick}
 						<g class="tick tick-{tick}" transform="translate(0, {yScale(tick)})">
 							<line x2="100%"></line>
-							<text y="-4">{tick} %</text>
+							<text y="-4">{tick}</text>
 						</g>
 					{/each}
 				</g>
@@ -184,9 +296,6 @@
 		box-sizing: border-box;
 	}
 
-	h2 {
-		text-align: center;
-	}
 	.chart {
 		width: 95%;
 		margin: 0 auto;

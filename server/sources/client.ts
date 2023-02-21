@@ -1,4 +1,4 @@
-import express, { query } from 'express';
+import express from 'express';
 import Global from './Global.js';
 import * as Connection from './users/connection.js';
 import fs from 'fs';
@@ -139,69 +139,8 @@ export function requests()
 
 		// TODO: Notifications and stuff
 
-		console.log(`Request sent by ${request.author} with id: ${request.id}`);
-		res.send({ message: "Request sent" });
-	});
-
-	Global.app.post('/accept-request', async (req: express.Request, res: express.Response) =>
-	{
-		try
-		{
-			var email = Connection.verify_token(req.query.token);
-		}
-
-		catch (error: any)
-		{
-			res.status(400).send(error.message);
-			return;
-		}
-
-		let request = await Request.get({_id: req.query.id});
-
-		if (!request) {
-			res.status(400).send("Request not found");
-			return;
-		}
-
-		//get the current user, and the user we are validating the request
-		let current_user = await User.get({email: email});
-		let user = await User.get({email: request?.author});
-
-		//Check if current user is the manager of the person or from Human Ressources
-		if ( user?.manager !== email && current_user?.department!== "HR") 
-		{
-			res.status(400).send("Invalid token");
-			return;
-		}
-
-		try
-		{
-			//manager validation
-			if(user?.manager == email)
-			{
-				request.manager = email;
-				req.body.accept ? request.state="Validée manager" : request.state="Refusée";
-			}
-			//HR validation
-			else if(current_user?.department == "HR")
-			{
-				request.hr = email;
-				req.body.accept ? request.state="Validée RH" : request.state="Refusée";
-			}
-
-			request.save();
-		}
-
-		catch (error: any)
-		{
-			res.status(400).send(error.message);
-			return;
-		}
-
-		// TODO: Notifications and stuff
-
-		console.log(`Request answered by ${email} with id: ${request?.id}`);
-		res.send({ message: "Request answered" });
+		console.log(`Request sended by ${request.author} with id: ${request.id}`);
+		res.send({ message: "Request sended" });
 	});
 
 	Global.app.get('/user-requests', async (req, res) =>
@@ -240,7 +179,7 @@ export function requests()
 		}
 
 		let users = await User.getAll({ manager: email }) ?? [];
-		let requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: "En attente"}) ?? [];
+		let requests = await Request.getAll({ author: { $in: users.map(user => user.email) } }) ?? [];
 		let requests_data = [];
 
 		for (let request of requests)
@@ -249,81 +188,69 @@ export function requests()
 		res.send(JSON.stringify(requests_data));
 	});
 
-	Global.app.get('/HR-requests', async (req, res) =>
-	{
-		try
-		{
-			var email = Connection.verify_token(req.query.token);
-		}
+	Global.app.get('/work-accident-requests', async (req, res) =>
+    {
+        try
+        {
+            var email = Connection.verify_token(req.query.token);
+        }
 
-		catch (error: any)
-		{
-			res.status(400).send(error.message);
-			return;
-		}
+        catch (error: any)
+        {
+            res.status(400).send(error.message);
+            return;
+        }
 
-		//All requests exept mines, and those which need manager approval
-		let requests = await Request.getAll({author: {$ne:email}, state: "Validée manager"}) ?? [];
-		let requests_data = [];
+        let requests = await Request.getAll({type : "Accident"}) ?? [];
+        let requests_data = [];
 
-		for (let request of requests)
-			requests_data.push(await Request.get_data(request));
+        for (let request of requests)
+            requests_data.push(await Request.get_data(request));
 
-		res.send(JSON.stringify(requests_data));
-	});
+        res.send(JSON.stringify(requests_data));
+    });
 
-	Global.app.get('/calendar-requests', async (req, res) =>
-	{
-		try
-		{
-			var email = Connection.verify_token(req.query.token);
-		}
+    Global.app.get('/sickness-requests', async (req, res) =>
+    {
+        try
+        {
+            var email = Connection.verify_token(req.query.token);
+        }
 
-		catch (error: any)
-		{
-			res.status(400).send(error.message);
-			return;
-		}
+        catch (error: any)
+        {
+            res.status(400).send(error.message);
+            return;
+        }
 
-		let current_user = await User.get({email: email});
-		let requests: Request.RequestInterface[];
+        let requests = await Request.getAll({type : "Maladie"}) ?? [];
+        let requests_data = [];
 
-		//HR sees all the sent requests
-		if(current_user?.department == "HR")
-		{
-			requests = await Request.getAll({state: {$ne:"Brouillon"}}) ?? [];
-		}
-		//All my requests and requests of people I manage
-		else
-		{
-			let users = await User.getAll({ manager: email }) ?? [];
-			let manager_requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: {$ne:"Brouillon"} }) ?? [];
-			let my_requests = await Request.getAll({ author: email, state: {$ne:"Brouillon"} }) ?? [];
-			requests = [...manager_requests, ...my_requests];
-		}
+        for (let request of requests)
+            requests_data.push(await Request.get_data(request));
 
-		let requests_data = [];
+        res.send(JSON.stringify(requests_data));
+    });
 
-		//Select only the requests in the displayed period of time
-		for (let request of requests)
-		{
-			let start = request.start.day;
-			let end = request.end.day;
+    Global.app.get('/remote-work-requests', async (req, res) =>
+    {
+        try
+        {
+            var email = Connection.verify_token(req.query.token);
+        }
 
-			let formatted_start = new Date(start.split("/").reverse().join("-"));
-			let formatted_end = new Date(end.split("/").reverse().join("-"));
+        catch (error: any)
+        {
+            res.status(400).send(error.message);
+            return;
+        }
 
-			if (typeof req.query.start === "string" && typeof req.query.end === "string" ) 
-			{
-				let calendar_start = new Date(req.query.start);
-				let calendar_end = new Date(req.query.end);
+        let requests = await Request.getAll({type : "Télétravail"}) ?? [];
+        let requests_data = [];
 
-				if(formatted_start < calendar_end && formatted_end > calendar_start)
-				{
-					requests_data.push(await Request.get_data(request));
-				}
-			}
-		}		
-		res.send(JSON.stringify(requests_data));
-	});	
+        for (let request of requests)
+            requests_data.push(await Request.get_data(request));
+
+        res.send(JSON.stringify(requests_data));
+    });
 }
