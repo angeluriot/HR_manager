@@ -25,11 +25,6 @@
 		return false;
 	}
 
-	function truc(absence)
-	{
-		update_card(absence);
-	}
-
 </script>
 
 <div class="calendar_content">
@@ -48,7 +43,7 @@
 	{#each absences as absence}
 		{#if absence.shown}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<section class="absence_section {absence.type} {absence.selected ? "selected" : ""}" on:click={() => truc(absence)} style="grid-row: {absence.start_row}; grid-column: {absence.start_col} / span {absence.section_duration}; top: {absence.position * 25 - 5}px">
+			<section class="absence_section {absence.type} {absence.selected ? "selected" : ""}" on:click={() => update_card(absence)} style="grid-row: {absence.start_row}; grid-column: {absence.start_col} / span {absence.section_duration}; top: {absence.position * 25 - 5}px">
 				<span class="absence_title">{absence.title}</span>
 			</section>
 		{/if}

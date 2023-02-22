@@ -7,6 +7,7 @@
 	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
     import type { RequestData } from "../shared/types";
+    import { Cpu } from "svelte-bootstrap-icons";
 
 	let unique = {};
 
@@ -54,7 +55,6 @@
 
 	let filters = [
 		{name: "Validées", checked: true},
-		{name: "Refusées", checked: true},
 		{name: "En cours", checked: true},
 		{name: "Brouillon", checked: true}
 	]
@@ -443,9 +443,6 @@
 		if (absence.state == "Validée" && !filters[0].checked)
 			return true;
 
-		if (absence.state == "Refusée" && !filters[1].checked)
-			return true;
-
 		if (absence.state == "En attente" && !filters[2].checked)
 			return true;
 
@@ -466,57 +463,9 @@
 				abs.selected = false;
 		}
 
-		let remote_days = [];
-
-		for (let day of absence.remote_days)
-		{
-			switch(day)
-			{
-				case 1:
-				{
-					remote_days.push({day: "Lundi", am: true, pm: false});
-					break;
-				}
-				case 2:
-				{
-					remote_days.push({day: "Mardi", am: true, pm: false});
-					break;
-				}
-				case 3:
-				{
-					remote_days.push({day: "Mercredi", am: true, pm: false});
-					break;
-				}
-				case 4:
-				{
-					remote_days.push({day: "Jeudi", am: true, pm: false});
-					break;
-				}
-				case 5:
-				{
-					remote_days.push({day: "Vendredi", am: true, pm: false});
-					break;
-				}
-			}
-		}
-
-		Global.displayed =
-		{
-			id: "",
-			type: absence.sub_type,
-			author: {email: "", first_name: absence.first_name, last_name: absence.last_name, department: ""},
-			state: absence.state,
-			manager: null,
-			hr: null,
-			start: {day: (absence.date.getDate() < 10 ? "0" : "") + absence.date.getDate() + "/" + (absence.date.getMonth() + 1 < 10 ? "0" : "") + (absence.date.getMonth() + 1) + "/" + absence.date.getFullYear(), pm: false},
-			end: {day: (absence.end_date.getDate() < 10 ? "0" : "") + absence.end_date.getDate() + "/" + (absence.end_date.getMonth() + 1 < 10 ? "0" : "") + (absence.end_date.getMonth() + 1) + "/" + absence.end_date.getFullYear(), pm: false},
-			remote: remote_days,
-			subject: "",
-			place: "",
-			proof: "",
-			cause: "",
-			comment: absence.comment
-		}
+		for (let request of requests)
+			if (request.id == absence.id)
+				Global.displayed = request;
 
 		update_calendar();
 	}
@@ -531,7 +480,20 @@
 		for (let r of request_data.remote)
 			remote_days.push(new Date(Number(r.day.substring(6)), Number(r.day.substring(3, 5)), Number(r.day.substring(0, 2))));
 
-		raw_absences.push({
+		let type: string;
+		if (request_data.state == "En attente")
+			type = "en_cours";
+
+		else if (request_data.type == "Congé payé" || request_data.type == "Congé exceptionnel" || request_data.type == "Congé sans solde" || request_data.type == "RTT")
+			type = "conge";
+
+		else if (request_data.type == "Arrêt maladie" || request_data.type == "Arrêt de travail" || request_data.type == "Accident du travail")
+			type = "maladie";
+
+		else
+			type = "physique";
+
+		raw_absences = [...raw_absences, ({
 			id: request_data.id,
 			title: title, // TODO
 			first_name: request_data.author.first_name,
@@ -543,14 +505,14 @@
 			start_row: 0,
 			start_col: 0,
 			position: -1,
-			type: "en_cours", // TODO
+			type: type,
 			sub_type: request_data.type,
 			shown: true,
 			comment: request_data.comment,
 			state: request_data.state,
 			remote_days: remote_days,
 			selected: false
-		})
+		})];
 	}
 
 	(async () => {
@@ -605,7 +567,7 @@
 				<button class="request_button" on:click={() => window.location.href="#/requests/new"}>Nouvelle demande</button>
 			</div>
 			{#if Global.displayed != null}
-				<RequestCard data={Global.displayed} user={false} action="Valider"/>
+				<RequestCard data={Global.displayed} user={false} action="Valider" on:validation={update_calendar}/>
 			{/if}
 		</div>
 	</div>

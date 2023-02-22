@@ -1,9 +1,11 @@
-import express from 'express';
+import express, { query } from 'express';
 import Global from './Global.js';
 import * as Connection from './users/connection.js';
 import fs from 'fs';
 import * as Request from './models/request.js';
 import * as User from './models/user.js';
+import * as Notification from './models/notification.js';
+import { ObjectId } from 'mongodb'
 
 export function requests()
 {
@@ -137,121 +139,138 @@ export function requests()
 			return;
 		}
 
-		// TODO: Notifications and stuff
+		let author = await User.get({ email: email }); // get the author of the request
+		let manager = await User.get({ email: author?.manager }); // get the manager of the author
 
-		console.log(`Request sended by ${request.author} with id: ${request.id}`);
-		res.send({ message: "Request sended" });
+		// Notification to manager of the request
+		if (manager !== null && author !== null) {
+			let notification : Notification.NotificationData;
+			notification = {
+				owner : {
+					email: manager.email,
+					first_name: manager.first_name,
+					last_name: manager.last_name,
+					department: manager.department
+				},
+				request: request._id.toString(),
+				text: "Demande de " + author.first_name + " " + author.last_name
+			}
+			var notif = await Notification.add(notification);
+		}
+
+		console.log(`Request sent by ${request.author} with id: ${request.id}`);
+		res.send({ message: "Request sent" });
 	});
 
-    Global.app.post('/accept-request', async (req: express.Request, res: express.Response) =>
-    	{
-    		try
-    		{
-    			var email = Connection.verify_token(req.query.token);
-    		}
+	Global.app.post('/accept-request', async (req: express.Request, res: express.Response) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
 
-    		catch (error: any)
-    		{
-    			res.status(400).send(error.message);
-    			return;
-    		}
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
 
-    		let request = await Request.get({_id: req.query.id});
+		let request = await Request.get({_id: req.query.id});
 
-    		if (!request) {
-    			res.status(400).send("Request not found");
-    			return;
-    		}
+		if (!request) {
+			res.status(400).send("Request not found");
+			return;
+		}
 
-    		//get the current user, and the user we are validating the request
-    		let current_user = await User.get({email: email});
-    		let user = await User.get({email: request?.author});
+		//get the current user, and the user we are validating the request
+		let current_user = await User.get({email: email});
+		let user = await User.get({email: request?.author});
 
-    		//Check if current user is the manager of the person or from Human Ressources
-    		if ( user?.manager !== email && current_user?.department!== "HR")
-    		{
-    			res.status(400).send("Invalid token");
-    			return;
-    		}
+		//Check if current user is the manager of the person or from Human Ressources
+		if ( user?.manager !== email && current_user?.department!== "HR") 
+		{
+			res.status(400).send("Invalid token");
+			return;
+		}
 
-    		let notif_text : string = "";
-    		try
-    		{
-    			//manager validation
-    			if(user?.manager == email)
-    			{
-    				request.manager = email;
-    				if (req.body.accept) {
-    					request.state="En attente";
-    					notif_text = "Validée par manager : " + email;
+		let notif_text : string = "";
+		try
+		{
+			//manager validation
+			if(user?.manager == email)
+			{
+				request.manager = email;
+				if (req.body.accept) {
+					request.state="En attente";
+					notif_text = "Validée par manager : " + email;
 
-    					// Notification to all HR to validate
-    					let HRs = await User.getAll({ department: "HR" });
-    					if (HRs !== null) {
-    						HRs.forEach(async (hr) => {
-    							if (request !== null) {
-    								let notification : Notification.NotificationData;
-    								notification = {
-    									owner : {
-    										email: hr.email,
-    										first_name: hr.first_name,
-    										last_name: hr.last_name,
-    										department: hr.department
-    									},
-    									request: request._id.toString(),
-    									text: "Demande de " + user?.first_name + " " + user?.last_name
-    								}
-    								var notif = await Notification.add(notification);
-    							}
-    						});
-    					}
-    				}
-    				else {
-    					request.state="Refusée";
-    					notif_text = "Refusée par manager : " + email;
-    				}
-    			}
-    			//HR validation
-    			else if(current_user?.department == "HR")
-    			{
-    				request.hr = email;
-    				if (req.body.accept) {
-    					request.state="Validée";
-    					notif_text = "Validée par RH : " + email;
-    				} else {
-    					request.state="Refusée";
-    					notif_text = "Refusée par RH : " + email;
-    				}
-    			}
+					// Notification to all HR to validate
+					let HRs = await User.getAll({ department: "HR" });
+					if (HRs !== null) {
+						HRs.forEach(async (hr) => {
+							if (request !== null) {
+								let notification : Notification.NotificationData;
+								notification = {
+									owner : {
+										email: hr.email,
+										first_name: hr.first_name,
+										last_name: hr.last_name,
+										department: hr.department
+									},
+									request: request._id.toString(),
+									text: "Demande de " + user?.first_name + " " + user?.last_name
+								}
+								var notif = await Notification.add(notification);
+							}
+						});
+					}
+				}
+				else {
+					request.state="Refusée";
+					notif_text = "Refusée par manager : " + email;
+				}
+			}
+			//HR validation
+			else if(current_user?.department == "HR")
+			{
+				request.hr = email;
+				if (req.body.accept) {
+					request.state="Validée";
+					notif_text = "Validée par RH : " + email;
+				} else {
+					request.state="Refusée";
+					notif_text = "Refusée par RH : " + email;
+				}
+			}
 
-    			request.save();
-    		}
+			request.save();
+		}
 
-    		catch (error: any)
-    		{
-    			res.status(400).send(error.message);
-    			return;
-    		}
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
 
-    		// Notification to author of the request
-    		if (user !== null) {
-    			let notification : Notification.NotificationData;
-    			notification = {
-    				owner : {
-    					email: user.email,
-    					first_name: user.first_name,
-    					last_name: user.last_name,
-    					department: user.department
-    				},
-    				request: request._id.toString(),
-    				text: notif_text
-    			}
-    			var notif = await Notification.add(notification);
-    		}
+		// Notification to author of the request
+		if (user !== null) {
+			let notification : Notification.NotificationData;
+			notification = {
+				owner : {
+					email: user.email,
+					first_name: user.first_name,
+					last_name: user.last_name,
+					department: user.department
+				},
+				request: request._id.toString(),
+				text: notif_text
+			}
+			var notif = await Notification.add(notification);
+		}
 
-    		console.log(`Request answered by ${email} with id: ${request?.id}`);
-    		res.send({ message: "Request answered" });
-    	});
+		console.log(`Request answered by ${email} with id: ${request?.id}`);
+		res.send({ message: "Request answered" });
+	});
 
 	Global.app.get('/user-requests', async (req, res) =>
 	{
@@ -289,7 +308,7 @@ export function requests()
 		}
 
 		let users = await User.getAll({ manager: email }) ?? [];
-		let requests = await Request.getAll({ author: { $in: users.map(user => user.email) } }) ?? [];
+		let requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: "En attente", manager: ""}) ?? [];
 		let requests_data = [];
 
 		for (let request of requests)
@@ -298,80 +317,158 @@ export function requests()
 		res.send(JSON.stringify(requests_data));
 	});
 
+	Global.app.get('/HR-requests', async (req, res) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		//All requests exept mines, and those which need manager approval
+		let requests = await Request.getAll({author: {$ne:email}, state: "En attente", manager: {$ne:""}, hr: ""}) ?? [];
+		let requests_data = [];
+
+		for (let request of requests)
+			requests_data.push(await Request.get_data(request));
+
+		res.send(JSON.stringify(requests_data));
+	});
+
+	Global.app.get('/calendar-requests', async (req, res) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let current_user = await User.get({email: email});
+		let requests: Request.RequestInterface[];
+
+		//HR sees all the sent requests exept draws and refused
+		if(current_user?.department == "HR")
+		{
+			requests = await Request.getAll({ state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
+		}
+		//All my requests and requests of people I manage
+		else
+		{
+			let users = await User.getAll({ manager: email }) ?? [];
+			let manager_requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
+			let my_requests = await Request.getAll({ author: email, state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
+			requests = [...manager_requests, ...my_requests];
+		}
+
+		let requests_data = [];
+
+		//Select only the requests in the displayed period of time
+		for (let request of requests)
+		{
+			let start = request.start.day;
+			let end = request.end.day;
+
+			let formatted_start = new Date(start.split("/").reverse().join("-"));
+			let formatted_end = new Date(end.split("/").reverse().join("-"));
+
+			if (typeof req.query.start === "string" && typeof req.query.end === "string" ) 
+			{
+				let calendar_start = new Date(req.query.start);
+				let calendar_end = new Date(req.query.end);
+
+				if(formatted_start < calendar_end && formatted_end > calendar_start)
+				{
+					requests_data.push(await Request.get_data(request));
+				}
+			}
+		}		
+		res.send(JSON.stringify(requests_data));
+	});
+
 	Global.app.get('/work-accident-requests', async (req, res) =>
-    {
-        try
         {
-            var email = Connection.verify_token(req.query.token);
-        }
+            try
+            {
+                var email = Connection.verify_token(req.query.token);
+            }
 
-        catch (error: any)
+            catch (error: any)
+            {
+                res.status(400).send(error.message);
+                return;
+            }
+
+            let requests = await Request.getAll({type : "Accident"}) ?? [];
+            let requests_data = [];
+
+            for (let request of requests)
+                requests_data.push(await Request.get_data(request));
+
+            res.send(JSON.stringify(requests_data));
+        });
+
+        Global.app.get('/sickness-requests', async (req, res) =>
         {
-            res.status(400).send(error.message);
-            return;
-        }
+            try
+            {
+                var email = Connection.verify_token(req.query.token);
+            }
 
-        let requests = await Request.getAll({type : "Accident"}) ?? [];
-        let requests_data = [];
+            catch (error: any)
+            {
+                res.status(400).send(error.message);
+                return;
+            }
 
-        for (let request of requests)
-            requests_data.push(await Request.get_data(request));
+            let requests = await Request.getAll({type : "Maladie"}) ?? [];
+            let requests_data = [];
 
-        res.send(JSON.stringify(requests_data));
-    });
+            for (let request of requests)
+                requests_data.push(await Request.get_data(request));
 
-    Global.app.get('/sickness-requests', async (req, res) =>
-    {
-        try
+            res.send(JSON.stringify(requests_data));
+        });
+
+        Global.app.get('/remote-work-requests', async (req, res) =>
         {
-            var email = Connection.verify_token(req.query.token);
-        }
+            try
+            {
+                var email = Connection.verify_token(req.query.token);
+            }
 
-        catch (error: any)
-        {
-            res.status(400).send(error.message);
-            return;
-        }
+            catch (error: any)
+            {
+                res.status(400).send(error.message);
+                return;
+            }
 
-        let requests = await Request.getAll({type : "Maladie"}) ?? [];
-        let requests_data = [];
+            let requests = await Request.getAll({type : "Télétravail"}) ?? [];
+            let requests_data = [];
 
-        for (let request of requests)
-            requests_data.push(await Request.get_data(request));
+            for (let request of requests)
+                requests_data.push(await Request.get_data(request));
 
-        res.send(JSON.stringify(requests_data));
-    });
+            res.send(JSON.stringify(requests_data));
+        });
 
-    Global.app.get('/remote-work-requests', async (req, res) =>
-    {
-        try
-        {
-            var email = Connection.verify_token(req.query.token);
-        }
+        Global.app.get('/users', async (req, res) =>
+        	{
+        		let users = await User.getAll({}) ?? [];
+        		let users_data = [];
 
-        catch (error: any)
-        {
-            res.status(400).send(error.message);
-            return;
-        }
+        		for (let user of users)
+        			users_data.push(await Request.get_data(user));
 
-        let requests = await Request.getAll({type : "Télétravail"}) ?? [];
-        let requests_data = [];
-
-        for (let request of requests)
-            requests_data.push(await Request.get_data(request));
-
-        res.send(JSON.stringify(requests_data));
-    });
-
-    Global.app.get('/users', async (req, res) =>
-    	{
-    		let users = await User.getAll({}) ?? [];
-    		let users_data = [];
-
-    		for (let user of users)
-    			users_data.push(await Request.get_data(user));
-
-    		res.send(JSON.stringify(users_data));
-    	});
+        		res.send(JSON.stringify(users_data));
+        	});
 }

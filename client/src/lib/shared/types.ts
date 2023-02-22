@@ -23,3 +23,9 @@ export type RequestData = {
 	cause: string,
 	comment: string
 }
+
+export type NotificationData = {
+	owner: string,
+	request: string,
+	text: string
+}
