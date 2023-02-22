@@ -5,10 +5,15 @@
 	import Global from "../shared/Global"
 	import * as Server from "../shared/server"
 	import type { RequestData, UserData } from "../shared/types.js";
+	import { createEventDispatcher } from 'svelte';
 
 	export let data: RequestData;
 	export let user: boolean;
 	export let action: string;
+
+	const dispatch = createEventDispatcher();
+
+	$: data.state, update_color();
 
 	let show_validation_buttons = (data.author.email !== Global.user.email || Global.user.email === Global.user.manager) &&
 								  (
@@ -28,11 +33,12 @@
 			await Server.post('accept-request', {id: data.id}, {accept: false});
 			data.state = "Refusée";
 		}
-		
+
+		dispatch('validation');
 		show_validation_buttons = false;
-		update_color();		
+		update_color();
 	}
-	
+
 	let state_color = "";
 
 	function update_color()
@@ -102,7 +108,7 @@
 	{#if data.state !== "En attente" && data.state !== "Brouillon" && action !=="Consulter"}
 		<div class="line">
 			<span class="label">Décision :</span>
-			<span class="value">{data.manager.first_name} {data.manager.last_name} {data.hr == null ? "" : ", " + data.hr.first_name + " " + data.hr.last_name}</span>
+			<span class="value">{data.manager == null ? "" : ", " + data.manager.first_name + " " + data.manager.last_name} {data.hr == null ? "" : ", " + data.hr.first_name + " " + data.hr.last_name}</span>
 		</div>
 	{/if}
 	{#if data.type == "Télétravail"}
