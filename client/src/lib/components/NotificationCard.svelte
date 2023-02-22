@@ -27,9 +27,8 @@
     <div id="card" class="flex flex-col justify-start items-start w-full rounded-3xl p-5 gap-2 relative">
         <header class="flex flex-row w-full justify-between mb-2">
             <h2>{data.text}</h2>
-            <a href="#/" class="button-a ml-auto">
-                <button class="flex flex-row justify-center items-center gap-2" style="--color: #007AFF ; --hover-color: #0062CC;"
-                on:click={async() => {Global.displayed= request}}>
+            <a href="#/requests" class="button-a ml-auto">
+                <button class="flex flex-row justify-center items-center gap-2" style="--color: #007AFF ; --hover-color: #0062CC;">
                     <img src={Edit} alt="edit"/>
                     <span>Consulter</span>
                 </button>

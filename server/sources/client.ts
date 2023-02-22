@@ -201,7 +201,7 @@ export function requests()
 			{
 				request.manager = email;
 				if (req.body.accept) {
-					request.state="Validée";
+					request.state="En attente";
 					notif_text = "Validée par manager : " + email;
 
 					// Notification to all HR to validate
