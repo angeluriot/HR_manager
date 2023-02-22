@@ -205,7 +205,7 @@
 					<span>Nom de la formation</span>
 				</div>
 				<div class="input-container enabled flex relative w-full">
-					<input type="text" value={request_place}/>
+					<input type="text" bind:value={request_place}/>
 					<span>Lieu de la formation</span>
 				</div>
 			</div>
@@ -218,7 +218,7 @@
 					<span>Sujet de la visite</span>
 				</div>
 				<div class="input-container enabled flex relative w-full">
-					<input type="text" value={request_place}/>
+					<input type="text" bind:value={request_place}/>
 					<span>Lieu de la visite</span>
 				</div>
 			</div>
