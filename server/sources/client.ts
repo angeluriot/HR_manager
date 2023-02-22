@@ -143,6 +143,116 @@ export function requests()
 		res.send({ message: "Request sended" });
 	});
 
+    Global.app.post('/accept-request', async (req: express.Request, res: express.Response) =>
+    	{
+    		try
+    		{
+    			var email = Connection.verify_token(req.query.token);
+    		}
+
+    		catch (error: any)
+    		{
+    			res.status(400).send(error.message);
+    			return;
+    		}
+
+    		let request = await Request.get({_id: req.query.id});
+
+    		if (!request) {
+    			res.status(400).send("Request not found");
+    			return;
+    		}
+
+    		//get the current user, and the user we are validating the request
+    		let current_user = await User.get({email: email});
+    		let user = await User.get({email: request?.author});
+
+    		//Check if current user is the manager of the person or from Human Ressources
+    		if ( user?.manager !== email && current_user?.department!== "HR")
+    		{
+    			res.status(400).send("Invalid token");
+    			return;
+    		}
+
+    		let notif_text : string = "";
+    		try
+    		{
+    			//manager validation
+    			if(user?.manager == email)
+    			{
+    				request.manager = email;
+    				if (req.body.accept) {
+    					request.state="En attente";
+    					notif_text = "Validée par manager : " + email;
+
+    					// Notification to all HR to validate
+    					let HRs = await User.getAll({ department: "HR" });
+    					if (HRs !== null) {
+    						HRs.forEach(async (hr) => {
+    							if (request !== null) {
+    								let notification : Notification.NotificationData;
+    								notification = {
+    									owner : {
+    										email: hr.email,
+    										first_name: hr.first_name,
+    										last_name: hr.last_name,
+    										department: hr.department
+    									},
+    									request: request._id.toString(),
+    									text: "Demande de " + user?.first_name + " " + user?.last_name
+    								}
+    								var notif = await Notification.add(notification);
+    							}
+    						});
+    					}
+    				}
+    				else {
+    					request.state="Refusée";
+    					notif_text = "Refusée par manager : " + email;
+    				}
+    			}
+    			//HR validation
+    			else if(current_user?.department == "HR")
+    			{
+    				request.hr = email;
+    				if (req.body.accept) {
+    					request.state="Validée";
+    					notif_text = "Validée par RH : " + email;
+    				} else {
+    					request.state="Refusée";
+    					notif_text = "Refusée par RH : " + email;
+    				}
+    			}
+
+    			request.save();
+    		}
+
+    		catch (error: any)
+    		{
+    			res.status(400).send(error.message);
+    			return;
+    		}
+
+    		// Notification to author of the request
+    		if (user !== null) {
+    			let notification : Notification.NotificationData;
+    			notification = {
+    				owner : {
+    					email: user.email,
+    					first_name: user.first_name,
+    					last_name: user.last_name,
+    					department: user.department
+    				},
+    				request: request._id.toString(),
+    				text: notif_text
+    			}
+    			var notif = await Notification.add(notification);
+    		}
+
+    		console.log(`Request answered by ${email} with id: ${request?.id}`);
+    		res.send({ message: "Request answered" });
+    	});
+
 	Global.app.get('/user-requests', async (req, res) =>
 	{
 		try
@@ -253,4 +363,15 @@ export function requests()
 
         res.send(JSON.stringify(requests_data));
     });
+
+    Global.app.get('/users', async (req, res) =>
+    	{
+    		let users = await User.getAll({}) ?? [];
+    		let users_data = [];
+
+    		for (let user of users)
+    			users_data.push(await Request.get_data(user));
+
+    		res.send(JSON.stringify(users_data));
+    	});
 }

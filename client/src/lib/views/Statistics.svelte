@@ -20,6 +20,9 @@
 
     let unique = {};
 
+    let dpt_filter = []
+    let dpt_list = []
+
 	function restart()
 	{
 		unique = {}
@@ -38,6 +41,33 @@
             work_accident_requests = await Server.get('work-accident-requests');
             sickness_requests = await Server.get('sickness-requests');
             remote_work_requests = await Server.get('remote-work-requests');
+
+            users = await Server.get('users');
+
+            for(let i = 0; i < users.length; i++) {
+                if(dpt_filter[users[i].email] == null)
+                    dpt_filter[users[i].email] = [];
+
+                dpt_filter[users[i].email].push([users[i].first_name + " " + users[i].last_name]);
+
+                if(dpt_filter[users[i].manager] == null)
+                    dpt_filter[users[i].manager] = [];
+
+                let j = 0;
+                for(; j < dpt_filter[users[i].manager].length; j++)
+                    if(dpt_filter[users[i].manager][j] === users[i].department)
+                        break;
+                if(j >= dpt_filter[users[i].manager].length)
+                    dpt_filter[users[i].manager].push(users[i].department);
+
+                if(dpt_list[users[i].department] == null)
+                    dpt_list[users[i].department] = [];
+
+                dpt_list[users[i].department].push([users[i].first_name + " " + users[i].last_name]);
+            }
+
+            selectCollaborators = dpt_filter[Global.user.email];
+
         } catch (err) {
             console.error(err)
         }
@@ -68,13 +98,13 @@
 	$: innerWidth = width - (padding.left + padding.right);
 	$: barWidth = 30;
 
-	let selectStatisticType = ["Taux d'arrêt maladie", "Taux d'accident du travail", "Taux de télétravail", "Taux de présence sur site"];
+	let selectStatisticType = ["Taux d'arrêt maladie", "Taux d'accident du travail", "Taux de télétravail"];
 	let selectTimePeriod = ["Par jour de la semaine", "Par semaine", "Par mois", "Par année"];
-	let selectCollaborators = ["Tous les collaborateurs", "Service 1", "Service 2", "Collaborateur 1", "Collaborateur 2"];
+	let selectCollaborators = [];
 
 	let activeStat = "Taux d'arrêt maladie";
 	let activePeriod = "Par jour de la semaine";
-	let activeCollab = "Tous les collaborateurs";
+	let activeCollab = "Toute l'entreprise";
 
     function readDate(date_string : string) {
         let date = new Date();
@@ -86,6 +116,17 @@
         date.setSeconds(0);
 
         return date;
+    }
+
+    function isInDpt(dpt : string, name : string) {
+        if(dpt === "Toute l'entreprise")
+            return true;
+
+        for(let i = 0; i < dpt_list[dpt].length; i++)
+            if(dpt_list[dpt][i] === name)
+                return true;
+
+        return false;
     }
 
 	function updateGraph() {
@@ -100,6 +141,8 @@
 		if(activePeriod === "Par jour de la semaine") {
 			let histo = [0, 0, 0, 0, 0, 0, 0];
 			for(let i = 0; i < request.length; i++) {
+                if(!isInDpt(activeCollab, request[i].author))
+                    continue;
 
                 let req_date_end = readDate(request[i].end.day);
                 for(let req_date = readDate(request[i].start.day); req_date.getTime() <= req_date_end.getTime(); req_date.setDate(req_date.getDate() +1))
@@ -129,6 +172,9 @@
             while(date_start.getTime() <= next_month.getTime()) {
                 histo.push(0);
                 for(let i = 0; i < request.length; i++) {
+                    if(!isInDpt(activeCollab, request[i].author))
+                        continue;
+
                     let req_date_end = readDate(request[i].end.day);
                     for(let req_date = readDate(request[i].start.day); req_date.getTime() <= req_date_end.getTime(); req_date.setDate(req_date.getDate() +1))
                         if(date_start.getTime() <= req_date.getTime() && req_date.getTime() < date_end.getTime()) {
@@ -148,6 +194,8 @@
 		else if(activePeriod === "Par mois") {
             let histo = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             for(let i = 0; i < request.length; i++) {
+                if(!isInDpt(activeCollab, request[i].author))
+                    continue;
 
                 let req_date_end = readDate(request[i].end.day);
                 for(let req_date = readDate(request[i].start.day); req_date.getTime() <= req_date_end.getTime(); req_date.setDate(req_date.getDate() +1))
@@ -164,6 +212,9 @@
 		else if(activePeriod === "Par année") {
 			points = [];
             for(let i = 0; i < request.length; i++) {
+                if(!isInDpt(activeCollab, request[i].author))
+                    continue;
+
                 let req_date_end = readDate(request[i].end.day);
                 for(let req_date = readDate(request[i].start.day); req_date.getTime() <= req_date_end.getTime(); req_date.setDate(req_date.getDate() +1)) {
                     let p = 0;
@@ -218,24 +269,31 @@
 	<div class="main gap-10 w-full">
 		<h1>Statistiques</h1>
 		<div class="flex flex-row gap-6">
-			<select bind:value={activeStat} on:change={updateGraph}>
-				<option value="" disabled selected>-- Type de Statistiques --</option>
-				{#each selectStatisticType as type}
-					<option value={type}>{type}</option>
-				{/each}
-			</select>
-			<select bind:value={activePeriod} on:change={updateGraph}>
-				<option value="" disabled selected>-- Période --</option>
-				{#each selectTimePeriod as type}
-					<option value={type}>{type}</option>
-				{/each}
-			</select>
-			<select bind:value={activeCollab} on:change={updateGraph}>
-				<option value="" disabled selected>-- Services et Collaborateurs --</option>
-				{#each selectCollaborators as type}
-					<option value={type}>{type}</option>
-				{/each}
-			</select>
+		    <div class="flex flex-col gap-6">
+		        <h2>Choix de la statistique</h2>
+                <select bind:value={activeStat} on:change={updateGraph}>
+                    {#each selectStatisticType as type}
+                        <option value={type}>{type}</option>
+                    {/each}
+                </select>
+			</div>
+			<div class="flex flex-col gap-6">
+                <h2>Choix de la période</h2>
+                <select bind:value={activePeriod} on:change={updateGraph}>
+                    {#each selectTimePeriod as type}
+                        <option value={type}>{type}</option>
+                    {/each}
+                </select>
+			</div>
+            <div class="flex flex-col gap-6">
+                <h2>Choix du collaborateur ou du service</h2>
+                <select bind:value={activeCollab} on:change={updateGraph}>
+                    <option value="Toute l'entreprise" selected>Toute l'entreprise</option>
+                    {#each selectCollaborators as type}
+                        <option value={type}>{type}</option>
+                    {/each}
+                </select>
+			</div>
 		</div>
         <div class="flex flex-row gap-6">
             {#if activePeriod === "Par semaine"}
