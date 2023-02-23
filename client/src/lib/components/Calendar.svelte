@@ -34,9 +34,9 @@
 
 	{#each days as day}
 		{#if day.this_month}
-			<span class="day">{(is_holiday(day) ? "(Férié) " : "") + day.name}</span>
+			<span class="day {is_month_mode ? "" : "week_mode"}">{(is_holiday(day) ? "(Férié) " : "") + day.name}</span>
 		{:else}
-			<span class="day not_this_month">{day.name}</span>
+			<span class="day {is_month_mode ? "" : "week_mode"} not_this_month">{day.name}</span>
 		{/if}
 	{/each}
 
@@ -143,23 +143,18 @@
 
 	.day:nth-of-type(n + 1):nth-of-type(-n + 7) {
 		grid-row: 1;
-		border-bottom: 0;
 	}
 	.day:nth-of-type(n + 8):nth-of-type(-n + 14) {
 		grid-row: 2;
-		border-bottom: 0;
 	}
 	.day:nth-of-type(n + 15):nth-of-type(-n + 21) {
 		grid-row: 3;
-		border-bottom: 0;
 	}
 	.day:nth-of-type(n + 22):nth-of-type(-n + 28) {
 		grid-row: 4;
-		border-bottom: 0;
 	}
 	.day:nth-of-type(n + 29):nth-of-type(-n + 35) {
 		grid-row: 5;
-		border-bottom: 0;
 	}
 	.day:nth-of-type(n + 36):nth-of-type(-n + 42) {
 		grid-row: 6;
@@ -193,6 +188,10 @@
 	}
 	.day:nth-of-type(7n + 7) {
 		grid-column: 7/7;
+	}
+
+	.day.week_mode {
+		
 	}
 
 	.day_name {
