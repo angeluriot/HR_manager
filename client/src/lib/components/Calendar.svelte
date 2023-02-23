@@ -27,7 +27,7 @@
 
 </script>
 
-<div class="calendar_content">
+<div class="calendar_content {is_month_mode ? "" : "week_mode"}">
 	{#each day_names as day_name}
 		<span class="day_name">{day_name}</span>
 	{/each}
@@ -124,6 +124,13 @@
 		grid-auto-rows: 120px;
 	}
 
+	.calendar_content.week_mode {
+		display: grid;
+		grid-template-columns: repeat(7, minmax(120px, 1fr));
+		grid-template-rows: 50px;
+		grid-auto-rows: 500px;
+	}
+
 	.day {
 		border: 1px solid #C1CBDA;
 		text-align: right;
@@ -191,7 +198,7 @@
 	}
 
 	.day.week_mode {
-		
+		height: 500px;
 	}
 
 	.day_name {

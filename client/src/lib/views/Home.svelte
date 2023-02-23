@@ -6,9 +6,8 @@
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
-    import type { RequestData } from "../shared/types";
-    import { Cpu } from "svelte-bootstrap-icons";
-    import { date_to_string, string_to_date } from "../shared/utils";
+	import type { RequestData } from "../shared/types";
+	import { date_to_string, string_to_date } from "../shared/utils";
 
 	let unique = {};
 
@@ -215,7 +214,7 @@
 			if (!different_users.includes(this_user))
 				different_users.push(this_user);
 
-			if (Global.user.department == "RH" && !different_departments.includes(request.author.department))
+			if (Global.user && Global.user.department == "RH" && !different_departments.includes(request.author.department))
 				different_departments.push(request.author.department);
 		}
 
@@ -234,7 +233,7 @@
 			}
 
 		// Add department filters
-		if (Global.user.department == "RH" && different_departments.length > 1)
+		if (Global.user && Global.user.department == "RH" && different_departments.length > 1)
 			for (let department of different_departments)
 			{
 				let is_already_a_filter: boolean = false;
@@ -695,7 +694,7 @@
 
 {#key unique}
 	<Menu active="Accueil"/>
-	<div class="flex flex-row gap-20 justify-center items-start w-full h-full pt-[70px]">
+	<div class="main flex flex-row gap-20 justify-center items-start w-full h-full pt-[70px]">
 		<div class="gap-10 flex flex-col justify-center items-center">
 			<div class="calendar_header flex flex-row justify-between items-center w-full">
 				<div class="flex flex-row justify-center items-center gap-3">
@@ -771,6 +770,19 @@
 {/key}
 
 <style>
+
+	.main
+	{
+		overflow-y: scroll;
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	.main::-webkit-scrollbar
+	{
+		display: none;
+	}
+
 	.calendar_header
 	{
 		text-align: center;
