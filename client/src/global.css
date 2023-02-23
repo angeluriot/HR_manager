@@ -31,6 +31,9 @@ a
 h1
 {
 	@apply text-4xl font-bold text-center;
+	appearance: none;
+	-moz-appearance: none;
+	font-weight: normal;
 }
 
 span

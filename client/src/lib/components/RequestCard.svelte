@@ -100,10 +100,15 @@
 			<span class="value">{data.author.first_name} {data.author.last_name} ({data.author.department})</span>
 		</div>
 	{/if}
-	{#if data.state !== "En attente" && data.state !== "Brouillon"}
+	{#if data.state == "Refusée" && data.manager !== null}
 		<div class="line">
 			<span class="label">Décision :</span>
-			<span class="value">{data.manager == null ? "" : ", " + data.manager.first_name + " " + data.manager.last_name} {data.hr == null ? "" : ", " + data.hr.first_name + " " + data.hr.last_name}</span>
+			<span class="value">{data.hr == null ? (data.manager.first_name + " " + data.manager.last_name + " (manager)") : (data.hr.first_name + " " + data.hr.last_name + " (RH)")}</span>
+		</div>
+	{:else if data.state !== "Brouillon" && data.manager !== null}
+		<div class="line">
+			<span class="label">Décision :</span>
+			<span class="value">{`${data.manager == null ? "" : data.manager.first_name + " " + data.manager.last_name + " (manager)"}${data.hr == null ? "" : ", " + data.hr.first_name + " " + data.hr.last_name + " (RH)"}`}</span>
 		</div>
 	{/if}
 	{#if data.type == "Télétravail" && data.remote.length > 0}

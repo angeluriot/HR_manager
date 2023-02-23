@@ -35,7 +35,7 @@ export async function get(filter: any): Promise<NotificationInterface | null>
 
 export async function getAll(filter: any): Promise<NotificationInterface[] | null>
 {
-	return await Notification.find(filter);
+	return await Notification.find(filter, null, { sort: { createdAt: -1 } });
 }
 
 export async function remove(filter: any)
