@@ -695,61 +695,75 @@
 
 {#key unique}
 	<Menu active="Accueil"/>
-	<div id="container" class="flex flex-row gap-40">
-		<div id="calendar_container" class="main gap-10">
-			<div class="calendar">
-				<div class="calendar_header">
-					<input type="button" on:click={() => week_mode()} class="mode_button {!is_month_mode ? "checked" : "ml-2.5"}" id="week_mode_button" value="Semaines">
-					<input type="button" on:click={() => month_mode()} class="mode_button {is_month_mode ? "checked ml-2.5" : "ml-5"}" id="month_mode_button" value="Mois">
-
+	<div class="flex flex-row gap-20 justify-center items-start w-full h-full pt-[70px]">
+		<div class="gap-10 flex flex-col justify-center items-center">
+			<div class="calendar_header flex flex-row justify-between items-center w-full">
+				<div class="flex flex-row justify-center items-center gap-3">
+					<input type="button" on:click={() => week_mode()} class="mode_button rounded-full {is_month_mode ? "" : "selected"}" id="week_mode_button" value="Semaines">
+					<input type="button" on:click={() => month_mode()} class="mode_button rounded-full {is_month_mode ? "selected" : ""}" id="month_mode_button" value="Mois">
+				</div>
+				<div class="flex flex-row justify-center items-center {is_month_mode ? "gap-5" : "gap-2"}">
 					<button class="months_button" on:click={() => left()}>&lt;</button>
-					<h1 id="title">{calendar_title}</h1>
+					<h1>{calendar_title}</h1>
 					<button class="months_button" on:click={() => right()}>&gt;</button>
-					<span id="days_info">Jours de congé : {Global.days_left} </span>
 				</div>
-				<Calendar {update_card} {public_holidays} {days} {absences} {is_month_mode}/>
+				<div class="days_info flex flex-row justify-center items-center gap-2">
+					<h2>Jours de congé :</h2>
+					<span>{Global.days_left}</span>
+				</div>
 			</div>
+			<Calendar {update_card} {public_holidays} {days} {absences} {is_month_mode}/>
 		</div>
-		<div class="gap-8 h-full">
-			<div id="side_menu" class="gap-12 h-[35%]">
-				<button class="request_button" on:click={() => window.location.href="#/requests/new"}>Nouvelle demande</button>
-				<div class="justify-start overflow-y-auto border-2 rounded-xl w-80 h-40">
-					<h2 class="text-xl font-bold">Filtres</h2>
-					<ul class="inline-block text-left">
-						{#each state_filters as filter}
-						  <li class="relative right-24">
+		<div class="gap-10 flex flex-col justify-center items-start w-[450px] mt-2">
+			<a href="#/requests/new" class="new-request"><button class="bg-[#007AFF] cursor-pointer rounded-xl text-white">
+				Nouvelle demande
+			</button></a>
+			<div class="filters relative">
+				<div class="overflow-auto w-full h-full flex flex-col justify-start items-start px-5 gap-2">
+					<div class="mt-4"></div>
+					{#each state_filters as filter}
+						<div class="flex flex-row gap-2">
 							<input type="checkbox" bind:checked={filter.checked} on:change={update_calendar}/>
 							<span>{filter.name}</span>
-						  </li>
-						{/each}
-						{#each department_filters as filter}
-						  <li class="relative right-24">
+						</div>
+					{/each}
+					{#each department_filters as filter}
+						<div class="flex flex-row gap-2">
 							<input type="checkbox" bind:checked={filter.checked} on:change={update_calendar}/>
 							<span>{filter.name}</span>
-						  </li>
-						{/each}
-						{#each user_filters as filter}
-						  <li class="relative right-24">
+						</div>
+					{/each}
+					{#each user_filters as filter}
+						<div class="flex flex-row gap-2">
 							<input type="checkbox" bind:checked={filter.checked} on:change={update_calendar}/>
 							<span>{filter.name}</span>
-						  </li>
-						{/each}
-					</ul>
+						</div>
+					{/each}
+					<div class="mb-4"></div>
 				</div>
-				{#if Global.displayed != null}
+				<h2 class="absolute">Filtres</h2>
+			</div>
+			{#if Global.displayed != null}
+				<div class="max-w-[450px] w-full">
 					<RequestCard data={Global.displayed} user={false} place="home" on:validation={update_calendar}/>
-				{/if}
-				<div class="legend">
-					<div class="dots_column">
-						<span id="green_dot" class="dot"></span>
-						<span id="red_dot" class="dot"></span>
-						<span id="blue_dot" class="dot"></span>
-						<span id="gray_dot" class="dot"></span>
-					</div>
-					<span class="legend_text">Congé (congé payé, RTT...)<br>
-					Maladie (accident, arrêt maladie...)<br>
-					Absence physique (télétravail, formation...)<br>
-					Demande en attente</span>
+				</div>
+			{/if}
+			<div class="legende flex flex-col justify-center items-start gap-3">
+				<div class="flex flex-row gap-3 items-center">
+					<span class="dot bg-[#0AD442]"></span>
+					<span>Congé (congé payé, RTT...)</span>
+				</div>
+				<div class="flex flex-row gap-3 items-center">
+					<span class="dot bg-[#F62942]"></span>
+					<span>Maladie (accident, arrêt maladie...)<br>
+				</div>
+				<div class="flex flex-row gap-3 items-center">
+					<span class="dot bg-[#1640D4]"></span>
+					<span>Absence physique (télétravail, formation...)<br>
+				</div>
+				<div class="flex flex-row gap-3 items-center">
+					<span class="dot bg-[#AEB4C3]"></span>
+					<span>Demande en attente<br>
 				</div>
 			</div>
 		</div>
@@ -757,144 +771,162 @@
 {/key}
 
 <style>
-	.calendar {
-		width: 100%;
-		height: 95%;
-		margin: auto;
-		overflow: hidden;
-		border-radius: 10px;
-		max-width: 1200px;
-	}
-
-	.calendar_header {
-		display: flex;
-		flex-direction: row;
+	.calendar_header
+	{
 		text-align: center;
-		border-bottom: 1px solid rgba(166, 168, 179, 0.12);
-		padding: 30px 0;
 	}
 
-	.mode_button {
-		position: absolute;
-		font-size: 20px;
-		color: black;
-		cursor: pointer;
-	}
-
-	.mode_button.checked {
-		color: white;
-		background: #007AFF;
-		border-radius: 14px;
-		padding-left: 10px;
-		padding-right: 10px;
-		cursor: pointer;
-	}
-
-	.months_button {
+	.months_button
+	{
 		border: 1px;
-		padding-left: 7px;
-		padding-right: 10px;
 		cursor: pointer;
 	}
 
-	.calendar_header h1 {
+	.calendar_header h1, .calendar_header button
+	{
+		font-family: "Nunito-Bold";
 		font-size: 25px;
-	}
-
-	.request_button {
-		position: relative;
-
-		font-size: 20px;
-		color: white;
-		background: #007AFF;
-		border-radius: 14px;
-		padding-top: 10px;
-		padding-bottom: 10px;
-		padding-left: 15px;
-		padding-right: 15px;
-	}
-
-	.legend {
-		position: relative;
-		flex-direction: row;
-		display: flex;
-	}
-
-	.dots_column {
-		position: relative;
-		flex-direction: column;
-		display: flex;
-		top: 4px;
-	}
-
-	.dot {
-		position: relative;
-		height: 25px;
-		width: 25px;
-		border-radius: 50%;
-		display: inline-block;
-		margin-top: 7px;
-	}
-
-	.legend_text {
-		position: relative;
-		padding-top: 15px;
-		text-align: left;
-		line-height: 32px;
-		left: 15px;
-	}
-
-	#container {
-		position: relative;
-		flex-direction: row;
-		display: flex;
-		width: 100%;
-	}
-
-	#calendar_container {
-		position: relative;
-		flex-direction: column;
-		display: flex;
-		height: 100vh;
-	}
-
-	#side_menu {
-		position: relative;
-		flex-direction: column;
-		display: flex;
-	}
-
-	#month_mode_button {
-		left: 115px;
-	}
-
-	#week_mode_button {
-		left: 20px;
-	}
-
-	#days_info {
-		position: absolute;
-		right: 2%;
-		font-size: 20px;
-	}
-
-	#title {
 		color: #09244B;
 	}
 
-	#green_dot {
-		background-color: #0AD442;
+	.calendar_header button
+	{
+		padding: 5px 15px 5px 15px;
+		margin: -5px -15px -5px -15px;
 	}
 
-	#red_dot {
-		background-color: #F62942;
+	.days_info h2
+	{
+		font-family: "Nunito-Bold";
+		font-size: 19px;
+		color: #09244B;
 	}
 
-	#blue_dot {
-		background-color: #1640D4;
+	.days_info span
+	{
+		font-family: "Roboto-Regular";
+		font-size: 19px;
 	}
 
-	#gray_dot {
-		background-color: #AEB4C3;
+	.mode_button
+	{
+		padding: 19px 30px 18px 30px;
+		line-height: 0px;
+		font-family: "Nunito-SemiBold";
+		font-size: 17px;
+		color: #526581;
+		user-select: none;
+		cursor: pointer;
+	}
+
+	.mode_button:hover
+	{
+		background-color: #e0efff;
+	}
+
+	.mode_button.selected
+	{
+		background-color: #007AFF;
+		color: white;
+		pointer-events: none;
+	}
+
+	.new-request button
+	{
+		@apply select-none;
+		width: 240px;
+		height: 50px;
+		font-family: "Nunito-Bold";
+		font-size: 18px;
+		line-height: 0px;
+	}
+
+	.new-request button:hover
+	{
+		background-color: #005CC0;
+	}
+
+	.dot
+	{
+		height: 25px;
+		width: 25px;
+		border-radius: 50%;
+	}
+
+	.legende span
+	{
+		font-family: "Nunito-SemiBold";
+		color: #526581;
+		font-size: 17px;
+		line-height: 0px;
+	}
+
+	.filters
+	{
+		width: 350px;
+		height: 165px;
+		border: 2px solid #b6b9c4;
+		border-radius: 15px;
+	}
+
+	.filters h2
+	{
+		pointer-events: none;
+		position: absolute;
+		top: -9px;
+		left: 15px;
+		font-family: "Nunito-SemiBold";
+		color: #6D6E7A;
+		font-size: 16px;
+		line-height: 16px;
+		background-color: white;
+		padding: 0px 4px 0px 4px;
+		border-radius: 999px;
+	}
+
+	.filters div
+	{
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	.filters div::-webkit-scrollbar
+	{
+		display: none;
+	}
+
+	.filters span
+	{
+		font-family: "Nunito-SemiBold";
+		color: #526581;
+		font-size: 17px;
+		line-height: 0px;
+		margin-top: 1px;
+	}
+
+	input[type="checkbox"]
+	{
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+
+		width: 26px;
+		height: 26px;
+		cursor: pointer;
+		border: 2px solid #B1B3C5;
+		border-radius: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	input[type="checkbox"]:checked::after
+	{
+		content: "";
+		display: block;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background-color: #007AFF;
 	}
 </style>

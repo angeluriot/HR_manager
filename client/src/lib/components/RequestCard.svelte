@@ -129,7 +129,7 @@
 			</span>
 		</div>
 	{/if}
-	<div class="flex flex-row gap-4">
+	{#if place == "home"}
 		<div class="line">
 			<span class="label">Début :</span>
 			<span class="value">{data.start.day} {data.start.pm ? "(après-midi)" : "(matin)"}</span>
@@ -138,7 +138,18 @@
 			<span class="label">Fin :</span>
 			<span class="value">{data.end.day} {data.end.pm ? "(après-midi)" : "(matin)"}</span>
 		</div>
-	</div>
+	{:else}
+		<div class="flex flex-row gap-4">
+			<div class="line">
+				<span class="label">Début :</span>
+				<span class="value">{data.start.day} {data.start.pm ? "(après-midi)" : "(matin)"}</span>
+			</div>
+			<div class="line">
+				<span class="label">Fin :</span>
+				<span class="value">{data.end.day} {data.end.pm ? "(après-midi)" : "(matin)"}</span>
+			</div>
+		</div>
+	{/if}
 	{#if data.type === "Formation" || data.type === "Visite extérieure"}
 		<div class="flex flex-row gap-4">
 			<div class="line">
