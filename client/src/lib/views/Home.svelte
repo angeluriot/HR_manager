@@ -75,8 +75,7 @@
 
 	let state_filters = [
 		{name: "Validées", checked: true},
-		{name: "En cours", checked: true},
-		{name: "Brouillon", checked: true}
+		{name: "En cours", checked: true}
 	];
 	let user_filters = [];
 	let department_filters = [];
@@ -561,9 +560,6 @@
 			return true;
 
 		if (absence.state == "En attente" && !state_filters[2].checked)
-			return true;
-
-		if (absence.state == "Brouillon" && !state_filters[3].checked)
 			return true;
 
 		for (let user_filter of user_filters)
