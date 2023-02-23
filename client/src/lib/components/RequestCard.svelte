@@ -201,7 +201,7 @@
 					<img src={Delete} alt="delete"/>
 					<span>Supprimer</span>
 				</button>
-			{:else}
+			{:else if data.state !== "Refusée"}
 				<a href="#/" class="button-a">
 					<button class="flex flex-row justify-center items-center gap-2 bg-[#007AFF] hover:bg-[#0062CC]" on:click={ () => Global.displayed = data }>
 						<img src={Edit} alt="look"/>
