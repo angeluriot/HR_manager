@@ -30,7 +30,15 @@
 				await Server.post('accept-request', {id: data.id}, {accept: true});
 
 				if (data.manager !== null && data.hr === null)
+				{
 					data.state = "Validée";
+					data.hr = {email: Global.user.email, first_name: Global.user.first_name, last_name: Global.user.last_name};
+				}					
+				else
+				{
+					data.manager = {email: Global.user.email, first_name: Global.user.first_name, last_name: Global.user.last_name};;
+				}
+					
 			}
 
 			catch (err)

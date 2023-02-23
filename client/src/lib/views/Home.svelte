@@ -78,7 +78,7 @@
 		{name: "Validées", checked: true},
 		{name: "En cours", checked: true},
 		{name: "Brouillon", checked: true}
-	]
+	];
 
 	let raw_absences = [];
 
@@ -158,7 +158,7 @@
 		}
 
 		days_in_db = {start: days[0].date, end: days[days.length-1].date};
-		requests = await Server.get('calendar-requests', { start: days_in_db.start, end: days_in_db.end });
+		requests = await Server.get('calendar-requests', { start: days_in_db.start, end: days_in_db.end, manager:"" });
 		raw_absences = [];
 
 		for (let request of requests)

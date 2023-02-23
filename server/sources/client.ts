@@ -386,7 +386,18 @@ export function requests()
 		//HR sees all the sent requests exept draws and refused
 		if(current_user?.department == "RH")
 		{
-			requests = await Request.getAll({ state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
+			if(req.query.manager !== "")
+			{
+				let users = await User.getAll({manager: req.query.manager}) ?? [];
+				let manager_requests= await Request.getAll({ author: req.query.manager, state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
+				let users_requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
+				requests = [...users_requests,...manager_requests];
+			}
+			else
+			{
+				requests = await Request.getAll({ state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
+			}
+					
 		}
 		//All my requests and requests of people I manage
 		else
