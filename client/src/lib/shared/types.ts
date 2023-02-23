@@ -25,7 +25,8 @@ export type RequestData = {
 }
 
 export type NotificationData = {
-	owner: string,
-	request: string,
+	id: string,
+	owner: { email: string, first_name: string, last_name: string, department: string },
+	request: RequestData,
 	text: string
 }

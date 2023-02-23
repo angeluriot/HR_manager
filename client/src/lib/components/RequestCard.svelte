@@ -4,12 +4,12 @@
 	import No from "../../assets/shapes/No.svg"
 	import Global from "../shared/Global"
 	import * as Server from "../shared/server"
-	import type { RequestData, UserData } from "../shared/types.js";
+	import type { RequestData } from "../shared/types.js";
 	import { createEventDispatcher } from 'svelte';
 
 	export let data: RequestData;
 	export let user: boolean;
-	export let action: string;
+	export let place: string;
 
 	const dispatch = createEventDispatcher();
 
@@ -17,21 +17,40 @@
 
 	let show_validation_buttons = (data.author.email !== Global.user.email || Global.user.email === Global.user.manager) &&
 								  (
-									(Global.user.department !== "HR" && data.state === "En attente" && data.manager === null) ||
-									(Global.user.department === "HR" && data.hr === null && data.manager !== null)
+									(Global.user.department !== "RH" && data.state === "En attente" && data.manager === null) ||
+									(Global.user.department === "RH" && data.hr === null && data.manager !== null)
 								  );
 
-	async function validation(decision: string){
-
-		if(decision === "Accept")
+	async function validation(decision: string)
+	{
+		if (decision === "Accept")
 		{
-			await Server.post('accept-request', {id: data.id}, {accept: true});
-			data.state = "Validée";
+			try
+			{
+				await Server.post('accept-request', {id: data.id}, {accept: true});
+
+				if (data.manager !== null && data.hr === null)
+					data.state = "Validée";
+			}
+
+			catch (err)
+			{
+				console.error(err)
+			}
 		}
+
 		else if (decision === "Refuse")
 		{
-			await Server.post('accept-request', {id: data.id}, {accept: false});
-			data.state = "Refusée";
+			try
+			{
+				await Server.post('accept-request', {id: data.id}, {accept: false});
+				data.state = "Refusée";
+			}
+
+			catch (err)
+			{
+				console.error(err)
+			}
 		}
 
 		dispatch('validation');
@@ -52,11 +71,11 @@
 			case "En attente":
 				state_color = "#E8A525";
 				break;
-			
+
 			case "Validée":
 				state_color = "#1DCF5A";
 				break;
-			
+
 			case "Refusée":
 				state_color = "#F62942";
 				break;
@@ -66,35 +85,11 @@
 				break;
 		}
 	}
+
 	update_color();
-
-	let button_color = "";
-	let button_color_hover = "";
-	let button_logo = "";
-
-	switch (action)
-	{
-		case "Consulter":
-			button_color = "#007AFF";
-			button_color_hover = "#0062CC";
-			button_logo = Edit;
-			break;
-
-		case "Valider":
-			button_color = "#19C97F";
-			button_color_hover = "#0CA86F";
-			button_logo = Yes;
-			break;
-
-		default:
-			button_color = "#007AFF";
-			button_color_hover = "#0062CC";
-			button_logo = Edit;
-			break;
-	}
 </script>
 
-<div id="card" class="flex flex-col justify-start items-start w-full rounded-3xl p-5 gap-2 relative {action}">
+<div id="card" class="flex flex-col justify-start items-start w-full rounded-3xl p-5 gap-2 relative {place}">
 	<header class="flex flex-row w-full justify-between mb-2">
 		<h2>{data.type}</h2>
 		<div id="state" class="rounded-full" style="--color: {state_color};">{data.state}</div>
@@ -105,13 +100,13 @@
 			<span class="value">{data.author.first_name} {data.author.last_name} ({data.author.department})</span>
 		</div>
 	{/if}
-	{#if data.state !== "En attente" && data.state !== "Brouillon" && action !=="Consulter"}
+	{#if data.state !== "En attente" && data.state !== "Brouillon"}
 		<div class="line">
 			<span class="label">Décision :</span>
 			<span class="value">{data.manager == null ? "" : ", " + data.manager.first_name + " " + data.manager.last_name} {data.hr == null ? "" : ", " + data.hr.first_name + " " + data.hr.last_name}</span>
 		</div>
 	{/if}
-	{#if data.type == "Télétravail"}
+	{#if data.type == "Télétravail" && data.remote.length > 0}
 		<div class="line">
 			<span class="label">Jours :</span>
 			<span class="value">
@@ -131,7 +126,7 @@
 			<span class="value">{data.end.day} {data.end.pm ? "(après-midi)" : "(matin)"}</span>
 		</div>
 	</div>
-	{#if action !== "Consulter" && data.type === "Formation" || data.type === "Visite extérieure"}
+	{#if data.type === "Formation" || data.type === "Visite extérieure"}
 		<div class="flex flex-row gap-4">
 			<div class="line">
 				<span class="label">Sujet :</span>
@@ -143,43 +138,36 @@
 			</div>
 		</div>
 	{/if}
-	{#if action !== "Consulter" && data.type === "Accident du travail"}
+	{#if data.type === "Accident du travail"}
 		<div class="line">
 			<span class="label">Cause :</span>
 			<span class="value">{data.cause}</span>
 		</div>
 	{/if}
-	<div class="line {action == "Consulter" ? "mb-4" : ""}">
+	<div class="line">
 		<span class="label">Commentaire :</span>
 		<span class="value">{data.comment == "" ? "(vide)" : data.comment}</span>
 	</div>
-	{#if action == "Consulter"}
-		<a href="#/" class="button-a absolute">
-			<button class="flex flex-row justify-center items-center gap-2" style="--color: {button_color}; --hover-color: {button_color_hover};"
-					on:click={ async() => Global.displayed = data }>
-				<img src={button_logo} alt="edit"/>
-				<span>{action}</span>
+	<div class="flex flex-row gap-3 justify-end w-full mt-2">
+		{#if place == "requests"}
+			<a href="#/" class="button-a">
+				<button class="flex flex-row justify-center items-center gap-2 bg-[#007AFF] hover:bg-[#0062CC]" on:click={ () => Global.displayed = data }>
+					<img src={Edit} alt="edit"/>
+					<span>Consulter</span>
+				</button>
+			</a>
+		{/if}
+		{#if show_validation_buttons}
+			<button class="flex flex-row justify-center items-center gap-2 bg-[#19C97F] hover:bg-[#0CA86F]" on:click={ () => validation("Accept") }>
+				<img src={Yes} alt="edit"/>
+				<span>Accepter</span>
 			</button>
-		</a>
-	{:else if show_validation_buttons}
-		<div class="flex flex-row gap-8 mx-auto">
-			<a href="#/" >
-				<button class="flex flex-row justify-center items-center gap-2" style="--color: {button_color}; --hover-color: {button_color_hover};"
-						on:click={ () => validation("Accept") }>
-					<img src={button_logo} alt="edit"/>
-					<span>{action}</span>
-				</button>
-			</a>
-			<a href="#/" >
-				<button class="flex flex-row justify-center items-center gap-2" style="--color: #F62942; --hover-color: #c71f28;"
-						on:click={ () => validation("Refuse") }>
-					<img src={No} alt="edit"/>
-					<span>Refuser</span>
-				</button>
-			</a>
-		</div>	
-	{/if}
-
+			<button class="flex flex-row justify-center items-center gap-2 bg-[#F62942] hover:bg-[#c71f28]" on:click={ () => validation("Refuse") }>
+				<img src={No} alt="edit"/>
+				<span>Refuser</span>
+			</button>
+		{/if}
+	</div>
 </div>
 
 <style>
@@ -195,14 +183,14 @@
 		max-width: 550px;
 	}
 
-	#card.consulter
+	#card.requests
 	{
 		margin: 10px;
 		width: 30vw;
 		text-align: left;
 	}
 
-	#card.valider
+	#card.home
 	{
 		width: 100%;
 		height: 47%;
@@ -245,17 +233,10 @@
 		color: #09244B;
 	}
 
-	.button-a
-	{
-		right: 1.25rem;
-		bottom: 1.25rem;
-	}
-
 	button
 	{
 		padding: 10px 17px 10px 14px;
 		border-radius: 10px;
-		background-color: var(--color);
 	}
 
 	button span
@@ -270,10 +251,5 @@
 	button img
 	{
 		width: 21px;
-	}
-
-	button:hover
-	{
-		background-color: var(--hover-color);
 	}
 </style>

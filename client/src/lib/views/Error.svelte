@@ -21,4 +21,10 @@
 {/key}
 
 <style>
+	h1
+	{
+		font-family: "Nunito-Bold";
+		font-size: 35px;
+		color: #09244B;
+	}
 </style>

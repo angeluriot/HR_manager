@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import { config } from 'dotenv';
+import * as User from './models/user.js';
+import * as Request from './models/request.js';
 
 export async function connect_mongodb()
 {
@@ -44,4 +46,50 @@ export function string_to_date(date: string)
 	let year = parseInt(date.substring(6, 10));
 
 	return new Date(year, month - 1, day);
+}
+
+export async function get_days_left(email: string)
+{
+	let today = new Date();
+	let last_may_first = new Date(today.getFullYear(), 4, 1);
+
+	if (today.getTime() < last_may_first.getTime())
+		last_may_first.setFullYear(last_may_first.getFullYear() - 1);
+
+	let nb_days = 2.5 * (today.getMonth() - last_may_first.getMonth() + (12 * (today.getFullYear() - last_may_first.getFullYear())));
+	let requests = await Request.getAll({ author: email });
+
+	if (!requests || requests.length == 0)
+		return nb_days;
+
+	let days = 0;
+
+	for (let request of requests)
+	{
+		if (!((request.type == "Congé payé" || request.type == "Congé exceptionnel") && request.state == "Validée"))
+			continue;
+
+		let start = string_to_date(request.start.day);
+		let end = string_to_date(request.end.day);
+
+		for (let i = start.getTime(); i <= end.getTime(); i += 86400000)
+		{
+			let day = new Date(i).getDay();
+
+			if (day == 0 || day == 6)
+				continue;
+
+			days++;
+		}
+
+		days -= 0.5;
+
+		if (request.end.pm)
+			days += 0.5;
+
+		if (request.start.pm)
+			days -= 0.5;
+	}
+
+	return nb_days - days;
 }

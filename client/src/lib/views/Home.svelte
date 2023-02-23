@@ -6,8 +6,7 @@
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
-    import type { RequestData } from "../shared/types";
-    import { Cpu } from "svelte-bootstrap-icons";
+	import type { RequestData } from "../shared/types";
 
 	let unique = {};
 
@@ -21,6 +20,12 @@
 		if (!Global.user)
 		{
 			await Server.auto_login();
+			restart();
+		}
+
+		else
+		{
+			await Server.update_info();
 			restart();
 		}
 	});
@@ -567,7 +572,7 @@
 				<button class="request_button" on:click={() => window.location.href="#/requests/new"}>Nouvelle demande</button>
 			</div>
 			{#if Global.displayed != null}
-				<RequestCard data={Global.displayed} user={false} action="Valider" on:validation={update_calendar}/>
+				<RequestCard data={Global.displayed} user={false} place="home" on:validation={update_calendar}/>
 			{/if}
 		</div>
 	</div>

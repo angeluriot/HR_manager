@@ -133,3 +133,12 @@ export async function post(url: string, params: any, body: any)
 
 	return await response.json();
 }
+
+export async function update_info()
+{
+	let data = await get("update-info");
+
+	Global.days_left = data.days_left;
+	Global.rtt_left = data.rtt_left;
+	Global.nb_notifications = data.nb_notifications;
+}

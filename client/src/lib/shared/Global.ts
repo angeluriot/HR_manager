@@ -7,7 +7,7 @@ export default class Global
 	static rtt_left = 5;
 	static days_left = 0;
 	static nb_notifications = 0;
-	static request_pending = true;
+	static request_pending = false;
 	static index = "-1";
 	static displayed: Types.RequestData | null = null;
 }

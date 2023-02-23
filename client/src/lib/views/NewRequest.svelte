@@ -19,9 +19,16 @@
 		if (!Global.user)
 		{
 			await Server.auto_login();
-			update_days();
 			restart();
 		}
+
+		else
+		{
+			await Server.update_info();
+			restart();
+		}
+
+		update_days();
 	});
 
 	const types = ["Télétravail", "Congé payé", "Congé exceptionnel", "Congé sans solde", "RTT", "Formation", "Visite extérieure", "Arrêt maladie", "Arrêt de travail", "Accident du travail"];
@@ -134,7 +141,7 @@
 
 		<div class="line flex flex-row justify-center items-center">
 			<div class="input-container enabled flex relative w-full">
-				<select bind:value={request_type}>
+				<select bind:value={request_type} on:change={update_days}>
 					{#each types as type}
 						<option value={type}>{type}</option>
 					{/each}

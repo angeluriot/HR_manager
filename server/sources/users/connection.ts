@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import * as Users from '../models/user.js';
 import * as Notification from '../models/notification.js';
 import Global from '../Global.js';
+import * as Utils from '../utils.js';
 
 export function verify_token(token: any): string
 {
@@ -55,12 +56,15 @@ export async function login(email: any, password: any, ip: string)
 
 	console.log('[' + new Date().toTimeString().split(' ')[0] + '] User logged (' + ip + ') : ' + email);
 
+	let notifications = await Notification.getAll({owner: email}) ?? [];
+
 	return {
 		token: token,
 		expires: date.toUTCString(),
-		user: await Users.get_data(user),
-		days_left: 5,
-		nb_notifications: (await Notification.getAll({ owner: email }))?.length
+		user: Users.get_data(user),
+		days_left: await Utils.get_days_left(email),
+		rtt_left: 0,
+		nb_notifications: notifications.length
 	};
 }
 
@@ -72,11 +76,14 @@ export async function auto_login(token: any, ip: string)
 	if (!user)
 		throw new Error('This user does not exist.');
 
-	console.log('[' + new Date().toTimeString().split(' ')[0] + '] User auto logged (' + ip + ') : ' + email);
+	console.log('[' + (new Date()).toTimeString().split(' ')[0] + '] User auto logged (' + ip + ') : ' + email);
+
+	let notifications = await Notification.getAll({owner: email}) ?? [];
 
 	return {
-		user: await Users.get_data(user),
-		days_left: 5,
-		nb_notifications: (await Notification.getAll({ owner: email }))?.length
+		user: Users.get_data(user),
+		days_left: await Utils.get_days_left(email),
+		rtt_left: 0,
+		nb_notifications: notifications.length
 	};
 }

@@ -4,7 +4,7 @@ import { connect_mongodb } from './utils.js';
 import Global from './Global.js';
 import * as Client from './client.js';
 import cors from 'cors';
-import bodyParser from 'body-parser';
+import * as Utils from './utils.js';
 
 
 config();

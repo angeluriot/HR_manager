@@ -1,4 +1,4 @@
-import express, { query } from 'express';
+import express from 'express';
 import Global from './Global.js';
 import * as Connection from './users/connection.js';
 import fs from 'fs';
@@ -6,6 +6,7 @@ import * as Request from './models/request.js';
 import * as User from './models/user.js';
 import * as Notification from './models/notification.js';
 import { ObjectId } from 'mongodb'
+import * as Utils from './utils.js';
 
 export function requests()
 {
@@ -44,6 +45,28 @@ export function requests()
 		}
 
 		res.send(JSON.stringify(connection_data));
+	});
+
+	Global.app.get('/update-info', async (req: express.Request, res: express.Response) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let notifications = await Notification.getAll({owner: email}) ?? [];
+
+		res.send(JSON.stringify({
+			days_left: await Utils.get_days_left(email),
+			rtt_left: 0,
+			nb_notifications: notifications.length
+		}));
 	});
 
 	Global.app.get('/photo', async (req: express.Request, res: express.Response) =>
@@ -143,20 +166,22 @@ export function requests()
 		let manager = await User.get({ email: author?.manager }); // get the manager of the author
 
 		// Notification to manager of the request
-		if (manager !== null && author !== null) {
-			let notification : Notification.NotificationData;
-			notification = {
+		if (manager !== null && author !== null)
+		{
+			let notification: Notification.NotificationData = {
+				id: "",
 				owner : {
 					email: manager.email,
 					first_name: manager.first_name,
 					last_name: manager.last_name,
 					department: manager.department
 				},
-				request: request._id.toString(),
-				text: "Demande de " + author.first_name + " " + author.last_name
+				request: await Request.get_data(request),
+				text: "Nouvelle demande de " + author.first_name + " " + author.last_name + " (" + author.department + ")"
 			}
-			var notif = await Notification.add(notification);
-		}	
+
+			await Notification.add(notification);
+		}
 
 		console.log(`Request sent by ${request.author} with id: ${request.id}`);
 		res.send({ message: "Request sent" });
@@ -177,70 +202,70 @@ export function requests()
 
 		let request = await Request.get({_id: req.query.id});
 
-		if (!request) {
+		if (!request)
+		{
 			res.status(400).send("Request not found");
 			return;
 		}
 
-		//get the current user, and the user we are validating the request
+		// Get the current user, and the user we are validating the request
 		let current_user = await User.get({email: email});
-		let user = await User.get({email: request?.author});
+		let user = await User.get({email: request.author});
 
-		//Check if current user is the manager of the person or from Human Ressources
-		if ( user?.manager !== email && current_user?.department!== "HR") 
+		// Check if current user is the manager of the person or from Human Ressources
+		if (!user || user.manager !== email && current_user?.department !== "RH")
 		{
 			res.status(400).send("Invalid token");
 			return;
-		}	
+		}
 
-		let notif_text : string = "";
 		try
 		{
-			//manager validation
-			if(user?.manager == email)
+			// Manager validation
+			if(user.manager == email)
 			{
 				request.manager = email;
-				if (req.body.accept) {
-					request.state="En attente";
-					notif_text = "Validée par manager : " + email;
+
+				if (req.body.accept)
+				{
+					request.state = "En attente";
 
 					// Notification to all HR to validate
-					let HRs = await User.getAll({ department: "HR" });
-					if (HRs !== null) {
-						HRs.forEach(async (hr) => {
-							if (request !== null) {
-								let notification : Notification.NotificationData;
-								notification = {
+					let HRs = await User.getAll({ department: "RH" });
+
+					if (HRs !== null)
+						for (let hr of HRs)
+							if (request !== null)
+							{
+								let notification: Notification.NotificationData = {
+									id: "",
 									owner : {
 										email: hr.email,
 										first_name: hr.first_name,
 										last_name: hr.last_name,
 										department: hr.department
 									},
-									request: request._id.toString(),
-									text: "Demande de " + user?.first_name + " " + user?.last_name
+									request: await Request.get_data(request),
+									text: "Nouvelle demande de " + user.first_name + " " + user.last_name + " (" + user.department + ")"
 								}
-								var notif = await Notification.add(notification);
+
+								await Notification.add(notification);
 							}
-						});
-					}
-				} 
-				else {
-					request.state="Refusée";
-					notif_text = "Refusée par manager : " + email;
 				}
+
+				else
+					request.state = "Refusée";
 			}
-			//HR validation
-			else if(current_user?.department == "HR")
+
+			// HR validation
+			else if (current_user?.department == "RH")
 			{
 				request.hr = email;
-				if (req.body.accept) {
-					request.state="Validée";
-					notif_text = "Validée par RH : " + email;
-				} else {
-					request.state="Refusée";
-					notif_text = "Refusée par RH : " + email;
-				}
+
+				if (req.body.accept)
+					request.state = "Validée";
+				else
+					request.state = "Refusée";
 			}
 
 			request.save();
@@ -250,25 +275,27 @@ export function requests()
 		{
 			res.status(400).send(error.message);
 			return;
-		}	
-		
+		}
+
 		// Notification to author of the request
-		if (user !== null) {
-			let notification : Notification.NotificationData;
-			notification = {
-				owner : {
+		if (user !== null && request.state !== "En attente")
+		{
+			let notification: Notification.NotificationData = {
+				id: "",
+				owner: {
 					email: user.email,
 					first_name: user.first_name,
 					last_name: user.last_name,
 					department: user.department
 				},
-				request: request._id.toString(),
-				text: notif_text
+				request: await Request.get_data(request),
+				text: request.state == "Validée" ? "Votre demande a été acceptée !" : "Votre demande a été refusée"
 			}
-			var notif = await Notification.add(notification);
-		}	
 
-		console.log(`Request answered by ${email} with id: ${request?.id}`);
+			await Notification.add(notification);
+		}
+
+		console.log(`Request answered by ${email} with id: ${request.id}`);
 		res.send({ message: "Request answered" });
 	});
 
@@ -357,7 +384,7 @@ export function requests()
 		let requests: Request.RequestInterface[];
 
 		//HR sees all the sent requests exept draws and refused
-		if(current_user?.department == "HR")
+		if(current_user?.department == "RH")
 		{
 			requests = await Request.getAll({ state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
 		}
@@ -381,7 +408,7 @@ export function requests()
 			let formatted_start = new Date(start.split("/").reverse().join("-"));
 			let formatted_end = new Date(end.split("/").reverse().join("-"));
 
-			if (typeof req.query.start === "string" && typeof req.query.end === "string" ) 
+			if (typeof req.query.start === "string" && typeof req.query.end === "string" )
 			{
 				let calendar_start = new Date(req.query.start);
 				let calendar_end = new Date(req.query.end);
@@ -391,9 +418,9 @@ export function requests()
 					requests_data.push(await Request.get_data(request));
 				}
 			}
-		}		
+		}
 		res.send(JSON.stringify(requests_data));
-	});	
+	});
 
 	Global.app.get('/request-id', async (req, res) =>
 	{
@@ -435,5 +462,31 @@ export function requests()
 			notifications_data.push(await Notification.get_data(notif));
 
 		res.send(JSON.stringify(notifications_data));
+	});
+
+	Global.app.post('/delete-notification', async (req, res) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let notification = await Notification.get({_id: req.query.id});
+
+		if	(notification?.owner !== email)
+		{
+			res.status(400).send("You can't delete this notification");
+			return;
+		}
+
+		notification.delete();
+
+		res.send(JSON.stringify({ message: "Notification deleted" }));
 	});
 }

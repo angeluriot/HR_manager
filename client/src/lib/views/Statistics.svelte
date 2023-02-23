@@ -19,6 +19,12 @@
 			await Server.auto_login();
 			restart();
 		}
+
+		else
+		{
+			await Server.update_info();
+			restart();
+		}
 	});
 
 	let points: any = [

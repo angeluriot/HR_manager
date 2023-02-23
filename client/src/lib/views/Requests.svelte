@@ -23,10 +23,16 @@
 			restart();
 		}
 
+		else
+		{
+			await Server.update_info();
+			restart();
+		}
+
 		try
 		{
 			user_requests = await Server.get('user-requests');
-			validation_requests = Global.user.department == "HR" ? await Server.get('HR-requests') : await Server.get('manager-requests');			
+			validation_requests = Global.user.department == "RH" ? await Server.get('HR-requests') : await Server.get('manager-requests');
 		}
 
 		catch(err)
@@ -41,12 +47,12 @@
 	<div class="main flex flex-row justify-evenly items-end w-full h-full pl-10 pr-10">
 		<div class="flex flex-col justify-start w-full">
 			<h1 class="mb-8">Demandes personnelles</h1>
-			<a href="#/requests/new" class="custom-margin"><button class="bg-[#007AFF] cursor-pointer rounded-xl text-white" on:click={() => console.log("23/06/1999" > "15/07/2014")}>
+			<a href="#/requests/new" class="custom-margin"><button class="bg-[#007AFF] cursor-pointer rounded-xl text-white">
 				Nouvelle demande
 			</button></a>
 			<div class="list">
 				{#each user_requests as user_request}
-					<RequestCard data={user_request} user={true} action="Consulter"/>
+					<RequestCard data={user_request} user={true} place="requests"/>
 				{/each}
 			</div>
 		</div>
@@ -58,7 +64,7 @@
 			</button>
 			<div class="list">
 				{#each validation_requests as validation_request}
-					<RequestCard data={validation_request} user={false} action="Consulter"/>
+					<RequestCard data={validation_request} user={false} place="requests"/>
 				{/each}
 			</div>
 		</div>
