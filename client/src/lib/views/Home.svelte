@@ -694,7 +694,9 @@
 
 {#key unique}
 	<Menu active="Accueil"/>
-	<div class="main flex flex-row gap-20 justify-center items-start w-full h-full pt-[70px]">
+{/key}
+<div class="main flex flex-row gap-20 justify-center items-start w-full h-full pt-[70px]">
+	{#key unique}
 		<div class="gap-10 flex flex-col justify-center items-center">
 			<div class="calendar_header flex flex-row justify-between items-center w-full">
 				<div class="flex flex-row justify-center items-center gap-3">
@@ -713,35 +715,37 @@
 			</div>
 			<Calendar {update_card} {public_holidays} {days} {absences} {is_month_mode}/>
 		</div>
-		<div class="gap-10 flex flex-col justify-center items-start w-[450px] mt-2">
-			<a href="#/requests/new" class="new-request"><button class="bg-[#007AFF] cursor-pointer rounded-xl text-white">
-				Nouvelle demande
-			</button></a>
-			<div class="filters relative">
-				<div class="overflow-auto w-full h-full flex flex-col justify-start items-start px-5 gap-2">
-					<div class="mt-4"></div>
-					{#each state_filters as filter}
-						<div class="flex flex-row gap-2">
-							<input type="checkbox" bind:checked={filter.checked} on:change={update_calendar}/>
-							<span>{filter.name}</span>
-						</div>
-					{/each}
-					{#each department_filters as filter}
-						<div class="flex flex-row gap-2">
-							<input type="checkbox" bind:checked={filter.checked} on:change={update_calendar}/>
-							<span>{filter.name}</span>
-						</div>
-					{/each}
-					{#each user_filters as filter}
-						<div class="flex flex-row gap-2">
-							<input type="checkbox" bind:checked={filter.checked} on:change={update_calendar}/>
-							<span>{filter.name}</span>
-						</div>
-					{/each}
-					<div class="mb-4"></div>
-				</div>
-				<h2 class="absolute">Filtres</h2>
+	{/key}
+	<div class="gap-10 flex flex-col justify-center items-start w-[450px] mt-2">
+		<a href="#/requests/new" class="new-request"><button class="bg-[#007AFF] cursor-pointer rounded-xl text-white">
+			Nouvelle demande
+		</button></a>
+		<div class="filters relative">
+			<div class="overflow-auto w-full h-full flex flex-col justify-start items-start px-5 gap-2">
+				<div class="mt-4"></div>
+				{#each state_filters as filter}
+					<div class="flex flex-row gap-2">
+						<input type="checkbox" bind:checked={filter.checked} on:change={update_calendar}/>
+						<span>{filter.name}</span>
+					</div>
+				{/each}
+				{#each department_filters as filter}
+					<div class="flex flex-row gap-2">
+						<input type="checkbox" bind:checked={filter.checked} on:change={update_calendar}/>
+						<span>{filter.name}</span>
+					</div>
+				{/each}
+				{#each user_filters as filter}
+					<div class="flex flex-row gap-2">
+						<input type="checkbox" bind:checked={filter.checked} on:change={update_calendar}/>
+						<span>{filter.name}</span>
+					</div>
+				{/each}
+				<div class="mb-4"></div>
 			</div>
+			<h2 class="absolute">Filtres</h2>
+		</div>
+		{#key unique}
 			{#if Global.displayed != null}
 				<div class="max-w-[450px] w-full">
 					<RequestCard data={Global.displayed} user={false} place="home" on:validation={update_calendar}/>
@@ -765,12 +769,11 @@
 					<span>Demande en attente<br>
 				</div>
 			</div>
-		</div>
+		{/key}
 	</div>
-{/key}
+</div>
 
 <style>
-
 	.main
 	{
 		overflow-y: scroll;
@@ -879,6 +882,12 @@
 		height: 165px;
 		border: 2px solid #b6b9c4;
 		border-radius: 15px;
+		user-select: none;
+	}
+
+	.filters *
+	{
+		user-select: none;
 	}
 
 	.filters h2

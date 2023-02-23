@@ -8,6 +8,6 @@ export default class Global
 	static days_left = 0;
 	static nb_notifications = 0;
 	static request_pending = false;
-	static index = "-1";
 	static displayed: Types.RequestData | null = null;
+	static edit: Types.RequestData | null = null;
 }

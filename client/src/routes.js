@@ -13,6 +13,7 @@ export const routes = {
 	"/statistics": Statistics,
 	"/requests": Requests,
 	"/requests/new": NewRequest,
+	"/requests/edit": NewRequest,
 	"/notifications": Notifications,
 	"/account": Account,
 	"/settings": Settings,
