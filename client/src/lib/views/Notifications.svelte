@@ -7,11 +7,17 @@
 	import NotificationCard from "../components/NotificationCard.svelte";
 
 	let unique = {};
+	let menu_unique = {};
 	let user_notifications: NotificationData[] = [];
 
 	function restart()
 	{
 		unique = {}
+	}
+
+	function restart_menu()
+	{
+		menu_unique = {}
 	}
 
 	onMount(async () =>
@@ -42,12 +48,14 @@
 </script>
 
 {#key unique}
-	<Menu active="Notifications"/>
+	{#key menu_unique}
+		<Menu active="Notifications"/>
+	{/key}
 	<div class="main gap-10 w-full h-full">
 		<h1 class="mt-20">Notifications</h1>
 		<div class="list">
 			{#each user_notifications as notif}
-				<NotificationCard data={notif} />
+				<NotificationCard data={notif} on:notification_delete={restart_menu}/>
 			{/each}
 		</div>
 	</div>

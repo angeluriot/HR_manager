@@ -74,8 +74,8 @@
 	.conge.selected {
 		z-index: 3;
 		border: solid;
-		border-color: #0AD443;
-		background: #00FF47;
+		border-color: #06c63d;
+		background: #12e74f;
 	}
 
 	.maladie {
@@ -85,8 +85,8 @@
 	.maladie.selected {
 		z-index: 3;
 		border: solid;
-		border-color: #F62942;
-		background: #FF7787;
+		border-color: #ec1931;
+		background: #ff5454;
 	}
 
 	.physique {
@@ -96,8 +96,8 @@
 	.physique.selected {
 		z-index: 3;
 		border: solid;
-		border-color: #1640D4;
-		background: #6688FF;
+		border-color: #1032cb;
+		background: #1e61e9;
 	}
 
 	.en_cours {
@@ -108,7 +108,7 @@
 		z-index: 3;
 		border: solid;
 		border-color: #AEB4C3;
-		background: #C6CDDD;
+		background: #c3c9da;
 	}
 
 	.absence_title {

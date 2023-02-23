@@ -559,7 +559,7 @@
 		if (absence.state == "Validée" && !state_filters[0].checked)
 			return true;
 
-		if (absence.state == "En attente" && !state_filters[2].checked)
+		if (absence.state == "En attente" && !state_filters[1].checked)
 			return true;
 
 		for (let user_filter of user_filters)
@@ -709,7 +709,9 @@
 					<span>{Global.days_left}</span>
 				</div>
 			</div>
-			<Calendar {update_card} {public_holidays} {days} {absences} {is_month_mode}/>
+			<div class="cal overflow-hidden p-[1px]">
+				<Calendar {update_card} {public_holidays} {days} {absences} {is_month_mode}/>
+			</div>
 		</div>
 	{/key}
 	<div class="gap-10 flex flex-col justify-center items-start w-[450px] mt-2">
@@ -780,6 +782,11 @@
 	.main::-webkit-scrollbar
 	{
 		display: none;
+	}
+
+	.cal
+	{
+		border-radius: 12px 12px 0px 0px;
 	}
 
 	.calendar_header

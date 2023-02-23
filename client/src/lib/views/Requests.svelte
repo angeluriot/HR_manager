@@ -59,8 +59,8 @@
 		<div class="vl"></div>
 		<div class="flex flex-col justify-start w-full">
 			<h1 class="mb-8">Demandes à valider</h1>
-			<button disabled class="bg-[#ADB1CC] rounded-xl text-white custom-margin">
-				*filtres*
+			<button disabled class="bg-[#e2e2eb] rounded-xl text-white custom-margin">
+				filtres (soon)
 			</button>
 			<div class="list">
 				{#each validation_requests as validation_request}

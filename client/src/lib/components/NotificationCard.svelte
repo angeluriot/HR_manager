@@ -3,9 +3,12 @@
 	import type { NotificationData } from "../shared/types.js";
 	import * as Server from "../shared/server.js";
 	import Global from "../shared/Global.js";
+	import { createEventDispatcher } from 'svelte';
 
 	export let data: NotificationData;
 	let shown = true;
+
+	const dispatch = createEventDispatcher();
 
 	async function delete_notification()
 	{
@@ -14,6 +17,7 @@
 			await Server.post('delete-notification', { id: data.id }, {});
 			shown = false;
 			Global.nb_notifications--;
+			dispatch('notification_delete');
 		}
 
 		catch(err)
