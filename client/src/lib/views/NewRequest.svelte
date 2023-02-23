@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from "svelte";
+	import { onMount, onDestroy } from "svelte";
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
@@ -31,15 +31,20 @@
 		update_days();
 	});
 
+	onDestroy(() =>
+	{
+		Global.edit = null;
+	});
+
 	const types = ["Télétravail", "Congé payé", "Congé exceptionnel", "Congé sans solde", "RTT", "Formation", "Visite extérieure", "Arrêt maladie", "Arrêt de travail", "Accident du travail"];
 
 	// Request data
-	let request_type = types[0];
+	let request_type = Global.edit ? Global.edit.type : types[0];
 	let request_state = "Brouillon";
-	let request_start_date = (new Date()).toISOString().substring(0, 10);
-	let request_start_pm = false;
-	let request_end_date = (new Date()).toISOString().substring(0, 10);
-	let request_end_pm = true;
+	let request_start_date = Global.edit ? Utils.string_to_date(Global.edit.start.day).toISOString().substring(0, 10) : (new Date()).toISOString().substring(0, 10);
+	let request_start_pm = Global.edit ? Global.edit.start.pm : false;
+	let request_end_date = Global.edit ? Utils.string_to_date(Global.edit.end.day).toISOString().substring(0, 10) : (new Date()).toISOString().substring(0, 10);
+	let request_end_pm = Global.edit ? Global.edit.end.pm : true;
 
 	let request_remote = [
 		{ day: "Lundi",		am: false, pm: false },
@@ -51,23 +56,35 @@
 		{ day: "Dimanche",	am: false, pm: false }
 	];
 
-	let request_subject = "";
-	let request_place = "";
-	let request_proof = "";
-	let request_cause = "";
-	let request_comment = "";
+	if (Global.edit)
+		for (let i = 0; i < request_remote.length; i++)
+		{
+			let day = Global.edit.remote.find(day => day.day == request_remote[i].day);
+
+			if (day)
+			{
+				request_remote[i].am = day.am;
+				request_remote[i].pm = day.pm;
+			}
+		}
+
+	let request_subject = Global.edit ? Global.edit.subject : "";
+	let request_place = Global.edit ? Global.edit.place : "";
+	let request_proof = Global.edit ? Global.edit.proof : "";
+	let request_cause = Global.edit ? Global.edit.cause : "";
+	let request_comment = Global.edit ? Global.edit.comment : "";
 
 	let requested_days = 1;
 	let remaining_days = 1;
 	let requested_rtt = 1;
 	let remaining_rtt = 1;
 	let upload: HTMLInputElement;
-	let repeat = false;
+	let repeat = Global.edit ? Global.edit.remote.length > 0 : false;
 
 	async function send_request(action: string)
 	{
 		let request: RequestData = {
-			id: "",
+			id: Global.edit ? Global.edit.id : "",
 			type: request_type,
 			author: { email: Global.user.email, first_name: Global.user.first_name, last_name: Global.user.last_name, department: Global.user.department },
 			state: action == "save" ? "Brouillon" : "En attente",

@@ -2,6 +2,7 @@
 	import Edit from "../../assets/shapes/Edit.svg"
 	import Yes from "../../assets/shapes/Yes.svg"
 	import No from "../../assets/shapes/No.svg"
+	import Delete from "../../assets/shapes/Delete.svg"
 	import Global from "../shared/Global"
 	import * as Server from "../shared/server"
 	import type { RequestData } from "../shared/types.js";
@@ -10,6 +11,7 @@
 	export let data: RequestData;
 	export let user: boolean;
 	export let place: string;
+	let shown = true;
 
 	const dispatch = createEventDispatcher();
 
@@ -33,12 +35,12 @@
 				{
 					data.state = "Validée";
 					data.hr = {email: Global.user.email, first_name: Global.user.first_name, last_name: Global.user.last_name};
-				}					
+				}
+
 				else
 				{
 					data.manager = {email: Global.user.email, first_name: Global.user.first_name, last_name: Global.user.last_name};;
 				}
-					
 			}
 
 			catch (err)
@@ -94,10 +96,24 @@
 		}
 	}
 
+	function delete_request()
+	{
+		try
+		{
+			Server.post('delete-request', { id: data.id }, {});
+			shown = false;
+		}
+
+		catch (err)
+		{
+			console.error(err)
+		}
+	}
+
 	update_color();
 </script>
 
-<div id="card" class="flex flex-col justify-start items-start w-full rounded-3xl p-5 gap-2 relative {place}">
+<div id="card" class="flex flex-col justify-start items-start w-full rounded-3xl p-5 gap-2 relative {place} {shown ? "" : "hidden"}">
 	<header class="flex flex-row w-full justify-between mb-2">
 		<h2>{data.type}</h2>
 		<div id="state" class="rounded-full" style="--color: {state_color};">{data.state}</div>
@@ -174,20 +190,33 @@
 	</div>
 	<div class="flex flex-row gap-3 justify-end w-full mt-2">
 		{#if place == "requests"}
-			<a href="#/" class="button-a">
-				<button class="flex flex-row justify-center items-center gap-2 bg-[#007AFF] hover:bg-[#0062CC]" on:click={ () => Global.displayed = data }>
-					<img src={Edit} alt="edit"/>
-					<span>Consulter</span>
+			{#if data.author.email == Global.user.email && data.state == "Brouillon"}
+				<a href="#/requests/edit" class="button-a">
+					<button class="flex flex-row justify-center items-center gap-2 bg-[#007AFF] hover:bg-[#0062CC]" on:click={ () => Global.edit = data }>
+						<img src={Edit} alt="edit"/>
+						<span>Modifier</span>
+					</button>
+				</a>
+				<button class="flex flex-row justify-center items-center gap-2 bg-[#F62942] hover:bg-[#c71f28]" on:click={delete_request}>
+					<img src={Delete} alt="delete"/>
+					<span>Supprimer</span>
 				</button>
-			</a>
+			{:else}
+				<a href="#/" class="button-a">
+					<button class="flex flex-row justify-center items-center gap-2 bg-[#007AFF] hover:bg-[#0062CC]" on:click={ () => Global.displayed = data }>
+						<img src={Edit} alt="look"/>
+						<span>Consulter</span>
+					</button>
+				</a>
+			{/if}
 		{/if}
 		{#if show_validation_buttons}
 			<button class="flex flex-row justify-center items-center gap-2 bg-[#19C97F] hover:bg-[#0CA86F]" on:click={ () => validation("Accept") }>
-				<img src={Yes} alt="edit"/>
+				<img src={Yes} alt="accept"/>
 				<span>Accepter</span>
 			</button>
 			<button class="flex flex-row justify-center items-center gap-2 bg-[#F62942] hover:bg-[#c71f28]" on:click={ () => validation("Refuse") }>
-				<img src={No} alt="edit"/>
+				<img src={No} alt="refuse"/>
 				<span>Refuser</span>
 			</button>
 		{/if}

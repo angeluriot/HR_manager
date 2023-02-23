@@ -179,3 +179,28 @@ export async function add(data: RequestData): Promise<RequestInterface>
 	//@ts-ignore
 	return await request.save();
 }
+
+export async function edit(data: RequestData): Promise<RequestInterface>
+{
+	let request = await Request.findById(data.id);
+
+	if (!request)
+		throw new Error("Request not found");
+
+	request.type = data.type;
+	request.author = data.author.email;
+	request.state = data.state;
+	request.manager = data.manager ? data.manager.email : "";
+	request.hr = data.hr ? data.hr.email : "";
+	request.start = data.start;
+	request.end = data.end;
+	request.remote = data.remote;
+	request.subject = data.subject;
+	request.place = data.place;
+	request.proof = data.proof;
+	request.cause = data.cause;
+	request.comment = data.comment;
+
+	//@ts-ignore
+	return await request.save();
+}

@@ -115,19 +115,39 @@ export function requests()
 			return;
 		}
 
-		try
+		if (request_data.id)
 		{
-			var request = await Request.add(req.body);
+			try
+			{
+				var request = await Request.edit(req.body);
+			}
+
+			catch (error: any)
+			{
+				res.status(400).send(error.message);
+				return;
+			}
+
+			console.log(`Request ${request.id} saved by ${request.author}`);
+			res.send({ message: "Request saved" });
 		}
 
-		catch (error: any)
+		else
 		{
-			res.status(400).send(error.message);
-			return;
-		}
+			try
+			{
+				var request = await Request.add(req.body);
+			}
 
-		console.log(`Request saved by ${request.author} with id: ${request.id}`);
-		res.send({ message: "Request saved" });
+			catch (error: any)
+			{
+				res.status(400).send(error.message);
+				return;
+			}
+
+			console.log(`Request saved by ${request.author} with id: ${request.id}`);
+			res.send({ message: "Request saved" });
+		}
 	});
 
 	Global.app.post('/send-request', async (req: express.Request, res: express.Response) =>
@@ -151,15 +171,32 @@ export function requests()
 			return;
 		}
 
-		try
+		if (request_data.id)
 		{
-			var request = await Request.add(req.body);
+			try
+			{
+				var request = await Request.edit(req.body);
+			}
+
+			catch (error: any)
+			{
+				res.status(400).send(error.message);
+				return;
+			}
 		}
 
-		catch (error: any)
+		else
 		{
-			res.status(400).send(error.message);
-			return;
+			try
+			{
+				var request = await Request.add(req.body);
+			}
+
+			catch (error: any)
+			{
+				res.status(400).send(error.message);
+				return;
+			}
 		}
 
 		let author = await User.get({ email: email }); // get the author of the request
@@ -384,18 +421,18 @@ export function requests()
 		let requests: Request.RequestInterface[];
 
 		//HR sees all the sent requests exept draws and refused
-		if(current_user?.department == "RH")
+		if (current_user?.department == "RH")
 		{
-			if(req.query.department !== "")
+			if (req.query.department !== "")
 			{
 				let users = await User.getAll({department: req.query.department}) ?? [];
 				requests = await Request.getAll({ author: { $in: users.map(user => user.email) }, state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
 			}
+
 			else
 			{
 				requests = await Request.getAll({ state: { $nin: ["Brouillon", "Refusée"] } }) ?? [];
 			}
-					
 		}
 		//All my requests and requests of people I manage
 		else
@@ -499,80 +536,106 @@ export function requests()
 		res.send(JSON.stringify({ message: "Notification deleted" }));
 	});
 
+	Global.app.post('/delete-request', async (req, res) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let request = await Request.get({_id: req.query.id});
+
+		if	(request?.author !== email)
+		{
+			res.status(400).send("You can't delete this request");
+			return;
+		}
+
+		request.delete();
+
+		res.send(JSON.stringify({ message: "Request deleted" }));
+	});
+
 	Global.app.get('/work-accident-requests', async (req, res) =>
-    {
-        try
-        {
-            var email = Connection.verify_token(req.query.token);
-        }
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
 
-        catch (error: any)
-        {
-            res.status(400).send(error.message);
-            return;
-        }
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
 
-        let requests = await Request.getAll({type : "Accident du travail", state : "Validée"}) ?? [];
-        let requests_data = [];
+		let requests = await Request.getAll({type : "Accident du travail", state : "Validée"}) ?? [];
+		let requests_data = [];
 
-        for (let request of requests)
-            requests_data.push(await Request.get_data(request));
+		for (let request of requests)
+			requests_data.push(await Request.get_data(request));
 
-        res.send(JSON.stringify(requests_data));
-    });
+		res.send(JSON.stringify(requests_data));
+	});
 
-    Global.app.get('/sickness-requests', async (req, res) =>
-    {
-        try
-        {
-            var email = Connection.verify_token(req.query.token);
-        }
+	Global.app.get('/sickness-requests', async (req, res) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
 
-        catch (error: any)
-        {
-            res.status(400).send(error.message);
-            return;
-        }
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
 
-        let requests = await Request.getAll({type : "Arrêt maladie", state : "Validée"}) ?? [];
-        let requests_data = [];
+		let requests = await Request.getAll({type : "Arrêt maladie", state : "Validée"}) ?? [];
+		let requests_data = [];
 
-        for (let request of requests)
-            requests_data.push(await Request.get_data(request));
+		for (let request of requests)
+			requests_data.push(await Request.get_data(request));
 
-        res.send(JSON.stringify(requests_data));
-    });
+		res.send(JSON.stringify(requests_data));
+	});
 
-    Global.app.get('/remote-work-requests', async (req, res) =>
-    {
-        try
-        {
-            var email = Connection.verify_token(req.query.token);
-        }
+	Global.app.get('/remote-work-requests', async (req, res) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
 
-        catch (error: any)
-        {
-            res.status(400).send(error.message);
-            return;
-        }
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
 
-        let requests = await Request.getAll({type : "Télétravail", state : "Validée"}) ?? [];
-        let requests_data = [];
+		let requests = await Request.getAll({type : "Télétravail", state : "Validée"}) ?? [];
+		let requests_data = [];
 
-        for (let request of requests)
-            requests_data.push(await Request.get_data(request));
+		for (let request of requests)
+			requests_data.push(await Request.get_data(request));
 
-        res.send(JSON.stringify(requests_data));
-    });
+		res.send(JSON.stringify(requests_data));
+	});
 
-    Global.app.get('/users', async (req, res) =>
-    {
-        let users = await User.getAll({}) ?? [];
-        let users_data = [];
+	Global.app.get('/users', async (req, res) =>
+	{
+		let users = await User.getAll({}) ?? [];
+		let users_data = [];
 
-        for (let user of users)
-            users_data.push(await User.get_data(user));
+		for (let user of users)
+			users_data.push(await User.get_data(user));
 
-        res.send(JSON.stringify(users_data));
-    });
+		res.send(JSON.stringify(users_data));
+	});
 }
