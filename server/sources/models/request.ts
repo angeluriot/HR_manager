@@ -83,7 +83,7 @@ export async function get(filter: any): Promise<RequestInterface | null>
 
 export async function getAll(filter: any): Promise<RequestInterface[] | null>
 {
-	return await Request.find(filter);
+	return await Request.find(filter, null, { sort: { createdAt: -1 } });
 }
 
 export async function remove(filter: any)
