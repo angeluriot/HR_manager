@@ -158,7 +158,7 @@
 		}
 
 		days_in_db = {start: days[0].date, end: days[days.length-1].date};
-		requests = await Server.get('calendar-requests', { start: days_in_db.start, end: days_in_db.end, manager:"" });
+		requests = await Server.get('calendar-requests', { start: days_in_db.start, end: days_in_db.end, department:"" });
 		raw_absences = [];
 
 		for (let request of requests)
