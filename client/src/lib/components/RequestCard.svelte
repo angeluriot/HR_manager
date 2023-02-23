@@ -162,13 +162,22 @@
 		<span class="value">{data.comment == "" ? "(vide)" : data.comment}</span>
 	</div>
 	<div class="flex flex-row gap-3 justify-end w-full mt-2">
-		{#if place == "requests"}
-			<a href="#/" class="button-a">
+		{#if place == "requests"}			
+			<a href="{data.state === "Brouillon" && data.author.email === Global.user.email ? "#/requests/new" : "#/" }" class="button-a">
 				<button class="flex flex-row justify-center items-center gap-2 bg-[#007AFF] hover:bg-[#0062CC]" on:click={ () => Global.displayed = data }>
 					<img src={Edit} alt="edit"/>
 					<span>Consulter</span>
 				</button>
 			</a>
+			<!-- {#if data.state == "Brouillon"}
+			{:else}
+				<a href="#/requests/new" class="button-a">
+					<button class="flex flex-row justify-center items-center gap-2 bg-[#007AFF] hover:bg-[#0062CC]" on:click={ () => Global.displayed = data }>
+						<img src={Edit} alt="edit"/>
+						<span>Consulter</span>
+					</button>
+				</a>
+			{/if} -->
 		{/if}
 		{#if show_validation_buttons}
 			<button class="flex flex-row justify-center items-center gap-2 bg-[#19C97F] hover:bg-[#0CA86F]" on:click={ () => validation("Accept") }>

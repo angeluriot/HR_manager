@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+	import { onDestroy } from "svelte";
 	import Global from "../shared/Global.js";
 	import Menu from '../components/menu/Menu.svelte';
 	import * as Server from "../shared/server.js";
@@ -31,6 +32,8 @@
 		update_days();
 	});
 
+	// onDestroy(() => Global.displayed = null);
+
 	const types = ["Télétravail", "Congé payé", "Congé exceptionnel", "Congé sans solde", "RTT", "Formation", "Visite extérieure", "Arrêt maladie", "Arrêt de travail", "Accident du travail"];
 
 	// Request data
@@ -57,6 +60,20 @@
 	let request_cause = "";
 	let request_comment = "";
 
+	if(Global.displayed !== null && Global.displayed.author.email === Global.user.email){
+		request_type = Global.displayed.type;
+		request_state = Global.displayed.state;
+		//request_start_date = Global.displayed.end.day;
+    	request_start_pm = Global.displayed.start.pm;
+		//request_end_date = Global.displayed.end.day;
+		request_end_pm = Global.displayed.end.pm;
+		request_subject = Global.displayed.subject;
+		request_place = Global.displayed.place;
+		request_proof = Global.displayed.proof;
+		request_cause = Global.displayed.cause;
+		request_comment = Global.displayed.comment;
+	}
+
 	let requested_days = 1;
 	let remaining_days = 1;
 	let requested_rtt = 1;
@@ -82,9 +99,17 @@
 			cause: request_cause,
 			comment: request_comment
 		};
-
-		await Server.post(action + '-request', '', request);
-		window.location.href = "#/requests";
+		
+		if(Global.displayed !== null && Global.displayed.author.email === Global.user.email)
+		{
+			await Server.post('update-draw', {update: "update"}, {to_add: request, to_remove: Global.displayed.id});
+			window.location.href = "#/requests";
+		}
+		else
+		{
+			await Server.post(action + '-request', '', request);
+			window.location.href = "#/requests";
+		}
 	}
 
 	function update_days()
@@ -316,7 +341,7 @@
 		{/if}
 
 		<div class="buttons flex flex-row gap-20 mt-5">
-			<button class="bg-[#9092A6] hover:bg-[#77788a]" on:click={() => { window.location.href = "#/requests"; }}>ANNULER</button>
+			<button class="bg-[#9092A6] hover:bg-[#77788a]" on:click={async () => { await Server.post('update-draw', {update: "delete"}, {to_add: '', to_remove: Global.displayed.id});window.location.href = "#/requests"; }}>ANNULER</button>
 			{#if request_type == "RTT"}
 				<button class="bg-[#1DCF5A] hover:bg-[#1cb75c] {remaining_rtt < 0 || requested_rtt <= 0 ? "invalid" : ""}" on:click={() => send_request("save")}>ENREGISTRER</button>
 				<button class="bg-[#007AFF] hover:bg-[#1a6bdc] {remaining_rtt < 0 || requested_rtt <= 0 ? "invalid" : ""}" on:click={() => send_request("send")}>SOUMETTRE</button>

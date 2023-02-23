@@ -187,6 +187,69 @@ export function requests()
 		res.send({ message: "Request sent" });
 	});
 
+	Global.app.post('/update-draw', async (req: express.Request, res: express.Response) =>
+	{
+		try
+		{
+			var email = Connection.verify_token(req.query.token);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let request_data = req.body;
+
+		if(req.query.update === "delete"){
+			await Request.remove({_id: request_data.to_remove});
+			return;
+		}
+
+		if (request_data.author.email !== email)
+		{
+			res.status(400).send("Invalid token");
+			return;
+		}
+
+		try
+		{
+			await Request.remove({_id: request_data.to_remove});
+			var request = await Request.add(request_data.to_add);
+		}
+
+		catch (error: any)
+		{
+			res.status(400).send(error.message);
+			return;
+		}
+
+		let author = await User.get({ email: email }); // get the author of the request
+		let manager = await User.get({ email: author?.manager }); // get the manager of the author
+
+		// Notification to manager of the request
+		if (manager !== null && author !== null)
+		{
+			let notification: Notification.NotificationData = {
+				id: "",
+				owner : {
+					email: manager.email,
+					first_name: manager.first_name,
+					last_name: manager.last_name,
+					department: manager.department
+				},
+				request: await Request.get_data(request),
+				text: "Nouvelle demande de " + author.first_name + " " + author.last_name + " (" + author.department + ")"
+			}
+
+			await Notification.add(notification);
+		}
+
+		console.log(`Request sent by ${request.author} with id: ${request.id}`);
+		res.send({ message: "Request sent" });
+	});
+
 	Global.app.post('/accept-request', async (req: express.Request, res: express.Response) =>
 	{
 		try
