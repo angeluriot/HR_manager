@@ -489,4 +489,81 @@ export function requests()
 
 		res.send(JSON.stringify({ message: "Notification deleted" }));
 	});
+
+	Global.app.get('/work-accident-requests', async (req, res) =>
+    {
+        try
+        {
+            var email = Connection.verify_token(req.query.token);
+        }
+
+        catch (error: any)
+        {
+            res.status(400).send(error.message);
+            return;
+        }
+
+        let requests = await Request.getAll({type : "Accident du travail", state : "Validée"}) ?? [];
+        let requests_data = [];
+
+        for (let request of requests)
+            requests_data.push(await Request.get_data(request));
+
+        res.send(JSON.stringify(requests_data));
+    });
+
+    Global.app.get('/sickness-requests', async (req, res) =>
+    {
+        try
+        {
+            var email = Connection.verify_token(req.query.token);
+        }
+
+        catch (error: any)
+        {
+            res.status(400).send(error.message);
+            return;
+        }
+
+        let requests = await Request.getAll({type : "Arrêt maladie", state : "Validée"}) ?? [];
+        let requests_data = [];
+
+        for (let request of requests)
+            requests_data.push(await Request.get_data(request));
+
+        res.send(JSON.stringify(requests_data));
+    });
+
+    Global.app.get('/remote-work-requests', async (req, res) =>
+    {
+        try
+        {
+            var email = Connection.verify_token(req.query.token);
+        }
+
+        catch (error: any)
+        {
+            res.status(400).send(error.message);
+            return;
+        }
+
+        let requests = await Request.getAll({type : "Télétravail", state : "Validée"}) ?? [];
+        let requests_data = [];
+
+        for (let request of requests)
+            requests_data.push(await Request.get_data(request));
+
+        res.send(JSON.stringify(requests_data));
+    });
+
+    Global.app.get('/users', async (req, res) =>
+    {
+        let users = await User.getAll({}) ?? [];
+        let users_data = [];
+
+        for (let user of users)
+            users_data.push(await User.get_data(user));
+
+        res.send(JSON.stringify(users_data));
+    });
 }
